@@ -196,7 +196,38 @@ Der Canvas ist DPR-skaliert: `canvas.width = cssWidth * min(devicePixelRatio, 2)
 die Transform wird einmal beim Resize gesetzt. Dargestellt wird auf höchstens
 1276 CSS-px Breite, also 1:1 zur Quelle statt hochskaliert.
 
-### 6.3 Textwechsel
+### 6.3 Rückwärtsscrollen
+
+Die Animation läuft in beide Richtungen gleichwertig. Scrollt der Besucher
+zurück, fügt sich die Maschine wieder zusammen — in derselben Geschwindigkeit und
+Glätte wie beim Zerfallen. Das ergibt sich aus der Konstruktion: Der Frame-Index
+ist eine reine Funktion der Scrollposition, keine fortschreitende Abspielung.
+Es gibt keinen Zustand, der sich merkt, dass die Animation „schon gelaufen" ist.
+
+Drei Stellen, an denen eine naheliegende Umsetzung das zerstören würde. Sie sind
+verbindlich:
+
+1. **Kein einmaliges Auslösen.** Weder Frame-Zeichnung noch Textwechsel dürfen an
+   ein „hat Schwelle überschritten"-Flag gebunden werden. Alles leitet sich in
+   jedem Frame neu aus `eased` ab. Kein `hasPlayed`, kein `triggered`.
+2. **Der Textwechsel ist richtungsunabhängig.** Die Deckkraft ergibt sich ohnehin
+   stetig aus `--p` und kehrt damit von selbst um. Das `data-phase`-Attribut, das
+   `visibility`, `pointer-events` und `aria-hidden` steuert, schaltet mit einem
+   toten Band: auf `"b"` ab `eased > 0.55`, zurück auf `"a"` unter `eased < 0.45`.
+   Das Band verhindert Flackern bei kleinen Scrollbewegungen genau auf der
+   Schwelle, ohne eine Vorzugsrichtung einzuführen.
+3. **Beim Betreten wird nicht bei null begonnen.** Kehrt der Besucher von unten in
+   die Bühne zurück, oder lädt er die Seite mit wiederhergestellter
+   Scrollposition mitten in der Strecke neu, wird `eased` beim Start des Loops
+   auf den aktuell gemessenen `raw`-Wert gesetzt, nicht auf 0. Sonst würde die
+   Animation sichtbar von Frame 0 an die richtige Position heranfahren.
+
+Alle 145 Frames sind vorgeladen, sobald das Scrubbing aktiv ist. Rückwärts kostet
+deshalb keinen einzigen zusätzlichen Request und läuft exakt so flüssig wie
+vorwärts. Der `IntersectionObserver` startet den rAF-Loop beim Wiedereintritt von
+unten genauso wie beim ersten Eintritt von oben.
+
+### 6.4 Textwechsel
 
 Derselbe rAF-Loop schreibt `--p: <eased>` als Custom Property auf die Bühne. Die
 Property wird per `@property --p { syntax: "<number>"; inherits: true; initial-value: 0 }`
@@ -208,10 +239,11 @@ Die Deckkraft beider Textblöcke leitet sich daraus ab:
 
 Für `visibility` und `pointer-events` setzt der Loop zusätzlich
 `data-phase="a" | "b"` auf die Bühne, aber nur beim tatsächlichen Wechsel — also
-zweimal pro Durchgang statt 145-mal. Beide Blöcke bleiben im DOM; der jeweils
-inaktive erhält `aria-hidden="true"`, damit Screenreader nicht doppelt vorlesen.
+zweimal pro Durchgang statt 145-mal. Die Schaltschwellen mit totem Band stehen in
+6.3. Beide Blöcke bleiben im DOM; der jeweils inaktive erhält
+`aria-hidden="true"`, damit Screenreader nicht doppelt vorlesen.
 
-### 6.4 Frames laden
+### 6.5 Frames laden
 
 145 WebP werden als `Image` erzeugt, mit `decoding="async"` und `await img.decode()`
 in Blöcken zu sechs parallel. Der Start erfolgt in `requestIdleCallback` nach dem
@@ -221,7 +253,7 @@ Ist Frame `i` noch nicht dekodiert, wird der nächstniedrigere fertige gezeichne
 Es entsteht kein Loch und kein Sprung, nur kurzzeitig eine gröbere Schrittweite.
 Frame 0 wird zusätzlich als `<link rel="preload" as="image">` angefordert.
 
-### 6.5 Wann gescrubbt wird
+### 6.6 Wann gescrubbt wird
 
 | Bedingung | Verhalten | Durchgesetzt von |
 |---|---|---|
@@ -388,8 +420,12 @@ Vor der Fertigmeldung wird geprüft und das Ergebnis berichtet, nicht behauptet:
 5. Darstellung bei 360 px, 768 px, 1024 px, 1440 px ohne horizontales Scrollen
 6. Scrubbing auf dem Desktop flüssig, Frame 0 und Frame 144 exakt an den
    Scrollenden
-7. `prefers-reduced-motion` aktiviert: keine Scrollstrecke, keine Frame-Requests
+7. Rückwärtsscrollen: Die Maschine setzt sich wieder zusammen, genauso flüssig
+   wie beim Zerfallen. Geprüft wird zusätzlich der Wiedereintritt von unten und
+   ein Reload mitten in der Scrollstrecke — die Animation muss dort sofort im
+   richtigen Frame stehen und darf nicht von Frame 0 heranfahren.
+8. `prefers-reduced-motion` aktiviert: keine Scrollstrecke, keine Frame-Requests
    im Netzwerk-Panel
-8. Formular: Erfolgsfall, jeder einzelne Validierungsfehler, sowie der Fall eines
+9. Formular: Erfolgsfall, jeder einzelne Validierungsfehler, sowie der Fall eines
    fehlenden `RESEND_API_KEY`
-9. `curl` auf `/sitemap.xml` und `/robots.txt`, JSON-LD durch den Rich-Results-Test
+10. `curl` auf `/sitemap.xml` und `/robots.txt`, JSON-LD durch den Rich-Results-Test
