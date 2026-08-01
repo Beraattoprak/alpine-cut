@@ -26,11 +26,16 @@ test('jedes interaktive Element zeigt einen sichtbaren Fokus-Ring in Gold', asyn
     await el.focus()
     const stil = await el.evaluate((n) => {
       const s = getComputedStyle(n)
-      return { breite: s.outlineWidth, farbe: s.outlineColor, stil: s.outlineStyle }
+      return {
+        breite: s.outlineWidth,
+        farbe: s.outlineColor,
+        stil: s.outlineStyle,
+        wer: (n as HTMLElement).outerHTML.slice(0, 120),
+      }
     })
-    expect(stil.stil).not.toBe('none')
-    expect(parseFloat(stil.breite)).toBeGreaterThanOrEqual(2)
-    expect(stil.farbe).toBe('rgb(138, 102, 32)')
+    expect(stil.stil, stil.wer).not.toBe('none')
+    expect(parseFloat(stil.breite), stil.wer).toBeGreaterThanOrEqual(2)
+    expect(stil.farbe, stil.wer).toBe('rgb(138, 102, 32)')
   }
 })
 
@@ -47,11 +52,15 @@ test('Fußzeile nennt Adresse und Telefon und verlinkt beide Rechtsseiten', asyn
   await expect(fuss.getByRole('link', { name: 'Datenschutz' })).toBeVisible()
 })
 
-test('kein horizontales Scrollen ab 360 px', async ({ page }) => {
-  await page.setViewportSize({ width: 360, height: 800 })
-  await page.goto('/')
-  const ueberstand = await page.evaluate(
-    () => document.documentElement.scrollWidth - document.documentElement.clientWidth,
-  )
-  expect(ueberstand).toBeLessThanOrEqual(0)
-})
+for (const breite of [360, 768, 1024, 1440]) {
+  test(`kein horizontales Scrollen bei ${breite} px`, async ({ page }) => {
+    await page.setViewportSize({ width: breite, height: 900 })
+    for (const pfad of ['/', '/impressum', '/datenschutz']) {
+      await page.goto(pfad)
+      const ueberstand = await page.evaluate(
+        () => document.documentElement.scrollWidth - document.documentElement.clientWidth,
+      )
+      expect(ueberstand, `${pfad} bei ${breite} px`).toBeLessThanOrEqual(0)
+    }
+  })
+}

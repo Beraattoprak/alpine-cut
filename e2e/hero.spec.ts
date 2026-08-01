@@ -30,7 +30,7 @@ async function canvasSignatur(page: Page) {
         letzte = jetzt
         return stabil
       },
-      { timeout: 20_000, intervals: [300] },
+      { timeout: 45_000, intervals: [300] },
     )
     .toBe(true)
   return letzte
@@ -44,6 +44,10 @@ async function scrolleZu(page: Page, anteil: number) {
 }
 
 test.describe('Hero auf dem Desktop', () => {
+  // Frames laden und dekodieren dauert; der Standard-Timeout von 30 s reicht
+  // unter paralleler Last nicht.
+  test.slow()
+
   test('die Buehne ist 200vh laenger als der Viewport', async ({ page }, info) => {
     test.skip(info.project.name !== 'desktop', 'nur Desktop')
     await page.goto('/')

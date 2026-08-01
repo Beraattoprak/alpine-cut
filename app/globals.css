@@ -97,17 +97,55 @@
   --ring: var(--gold);
 }
 
+/* Element-Grundstile gehoeren in @layer base, damit Tailwind-Utilities sie
+   ueberschreiben koennen. Unlayered wuerde etwa `a { color: gold }` jede
+   text-*-Klasse auf Links schlagen. */
 @layer base {
   * {
     @apply border-border;
+    min-width: 0;
   }
+
   body {
     @apply bg-background text-foreground;
+    font-family: var(--schrift-sans);
+    font-size: var(--mass-body);
+    line-height: 1.6;
+    overflow-x: hidden;
   }
-}
 
-* {
-  min-width: 0;
+  h1,
+  h2,
+  h3 {
+    font-family: var(--schrift-display);
+    font-weight: 400;
+    text-wrap: balance;
+  }
+
+  h1 {
+    font-size: var(--mass-hero);
+    line-height: 0.95;
+    letter-spacing: -0.02em;
+  }
+  h2 {
+    font-size: var(--mass-h2);
+    line-height: 1.05;
+    letter-spacing: -0.015em;
+  }
+  h3 {
+    font-size: var(--mass-h3);
+    line-height: 1.2;
+    letter-spacing: -0.01em;
+  }
+
+  p {
+    text-wrap: pretty;
+  }
+
+  a {
+    color: var(--gold);
+    text-underline-offset: 0.2em;
+  }
 }
 
 html {
@@ -128,52 +166,16 @@ html {
   }
 }
 
-body {
-  font-family: var(--schrift-sans);
-  font-size: var(--mass-body);
-  line-height: 1.6;
-  overflow-x: hidden;
-}
-
-h1,
-h2,
-h3 {
-  font-family: var(--schrift-display);
-  font-weight: 400;
-  text-wrap: balance;
-}
-
-h1 {
-  font-size: var(--mass-hero);
-  line-height: 0.95;
-  letter-spacing: -0.02em;
-}
-h2 {
-  font-size: var(--mass-h2);
-  line-height: 1.05;
-  letter-spacing: -0.015em;
-}
-h3 {
-  font-size: var(--mass-h3);
-  line-height: 1.2;
-  letter-spacing: -0.01em;
-}
-
-p {
-  text-wrap: pretty;
-}
-
-a {
-  color: var(--gold);
-  text-underline-offset: 0.2em;
-}
-
 /* Unlayered und damit staerker als jede Tailwind-Utility, auch als
    outline-none aus den shadcn-Komponenten. */
 :focus-visible {
   outline: 2px solid var(--gold);
   outline-offset: 2px;
   border-radius: 1px;
+  /* Sofort sichtbar. Tailwind v4 zaehlt outline-color zu transition-colors,
+     und die shadcn-Felder tragen diese Klasse — der Ring wuerde sonst
+     einblenden statt dazustehen. */
+  transition: none;
 }
 
 .container-seite {
@@ -308,6 +310,11 @@ a {
   display: grid;
   gap: 3rem;
   width: 100%;
+}
+
+/* Begrenzt, damit die Zeilen nicht in die schwebenden Einzelteile laufen. */
+.hero-text p {
+  max-width: 22rem;
 }
 
 /* Ohne Scrubbing stehen beide Bloecke untereinander und sind beide lesbar. */

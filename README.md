@@ -1,36 +1,82 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Alpine Cut
 
-## Getting Started
+Website des Friseursalons Alpine Cut, Dorf-Platz 1, 6263 Fügen, Tirol.
 
-First, run the development server:
+## Inhalte ändern
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+Alles Redaktionelle liegt unter `content/`. TypeScript meldet Tippfehler beim
+Build, statt sie live gehen zu lassen.
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+| Datei | Inhalt |
+|---|---|
+| `content/salon.ts` | Name, Adresse, Telefon, E-Mail |
+| `content/leistungen.ts` | Leistungen mit Preisen |
+| `content/team.ts` | Namen und Rollen |
+| `content/oeffnungszeiten.ts` | Öffnungszeiten |
+| `content/texte.ts` | Hero-Texte, Über-Text, Meta-Beschreibung |
+| `content/rechtliches.ts` | Impressum und Datenschutz |
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+### Offene Stellen
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+Was noch nicht geliefert wurde, steht als `todo("…")` im Code und erscheint auf
+der Seite als roter Balken. `npm run check:content` listet alle offenen Stellen
+auf.
 
-## Learn More
+**Vor dem Livegang** im Vercel-Projekt `STRICT_CONTENT=1` setzen. Der Build
+bricht dann ab, solange irgendwo noch ein Platzhalter steht.
 
-To learn more about Next.js, take a look at the following resources:
+Sobald `content/leistungen.ts` echte Leistungen enthält, wird aus dem freien
+Textfeld im Terminformular automatisch eine Auswahlliste daraus.
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## Umgebungsvariablen
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+Siehe `.env.example`. Ohne `RESEND_API_KEY` und `ANFRAGE_EMPFAENGER` zeigt das
+Formular eine ehrliche Fehlermeldung mit der Telefonnummer als Ausweg — es
+schweigt nicht und tut auch nicht so, als sei etwas versendet worden.
 
-## Deploy on Vercel
+## Befehle
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+    npm run dev             Entwicklungsserver
+    npm run build           Produktionsbuild, prüft vorher die Inhalte
+    npm test                Unit-Tests (Vitest)
+    npm run test:e2e        Browser-Tests (Playwright)
+    npm run check:content   offene TODO-Marker auflisten
+    npm run assets:frames   Video -> 145 WebP-Frames (braucht ffmpeg)
+    npm run assets:images   Poster, Salonfoto und OG-Bild
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+## Hero-Animation
+
+Die Maschine zerfällt entlang der Scrollposition und fügt sich beim
+Zurückscrollen wieder zusammen. Technisch ist das eine vorgeladene Sequenz aus
+145 WebP-Frames auf einem `<canvas>`, kein Video-Scrubbing — das Quellvideo hat
+nur einen einzigen Keyframe und wäre zum Seeken unbrauchbar.
+
+Die Rechenlogik liegt als reine Funktionen in `lib/scrub.ts` und ist unter
+`lib/__tests__/scrub.test.ts` vollständig getestet, einschließlich der
+Umkehrbarkeit.
+
+Kein Scrubbing gibt es unter 768 px Viewportbreite, bei
+`prefers-reduced-motion: reduce` und im Datensparmodus. Dort steht ein
+statisches Poster, und die 200vh Scrollstrecke entsteht gar nicht erst. In
+diesen Fällen wird auch kein einziger Frame geladen.
+
+Zwei Stellen, die man beim Weiterbauen leicht kaputtmacht:
+
+- Die Höhe der Bühne kommt **ausschließlich** aus Media Queries in
+  `globals.css`. Setzt man sie per JavaScript, entsteht ein Layout-Shift.
+- `data-scrub` wird von einem Inline-Skript im `<head>` gesetzt, vor dem ersten
+  Paint. Verschiebt man das nach React, springen die beiden Hero-Textblöcke bei
+  der Hydration.
+
+## Rechtliches
+
+Impressum und Datenschutzerklärung sind fachlich sorgfältig auf das abgestimmt,
+was diese Seite tatsächlich tut — sie sind aber **keine Rechtsberatung**. Vor
+dem Livegang anwaltlich prüfen lassen.
+
+## Bekannte Meldungen
+
+`npm audit` meldet drei Funde in Paketen **innerhalb** von Next.js
+(`next/node_modules/postcss` und `.../sharp`). Der angebotene Fix wäre ein
+Downgrade auf Next 9.3.3. Beide sind Build-Zeit-Abhängigkeiten, die hier keine
+fremden Eingaben verarbeiten. Sie verschwinden mit dem nächsten Next-Release.
