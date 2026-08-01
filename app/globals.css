@@ -276,19 +276,30 @@ html {
 .hero-buehne {
   position: absolute;
   inset: 0;
+  display: grid;
+  place-items: center;
+}
+
+/* Exakt das Seitenverhaeltnis der Quelle (1276x720) und nie breiter als sie.
+   Damit zeichnet der Canvas 1:1 statt hochskaliert und verzerrt. */
+.hero-rahmen {
+  position: relative;
+  width: min(100%, 1276px);
+  max-height: 100%;
+  aspect-ratio: 1276 / 720;
   /* Weiche Kanten: die Papiertextur des Materials soll nicht als Rechteck enden. */
   -webkit-mask-image:
-    linear-gradient(to right, transparent, #000 8%, #000 92%, transparent),
-    linear-gradient(to bottom, transparent, #000 8%, #000 92%, transparent);
+    linear-gradient(to right, transparent, #000 6%, #000 94%, transparent),
+    linear-gradient(to bottom, transparent, #000 6%, #000 94%, transparent);
   mask-image:
-    linear-gradient(to right, transparent, #000 8%, #000 92%, transparent),
-    linear-gradient(to bottom, transparent, #000 8%, #000 92%, transparent);
+    linear-gradient(to right, transparent, #000 6%, #000 94%, transparent),
+    linear-gradient(to bottom, transparent, #000 6%, #000 94%, transparent);
   -webkit-mask-composite: source-in;
   mask-composite: intersect;
 }
 
 .hero-poster {
-  object-fit: contain;
+  object-fit: cover;
   object-position: center;
 }
 

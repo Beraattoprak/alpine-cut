@@ -13,6 +13,9 @@ import {
 import { useFrameSequence } from './useFrameSequence'
 import { useScrubGate } from './useScrubGate'
 
+/** Breite des Bildmaterials. Mehr Pixel als das gibt es nicht. */
+const BREITE_QUELLE = 1276
+
 export function ScrubCanvas({ buehne }: { buehne: RefObject<HTMLElement | null> }) {
   const canvasRef = useRef<HTMLCanvasElement>(null)
   const erlaubt = useScrubGate()
@@ -89,10 +92,20 @@ export function ScrubCanvas({ buehne }: { buehne: RefObject<HTMLElement | null> 
     }
 
     function groesseSetzen() {
+      const cssBreite = canvas!.clientWidth
+      const cssHoehe = canvas!.clientHeight
+      if (cssBreite === 0 || cssHoehe === 0) return
+
+      // Nie mehr Pixel als die Quelle hergibt. Ein groesserer Puffer kostet
+      // Speicher und Rechenzeit, ohne ein einziges Detail hinzuzufuegen —
+      // das Bildmaterial ist 1276x720 und mehr existiert nicht.
       const dpr = Math.min(window.devicePixelRatio || 1, 2)
-      canvas!.width = Math.round(canvas!.clientWidth * dpr)
-      canvas!.height = Math.round(canvas!.clientHeight * dpr)
-      ctx!.setTransform(dpr, 0, 0, dpr, 0, 0)
+      const skala = Math.min(dpr, BREITE_QUELLE / cssBreite)
+
+      canvas!.width = Math.round(cssBreite * skala)
+      canvas!.height = Math.round(cssHoehe * skala)
+      ctx!.setTransform(skala, 0, 0, skala, 0, 0)
+      ctx!.imageSmoothingQuality = 'high'
       gezeichnet = -1
       schmutzig = true
       starten()

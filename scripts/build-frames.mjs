@@ -80,7 +80,10 @@ execFileSync(
     '-an',
     '-vsync', '0',
     '-c:v', 'libwebp',
-    '-quality', '80',
+    // 92 statt 80: bei Qualitaet 80 wog die Sequenz nur 1,7 MB, es war also
+    // reichlich Budget da. Kompressionsartefakte auf den glatten Gehaeuse-
+    // flaechen sind bei diesem Material der sichtbarste Qualitaetsverlust.
+    '-quality', '92',
     '-compression_level', '6',
     '-preset', 'picture',
     path.join(roh, 'roh-%04d.webp'),

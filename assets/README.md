@@ -33,9 +33,23 @@ selbst danach. Notfalls den Pfad ausdrücklich setzen:
 
 | Ausgabe | Maße | Größe |
 |---|---|---|
-| `public/frames/*.webp` | 1276×720 | 1,7 MB für alle 145 |
-| `public/clipper-poster.jpg` | 1276×720 | 18 KB |
+| `public/frames/*.webp` | 1276×720 | 4,2 MB für alle 145 (Qualität 92) |
+| `public/clipper-poster.jpg` | 1276×720 | 20 KB |
 | `public/clipper-foto.jpg` | 1600×904 | 34 KB |
+
+## Auflösung
+
+**1276×720 ist die Obergrenze** — mehr Pixel enthält `scroll_effekt.mp4` nicht.
+Der Canvas zeichnet deshalb höchstens 1276 CSS-px breit und begrenzt seinen
+Puffer auf die Quellauflösung; hochskalieren würde nur Speicher kosten, ohne ein
+Detail hinzuzufügen.
+
+Wer die Animation schärfer will, braucht einen **neuen Export der Quelle** in
+höherer Auflösung, idealerweise 2560×1440. Danach genügt es,
+`assets/source/scroll_effekt.mp4` zu ersetzen, `npm run assets:frames` und
+`npm run assets:images` laufen zu lassen und `BREITE_QUELLE` in
+`components/hero/ScrubCanvas.tsx` sowie die `aspect-ratio` von `.hero-rahmen` in
+`app/globals.css` anzupassen.
 
 Ändert sich die Frame-Anzahl, muss `FRAME_COUNT` an zwei Stellen mitgezogen
 werden: in `scripts/build-frames.mjs` und in `lib/scrub.ts`. Der Test

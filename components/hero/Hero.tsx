@@ -12,20 +12,25 @@ export function Hero() {
     <section ref={buehne} className="stage" aria-label="Alpine Cut">
       <div className="pin">
         <div className="hero-buehne">
-          <Image
-            src="/clipper-poster.jpg"
-            alt=""
-            fill
-            priority
-            sizes="100vw"
-            className="hero-poster"
-            data-testid="hero-poster"
-          />
-          <ScrubCanvas buehne={buehne} />
-          <noscript>
-            {/* Ohne JavaScript verdeckt nichts das Poster. */}
-            <style>{`.hero-canvas{display:none}`}</style>
-          </noscript>
+          {/* Der Rahmen hat exakt das Seitenverhaeltnis der Quelle und wird nie
+              breiter als sie. Sonst zieht der Canvas das Bild in die Form der
+              Buehne — hochskaliert und verzerrt. */}
+          <div className="hero-rahmen">
+            <Image
+              src="/clipper-poster.jpg"
+              alt=""
+              fill
+              priority
+              sizes="(min-width: 1276px) 1276px, 100vw"
+              className="hero-poster"
+              data-testid="hero-poster"
+            />
+            <ScrubCanvas buehne={buehne} />
+            <noscript>
+              {/* Ohne JavaScript verdeckt nichts das Poster. */}
+              <style>{`.hero-canvas{display:none}`}</style>
+            </noscript>
+          </div>
         </div>
 
         <div className="container-seite hero-texte">
