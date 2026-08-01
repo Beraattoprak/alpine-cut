@@ -243,6 +243,26 @@ a {
   }
 }
 
+/* --- Abschnitte -------------------------------------------------------- */
+
+.abschnitt {
+  padding-block: var(--abschnitt);
+  border-top: 1px solid var(--line);
+}
+
+.preisreihe {
+  display: flex;
+  align-items: baseline;
+  gap: 1rem;
+  padding-block: 0.75rem;
+  border-bottom: 1px solid var(--line);
+}
+.preisreihe > .fuellung {
+  flex: 1;
+  border-bottom: 1px dotted var(--line);
+  transform: translateY(-0.25em);
+}
+
 /* --- Hero -------------------------------------------------------------- */
 
 .pin {
