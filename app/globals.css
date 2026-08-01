@@ -242,3 +242,74 @@ a {
     height: calc(100svh + 200vh);
   }
 }
+
+/* --- Hero -------------------------------------------------------------- */
+
+.pin {
+  display: grid;
+  place-items: center;
+  overflow: hidden;
+}
+
+.hero-buehne {
+  position: absolute;
+  inset: 0;
+  /* Weiche Kanten: die Papiertextur des Materials soll nicht als Rechteck enden. */
+  -webkit-mask-image:
+    linear-gradient(to right, transparent, #000 8%, #000 92%, transparent),
+    linear-gradient(to bottom, transparent, #000 8%, #000 92%, transparent);
+  mask-image:
+    linear-gradient(to right, transparent, #000 8%, #000 92%, transparent),
+    linear-gradient(to bottom, transparent, #000 8%, #000 92%, transparent);
+  -webkit-mask-composite: source-in;
+  mask-composite: intersect;
+}
+
+.hero-poster {
+  object-fit: contain;
+  object-position: center;
+}
+
+.hero-canvas {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  opacity: 0;
+  transition: opacity 240ms ease-out;
+}
+.hero-canvas[data-aktiv='an'] {
+  opacity: 1;
+}
+
+.hero-texte {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  gap: 3rem;
+  width: 100%;
+}
+
+/* Ohne Scrubbing stehen beide Bloecke untereinander und sind beide lesbar. */
+html[data-scrub='an'] .hero-texte {
+  gap: 0;
+}
+html[data-scrub='an'] .hero-texte > * {
+  grid-area: 1 / 1;
+}
+
+/* Deckkraft rein aus --p. CSS klemmt Werte ausserhalb 0..1 selbst. */
+html[data-scrub='an'] .hero-text-a {
+  opacity: calc((0.42 - var(--p)) / 0.14);
+}
+html[data-scrub='an'] .hero-text-b {
+  opacity: calc((var(--p) - 0.55) / 0.2);
+}
+
+/* visibility: hidden nimmt das Element auch aus dem Accessibility-Baum. */
+html[data-scrub='an'] .stage[data-phase='a'] .hero-text-b {
+  visibility: hidden;
+}
+html[data-scrub='an'] .stage[data-phase='b'] .hero-text-a {
+  visibility: hidden;
+}
