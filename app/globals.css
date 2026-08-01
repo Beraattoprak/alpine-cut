@@ -317,6 +317,33 @@ html {
   max-width: 22rem;
 }
 
+/* Mobil liegt das Objekt mittig, nicht rechts — Text darueber waere unlesbar.
+   Deshalb dort gestapelt: Poster oben, Text darunter. */
+@media (max-width: 767px) {
+  .pin {
+    grid-template-rows: minmax(0, 1fr) auto;
+    /* stretch statt center: place-items: center aus der Grundregel wuerde
+       jedes Item auf seine Inhaltshoehe schrumpfen — und ein next/image mit
+       fill hat keine. Die Posterzeile fiele auf null zusammen. */
+    align-items: stretch;
+    justify-items: stretch;
+    gap: 1.5rem;
+    padding-block: 7.5rem 3rem;
+  }
+
+  .hero-buehne {
+    position: relative;
+    inset: auto;
+    width: 100%;
+    height: 100%;
+  }
+
+  .hero-texte {
+    align-self: end;
+    gap: 2rem;
+  }
+}
+
 /* Ohne Scrubbing stehen beide Bloecke untereinander und sind beide lesbar. */
 html[data-scrub='an'] .hero-texte {
   gap: 0;

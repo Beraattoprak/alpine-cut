@@ -44,7 +44,15 @@ export const metadata: Metadata = {
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="de" className={`${instrumentSerif.variable} ${GeistSans.variable}`}>
+    // suppressHydrationWarning: Das Inline-Skript unten setzt data-scrub vor
+    // der Hydration. React hydratisiert auch <html> und wuerde das unbekannte
+    // Attribut sonst als Mismatch melden. Gilt nur eine Ebene tief, also genau
+    // fuer dieses Element.
+    <html
+      lang="de"
+      suppressHydrationWarning
+      className={`${instrumentSerif.variable} ${GeistSans.variable}`}
+    >
       <head>
         {/* Kein Preload von clip-000: der Link wuerde auch dort laden, wo gar
             nicht gescrubbt wird. Das Poster zeigt ohnehin denselben Frame und
