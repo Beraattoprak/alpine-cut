@@ -2,22 +2,14 @@
 @import "tw-animate-css";
 @import "shadcn/tailwind.css";
 
-/* Der Fortschritt der Hero-Animation. Typisiert, damit calc() ihn
-   zuverlaessig als Zahl behandelt. */
-@property --p {
-  syntax: "<number>";
-  inherits: true;
-  initial-value: 0;
-}
-
 @theme inline {
   /* Eigene Tokens */
   --color-bg: var(--bg);
+  --color-bg-2: var(--bg-2);
   --color-fg: var(--fg);
   --color-fg-muted: var(--fg-muted);
+  --color-fg-dim: var(--fg-dim);
   --color-line: var(--line);
-  --color-gold: var(--gold);
-  --color-gold-soft: var(--gold-soft);
   --color-todo: var(--todo);
   --font-display: var(--schrift-display);
 
@@ -25,7 +17,6 @@
   --color-background: var(--background);
   --color-foreground: var(--foreground);
   --font-sans: var(--schrift-sans);
-  --font-mono: var(--font-geist-mono);
   --font-heading: var(--schrift-display);
   --color-ring: var(--ring);
   --color-input: var(--input);
@@ -53,53 +44,54 @@
 }
 
 :root {
-  /* --- Eigene Palette. Kontraste gegen --bg in Klammern. --- */
-  --bg: #FAFAFA;
-  --fg: #0F0F0F;        /* 18,9:1 */
-  --fg-muted: #5A5A57;  /*  6,6:1 */
-  --line: #E4E4E1;
-  --gold: #8A6620;      /*  5,0:1 — weisser Text darauf 5,3:1 */
-  --gold-soft: #C8A159; /*  2,3:1 — NUR dekorativ, nie fuer Text */
-  --todo: #B3261E;      /*  6,9:1 */
+  /* --- Palette. Streng monochrom, wie das Logo. Kontraste in Klammern. --- */
+  --bg: #000000;
+  --bg-2: #0D0D0D;
+  --fg: #FFFFFF;       /* 21,0:1 */
+  --fg-muted: #9A9A9A; /*  7,5:1 */
+  --fg-dim: #8A8A8A;   /*  6,1:1 */
+  --line: #262626;
+  --todo: #FF6B60;     /*  7,4:1 — nur fuer Entwicklungs-Marker */
 
-  --schrift-display: var(--font-instrument-serif), Georgia, serif;
+  --schrift-display: var(--font-space-grotesk), system-ui, sans-serif;
   --schrift-sans: var(--font-geist-sans), system-ui, sans-serif;
 
-  --mass-hero: clamp(3rem, 1.6rem + 6.2vw, 7.5rem);
-  --mass-h2: clamp(2rem, 1.2rem + 3.4vw, 3.5rem);
-  --mass-h3: clamp(1.25rem, 1.1rem + 0.7vw, 1.625rem);
-  --mass-lead: clamp(1.125rem, 1.05rem + 0.35vw, 1.375rem);
+  --mass-hero: clamp(3.5rem, 2rem + 8vw, 9rem);
+  --mass-h2: clamp(2.25rem, 1.4rem + 4vw, 5rem);
+  --mass-h3: clamp(1.25rem, 1.1rem + 0.8vw, 1.75rem);
+  --mass-lead: clamp(1.125rem, 1.05rem + 0.4vw, 1.5rem);
   --mass-body: 1.0625rem;
-  --mass-meta: 0.8125rem;
+  --mass-meta: 0.875rem;
+  --mass-label: 0.75rem;
 
-  --abschnitt: clamp(5rem, 10vw, 9rem);
-  --gasse: clamp(1.25rem, 5vw, 4rem);
+  --abschnitt: clamp(5rem, 11vw, 10rem);
+  --gasse: clamp(1.25rem, 5vw, 4.5rem);
 
-  /* --- shadcn-Tokens, aus der Palette abgeleitet --- */
-  --radius: 2px;
+  /* --- shadcn-Tokens --- */
+  --radius: 0px;
   --background: var(--bg);
   --foreground: var(--fg);
-  --card: var(--bg);
+  --card: var(--bg-2);
   --card-foreground: var(--fg);
-  --popover: var(--bg);
+  --popover: var(--bg-2);
   --popover-foreground: var(--fg);
-  --primary: var(--gold);
-  --primary-foreground: #FFFFFF;
-  --secondary: #F1F1EF;
+  --primary: var(--fg);
+  --primary-foreground: #000000;
+  --secondary: #161616;
   --secondary-foreground: var(--fg);
-  --muted: #F1F1EF;
+  --muted: #161616;
   --muted-foreground: var(--fg-muted);
-  --accent: #F1F1EF;
+  --accent: #161616;
   --accent-foreground: var(--fg);
   --destructive: var(--todo);
   --border: var(--line);
   --input: var(--line);
-  --ring: var(--gold);
+  --ring: var(--fg);
 }
 
-/* Element-Grundstile gehoeren in @layer base, damit Tailwind-Utilities sie
-   ueberschreiben koennen. Unlayered wuerde etwa `a { color: gold }` jede
-   text-*-Klasse auf Links schlagen. */
+/* Elementregeln gehoeren in @layer base, damit Tailwind-Utilities sie
+   ueberschreiben koennen. Ungelayerte Regeln schlagen JEDE Utility — das ist
+   nur beim Fokus-Ring weiter unten erwuenscht. */
 @layer base {
   * {
     @apply border-border;
@@ -110,7 +102,7 @@
     @apply bg-background text-foreground;
     font-family: var(--schrift-sans);
     font-size: var(--mass-body);
-    line-height: 1.6;
+    line-height: 1.65;
     overflow-x: hidden;
   }
 
@@ -118,23 +110,23 @@
   h2,
   h3 {
     font-family: var(--schrift-display);
-    font-weight: 400;
+    font-weight: 500;
     text-wrap: balance;
   }
 
   h1 {
     font-size: var(--mass-hero);
-    line-height: 0.95;
-    letter-spacing: -0.02em;
+    line-height: 0.9;
+    letter-spacing: -0.04em;
   }
   h2 {
     font-size: var(--mass-h2);
-    line-height: 1.05;
-    letter-spacing: -0.015em;
+    line-height: 0.95;
+    letter-spacing: -0.03em;
   }
   h3 {
     font-size: var(--mass-h3);
-    line-height: 1.2;
+    line-height: 1.15;
     letter-spacing: -0.01em;
   }
 
@@ -142,15 +134,33 @@
     text-wrap: pretty;
   }
 
+  /* Deutsche Komposita und URLs sprengen sonst bei 360 px den Container.
+     hyphens: auto greift dank lang="de" auf echte deutsche Trennregeln zu. */
+  p,
+  li,
+  dd,
+  dt,
+  address {
+    overflow-wrap: break-word;
+    hyphens: auto;
+  }
+
+  h1,
+  h2,
+  h3 {
+    overflow-wrap: break-word;
+  }
+
   a {
-    color: var(--gold);
-    text-underline-offset: 0.2em;
+    color: var(--fg);
+    text-underline-offset: 0.25em;
   }
 }
 
 html {
   scroll-behavior: smooth;
   -webkit-text-size-adjust: 100%;
+  background: var(--bg);
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -167,48 +177,55 @@ html {
 }
 
 /* Unlayered und damit staerker als jede Tailwind-Utility, auch als
-   outline-none aus den shadcn-Komponenten. */
+   outline-none aus den shadcn-Komponenten. Weiss ist auf Schwarz der
+   hoechste erreichbare Kontrast. */
 :focus-visible {
-  outline: 2px solid var(--gold);
+  outline: 2px solid var(--fg);
   outline-offset: 2px;
-  border-radius: 1px;
-  /* Sofort sichtbar. Tailwind v4 zaehlt outline-color zu transition-colors,
-     und die shadcn-Felder tragen diese Klasse — der Ring wuerde sonst
-     einblenden statt dazustehen. */
-  transition: none;
 }
 
-.container-seite {
-  width: 100%;
-  max-width: 1200px;
-  margin-inline: auto;
-  padding-inline: var(--gasse);
-}
+/* In @layer components, damit Utilities wie text-fg oder text-fg-muted sie
+   ueberschreiben koennen. */
+@layer components {
+  .container-seite {
+    width: 100%;
+    max-width: 1360px;
+    margin-inline: auto;
+    padding-inline: var(--gasse);
+  }
 
-.eyebrow {
-  font-size: var(--mass-meta);
-  line-height: 1.4;
-  letter-spacing: 0.14em;
-  text-transform: uppercase;
-  color: var(--fg-muted);
-}
+  /* Gesperrte Versalien — greift das "A L P I N E" des Logos auf. */
+  .label {
+    font-family: var(--schrift-display);
+    font-size: var(--mass-label);
+    line-height: 1.4;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    color: var(--fg-dim);
+  }
 
-.lead {
-  font-size: var(--mass-lead);
-  line-height: 1.5;
+  .lead {
+    font-size: var(--mass-lead);
+    line-height: 1.45;
+    color: var(--fg-muted);
+  }
+
+  .abschnitt {
+    padding-block: var(--abschnitt);
+    border-top: 1px solid var(--line);
+  }
 }
 
 .todo-marker {
   display: inline-block;
-  padding: 0.15em 0.5em;
+  padding: 0.3em 0.7em;
   border: 1px solid var(--todo);
   color: var(--todo);
-  font-family: var(--schrift-sans);
-  font-size: var(--mass-meta);
-  letter-spacing: 0.04em;
+  font-family: var(--schrift-display);
+  font-size: var(--mass-label);
+  letter-spacing: 0.08em;
   line-height: 1.5;
   text-transform: none;
-  background: color-mix(in srgb, var(--todo) 6%, transparent);
 }
 
 .skip-link {
@@ -216,11 +233,10 @@ html {
   left: var(--gasse);
   top: 0;
   transform: translateY(-140%);
-  z-index: 50;
-  background: var(--bg);
-  color: var(--fg);
+  z-index: 60;
+  background: var(--fg);
+  color: var(--bg);
   padding: 0.75rem 1rem;
-  border: 1px solid var(--line);
   text-decoration: none;
   transition: transform 120ms ease-out;
 }
@@ -228,35 +244,65 @@ html {
   transform: translateY(0.5rem);
 }
 
-/* Hero-Buehne. Die Hoehe bestimmt CSS, nie JavaScript — siehe Spec 6.1. */
-.stage {
-  position: relative;
-  height: 100svh;
-}
-.stage > .pin {
-  position: sticky;
-  top: 0;
-  height: 100svh;
-}
-
-@media (min-width: 768px) and (prefers-reduced-motion: no-preference) {
-  .stage {
-    height: calc(100svh + 200vh);
+/* --- Einblenden beim Scrollen -------------------------------------------
+   Inhalt darf nie hinter einer Animation verborgen bleiben: Ohne JS und bei
+   reduzierter Bewegung greift die Regel gar nicht erst. */
+@media (prefers-reduced-motion: no-preference) {
+  .reveal[data-sichtbar='nein'] {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+  .reveal {
+    opacity: 1;
+    transform: none;
+    transition:
+      opacity 620ms cubic-bezier(0.22, 1, 0.36, 1),
+      transform 620ms cubic-bezier(0.22, 1, 0.36, 1);
   }
 }
 
-/* --- Abschnitte -------------------------------------------------------- */
-
-.abschnitt {
-  padding-block: var(--abschnitt);
-  border-top: 1px solid var(--line);
+/* --- Laufband ------------------------------------------------------------ */
+.laufband {
+  display: flex;
+  overflow: hidden;
+  border-block: 1px solid var(--line);
+  padding-block: 1.15rem;
+  user-select: none;
 }
 
+.laufband-spur {
+  display: flex;
+  flex-shrink: 0;
+  gap: 2.5rem;
+  padding-right: 2.5rem;
+  min-width: 100%;
+  animation: laufband 38s linear infinite;
+}
+
+@keyframes laufband {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(-100%);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .laufband-spur {
+    animation: none;
+  }
+  .laufband {
+    overflow-x: auto;
+  }
+}
+
+/* --- Zeile mit Fuellpunkten: Leistung ... Preis, Tag ... Zeit ------------- */
 .preisreihe {
   display: flex;
   align-items: baseline;
   gap: 1rem;
-  padding-block: 0.75rem;
+  padding-block: 0.85rem;
   border-bottom: 1px solid var(--line);
 }
 .preisreihe > .fuellung {
@@ -265,116 +311,19 @@ html {
   transform: translateY(-0.25em);
 }
 
-/* --- Hero -------------------------------------------------------------- */
-
-.pin {
+/* --- Seitlich scrollendes Band ------------------------------------------- */
+.streifen {
   display: grid;
-  place-items: center;
-  overflow: hidden;
+  grid-auto-flow: column;
+  grid-auto-columns: minmax(15rem, 22rem);
+  gap: 1rem;
+  overflow-x: auto;
+  scroll-snap-type: x mandatory;
+  padding-inline: var(--gasse);
+  padding-bottom: 1.5rem;
+  scrollbar-width: thin;
+  scrollbar-color: var(--line) transparent;
 }
-
-.hero-buehne {
-  position: absolute;
-  inset: 0;
-  display: grid;
-  place-items: center;
-}
-
-/* Exakt das Seitenverhaeltnis der Quelle (1276x720) und nie breiter als sie.
-   Damit zeichnet der Canvas 1:1 statt hochskaliert und verzerrt. */
-.hero-rahmen {
-  position: relative;
-  width: min(100%, 1276px);
-  max-height: 100%;
-  aspect-ratio: 1276 / 720;
-  /* Weiche Kanten: die Papiertextur des Materials soll nicht als Rechteck enden. */
-  -webkit-mask-image:
-    linear-gradient(to right, transparent, #000 6%, #000 94%, transparent),
-    linear-gradient(to bottom, transparent, #000 6%, #000 94%, transparent);
-  mask-image:
-    linear-gradient(to right, transparent, #000 6%, #000 94%, transparent),
-    linear-gradient(to bottom, transparent, #000 6%, #000 94%, transparent);
-  -webkit-mask-composite: source-in;
-  mask-composite: intersect;
-}
-
-.hero-poster {
-  object-fit: cover;
-  object-position: center;
-}
-
-.hero-canvas {
-  position: absolute;
-  inset: 0;
-  width: 100%;
-  height: 100%;
-  opacity: 0;
-  transition: opacity 240ms ease-out;
-}
-.hero-canvas[data-aktiv='an'] {
-  opacity: 1;
-}
-
-.hero-texte {
-  position: relative;
-  z-index: 1;
-  display: grid;
-  gap: 3rem;
-  width: 100%;
-}
-
-/* Begrenzt, damit die Zeilen nicht in die schwebenden Einzelteile laufen. */
-.hero-text p {
-  max-width: 22rem;
-}
-
-/* Mobil liegt das Objekt mittig, nicht rechts — Text darueber waere unlesbar.
-   Deshalb dort gestapelt: Poster oben, Text darunter. */
-@media (max-width: 767px) {
-  .pin {
-    grid-template-rows: minmax(0, 1fr) auto;
-    /* stretch statt center: place-items: center aus der Grundregel wuerde
-       jedes Item auf seine Inhaltshoehe schrumpfen — und ein next/image mit
-       fill hat keine. Die Posterzeile fiele auf null zusammen. */
-    align-items: stretch;
-    justify-items: stretch;
-    gap: 1.5rem;
-    padding-block: 7.5rem 3rem;
-  }
-
-  .hero-buehne {
-    position: relative;
-    inset: auto;
-    width: 100%;
-    height: 100%;
-  }
-
-  .hero-texte {
-    align-self: end;
-    gap: 2rem;
-  }
-}
-
-/* Ohne Scrubbing stehen beide Bloecke untereinander und sind beide lesbar. */
-html[data-scrub='an'] .hero-texte {
-  gap: 0;
-}
-html[data-scrub='an'] .hero-texte > * {
-  grid-area: 1 / 1;
-}
-
-/* Deckkraft rein aus --p. CSS klemmt Werte ausserhalb 0..1 selbst. */
-html[data-scrub='an'] .hero-text-a {
-  opacity: calc((0.42 - var(--p)) / 0.14);
-}
-html[data-scrub='an'] .hero-text-b {
-  opacity: calc((var(--p) - 0.55) / 0.2);
-}
-
-/* visibility: hidden nimmt das Element auch aus dem Accessibility-Baum. */
-html[data-scrub='an'] .stage[data-phase='a'] .hero-text-b {
-  visibility: hidden;
-}
-html[data-scrub='an'] .stage[data-phase='b'] .hero-text-a {
-  visibility: hidden;
+.streifen > * {
+  scroll-snap-align: start;
 }

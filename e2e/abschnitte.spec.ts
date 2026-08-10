@@ -2,7 +2,7 @@ import { expect, test } from '@playwright/test'
 
 test('jede Sprungmarke im Kopf findet ihr Ziel', async ({ page }) => {
   await page.goto('/')
-  for (const id of ['leistungen', 'salon', 'team', 'zeiten']) {
+  for (const id of ['arbeiten', 'leistungen', 'salon', 'team', 'zeiten', 'termin']) {
     await expect(page.locator(`#${id}`)).toHaveCount(1)
   }
 })
@@ -14,7 +14,21 @@ test('offene Inhalte zeigen einen sichtbaren TODO-Marker statt erfundener Werte'
   const marker = page.locator('[data-todo]')
   expect(await marker.count()).toBeGreaterThanOrEqual(4)
   await expect(marker.first()).toBeVisible()
-  await expect(marker.first()).toContainText('TODO:')
+})
+
+test('das Laufband nennt nur gesicherte Daten', async ({ page }) => {
+  await page.goto('/')
+  const band = page.locator('.laufband')
+  await expect(band).toContainText('Alpine Cut')
+  await expect(band).toContainText('Dorf-Platz 1')
+  await expect(band).toContainText('+43 676 6786333')
+})
+
+test('die Arbeiten verweisen auf Instagram', async ({ page }) => {
+  await page.goto('/')
+  await expect(
+    page.locator('#arbeiten').getByRole('link', { name: '@alpine.cutz' }),
+  ).toHaveAttribute('href', 'https://www.instagram.com/alpine.cutz/')
 })
 
 test('nirgends stehen erfundene Preise, Namen oder Zeiten', async ({ page }) => {
@@ -50,7 +64,7 @@ test('es gibt keine eingebettete Karte, die vor der Einwilligung laedt', async (
 
 test('jeder Abschnitt ist ueber seine Ueberschrift benannt', async ({ page }) => {
   await page.goto('/')
-  for (const id of ['leistungen', 'salon', 'team', 'zeiten']) {
+  for (const id of ['arbeiten', 'leistungen', 'salon', 'team', 'zeiten', 'termin']) {
     await expect(page.locator(`#${id}`)).toHaveAttribute('aria-labelledby', `${id}-titel`)
   }
 })

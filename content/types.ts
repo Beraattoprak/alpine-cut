@@ -9,6 +9,8 @@ export type Salon = {
   land: string
   telefon: string
   telefonHref: string
+  instagram: string
+  instagramHandle: string
   email: Offen<string>
 }
 
@@ -31,8 +33,6 @@ export type Oeffnungstag = { tag: Wochentag; zeiten: string | null }
 export type Texte = {
   heroHeadline: string
   heroUnterzeile: string
-  heroZweiterBlock: string
-  heroZweiteUnterzeile: string
   ueberDenSalon: Offen<string>
   metaBeschreibung: Offen<string>
 }

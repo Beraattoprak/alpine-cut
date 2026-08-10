@@ -1,29 +1,48 @@
 import { salon } from '@/content'
 
 const sprungmarken = [
+  { id: 'arbeiten', text: 'Arbeiten' },
   { id: 'leistungen', text: 'Leistungen' },
   { id: 'salon', text: 'Salon' },
-  { id: 'team', text: 'Team' },
   { id: 'zeiten', text: 'Zeiten' },
-  { id: 'termin', text: 'Termin' },
 ]
 
 export function SiteHeader() {
   return (
-    <header className="absolute inset-x-0 top-0 z-40">
-      <div className="container-seite flex flex-wrap items-baseline justify-between gap-x-8 gap-y-2 py-6">
-        <a href="#inhalt" className="font-display text-xl tracking-tight text-fg no-underline">
+    // Im normalen Fluss statt absolut: bricht die Navigation auf schmalen
+    // Geräten um, schiebt sie den Hero nach unten, statt ihn zu überlagern.
+    <header className="relative z-50">
+      <div className="container-seite flex flex-wrap items-center justify-between gap-x-8 gap-y-3 py-6">
+        {/* Wortmarke als Schrift, nicht als Bild: Das Logo steht gross im Hero
+            direkt darunter — zweimal waere eine Dopplung. Die weite Sperrung
+            greift das "A L P I N E" des Logos auf. */}
+        <a
+          href="#inhalt"
+          className="label shrink-0 text-fg no-underline"
+          style={{ fontSize: '0.875rem' }}
+        >
           {salon.name}
         </a>
+
         <nav aria-label="Abschnitte">
-          <ul className="flex flex-wrap gap-x-5 gap-y-1">
+          <ul className="flex flex-wrap items-center gap-x-6 gap-y-2">
             {sprungmarken.map((m) => (
               <li key={m.id}>
-                <a href={`#${m.id}`} className="eyebrow text-fg-muted no-underline hover:text-fg">
+                <a href={`#${m.id}`} className="label text-fg-muted no-underline hover:text-fg">
                   {m.text}
                 </a>
               </li>
             ))}
+            <li>
+              <a
+                href={salon.instagram}
+                target="_blank"
+                rel="noreferrer noopener"
+                className="label text-fg no-underline hover:underline"
+              >
+                Instagram
+              </a>
+            </li>
           </ul>
         </nav>
       </div>

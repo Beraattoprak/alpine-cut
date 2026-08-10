@@ -35,7 +35,7 @@ export function Terminanfrage() {
     return (
       <section id="termin" aria-labelledby="termin-titel" className="abschnitt">
         <div className="container-seite">
-          <SectionHeading id="termin" nummer="05" eyebrow="Termin" titel="Terminanfrage" />
+          <SectionHeading id="termin" nummer="06" eyebrow="Termin" titel="Terminanfrage" />
           <p role="status" className="lead max-w-prose">
             {zustand.meldung}
           </p>
@@ -47,7 +47,7 @@ export function Terminanfrage() {
   return (
     <section id="termin" aria-labelledby="termin-titel" className="abschnitt">
       <div className="container-seite">
-        <SectionHeading id="termin" nummer="05" eyebrow="Termin" titel="Terminanfrage" />
+        <SectionHeading id="termin" nummer="06" eyebrow="Termin" titel="Terminanfrage" />
 
         <form action={absenden} noValidate className="grid max-w-xl gap-6">
           {zustand.status === 'fehler' && zustand.meldung ? (

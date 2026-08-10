@@ -10,5 +10,7 @@ export const salon: Salon = {
   land: 'AT',
   telefon: '+43 676 6786333',
   telefonHref: 'tel:+436766786333',
+  instagram: 'https://www.instagram.com/alpine.cutz/',
+  instagramHandle: '@alpine.cutz',
   email: todo('E-Mail-Adresse des Salons eintragen — auch Empfänger der Terminanfragen'),
 }

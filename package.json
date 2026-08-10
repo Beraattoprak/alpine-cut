@@ -13,7 +13,6 @@
     "test:watch": "vitest",
     "test:e2e": "playwright test",
     "check:content": "tsx scripts/check-content.ts",
-    "assets:frames": "node scripts/build-frames.mjs",
     "assets:images": "node scripts/build-images.mjs"
   },
   "dependencies": {

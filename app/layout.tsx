@@ -1,5 +1,5 @@
 import type { Metadata } from 'next'
-import { Instrument_Serif } from 'next/font/google'
+import { Space_Grotesk } from 'next/font/google'
 import { GeistSans } from 'geist/font/sans'
 import { SiteFooter } from '@/components/SiteFooter'
 import { SiteHeader } from '@/components/SiteHeader'
@@ -8,12 +8,11 @@ import { hairSalonJsonLd } from '@/lib/jsonld'
 import { SITE_URL } from '@/lib/site'
 import './globals.css'
 
-const instrumentSerif = Instrument_Serif({
+const spaceGrotesk = Space_Grotesk({
   subsets: ['latin'],
-  weight: '400',
-  style: ['normal', 'italic'],
+  weight: ['500', '700'],
   display: 'swap',
-  variable: '--font-instrument-serif',
+  variable: '--font-space-grotesk',
 })
 
 // Solange die Meta-Beschreibung offen ist, wird sie aus echten Daten
@@ -44,30 +43,7 @@ export const metadata: Metadata = {
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    // suppressHydrationWarning: Das Inline-Skript unten setzt data-scrub vor
-    // der Hydration. React hydratisiert auch <html> und wuerde das unbekannte
-    // Attribut sonst als Mismatch melden. Gilt nur eine Ebene tief, also genau
-    // fuer dieses Element.
-    <html
-      lang="de"
-      suppressHydrationWarning
-      className={`${instrumentSerif.variable} ${GeistSans.variable}`}
-    >
-      <head>
-        {/* Kein Preload von clip-000: der Link wuerde auch dort laden, wo gar
-            nicht gescrubbt wird. Das Poster zeigt ohnehin denselben Frame und
-            wird bereits mit priority geladen. */}
-        <script
-          // Setzt data-scrub VOR dem ersten Paint. Ohne das springen die beiden
-          // Hero-Textbloecke nach der Hydration von untereinander auf uebereinander.
-          dangerouslySetInnerHTML={{
-            __html:
-              "try{var m=window.matchMedia,c=navigator.connection;" +
-              "if(m('(min-width:768px)').matches&&m('(prefers-reduced-motion: no-preference)').matches&&!(c&&c.saveData))" +
-              "document.documentElement.dataset.scrub='an'}catch(e){}",
-          }}
-        />
-      </head>
+    <html lang="de" className={`${spaceGrotesk.variable} ${GeistSans.variable}`}>
       <body className="antialiased">
         <a className="skip-link" href="#inhalt">
           Zum Inhalt springen

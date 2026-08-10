@@ -23,8 +23,11 @@ export function hairSalonJsonLd(): Record<string, unknown> {
     '@type': 'HairSalon',
     name: salon.name,
     url: SITE_URL,
-    image: `${SITE_URL}/clipper-foto.jpg`,
+    // Solange keine echten Salonfotos vorliegen, steht hier das Logo.
+    // Ein Bild ist Pflicht; erfinden laesst sich keines.
+    image: `${SITE_URL}/logo-gross.png`,
     telephone: salon.telefon,
+    sameAs: [salon.instagram],
     address: {
       '@type': 'PostalAddress',
       streetAddress: salon.strasse,

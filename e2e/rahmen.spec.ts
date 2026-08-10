@@ -1,9 +1,32 @@
 import { expect, test } from '@playwright/test'
 
-test('Seitengrund trifft den Ton des Bildmaterials', async ({ page }) => {
+test('Seitengrund ist schwarz wie das Logo', async ({ page }) => {
   await page.goto('/')
   const bg = await page.evaluate(() => getComputedStyle(document.body).backgroundColor)
-  expect(bg).toBe('rgb(250, 250, 250)')
+  expect(bg).toBe('rgb(0, 0, 0)')
+})
+
+test('die Seite bleibt streng monochrom', async ({ page }) => {
+  await page.goto('/')
+  // Jede sichtbare Text- und Flaechenfarbe muss grau sein, also R = G = B.
+  // Faengt versehentlich eingeschleppte Akzentfarben ab.
+  const bunt = await page.evaluate(() => {
+    const treffer: string[] = []
+    const zerlegen = (v: string) => v.match(/\d+/g)?.slice(0, 3).map(Number)
+    for (const el of Array.from(document.querySelectorAll('body *'))) {
+      if (el.closest('[data-todo]')) continue // Marker sind absichtlich rot
+      const s = getComputedStyle(el)
+      for (const eigenschaft of ['color', 'backgroundColor', 'borderTopColor'] as const) {
+        const rgb = zerlegen(s[eigenschaft])
+        if (!rgb || s[eigenschaft].includes('rgba(0, 0, 0, 0)')) continue
+        if (rgb[0] !== rgb[1] || rgb[1] !== rgb[2]) {
+          treffer.push(`${el.tagName}.${el.className} ${eigenschaft}=${s[eigenschaft]}`)
+        }
+      }
+    }
+    return treffer.slice(0, 5)
+  })
+  expect(bunt, `bunte Werte gefunden: ${bunt.join(' | ')}`).toHaveLength(0)
 })
 
 test('Skip-Link ist der erste Fokus und springt zum Hauptinhalt', async ({ page }) => {
@@ -15,7 +38,7 @@ test('Skip-Link ist der erste Fokus und springt zum Hauptinhalt', async ({ page 
   await expect(link).toHaveAttribute('href', '#inhalt')
 })
 
-test('jedes interaktive Element zeigt einen sichtbaren Fokus-Ring in Gold', async ({ page }) => {
+test('jedes interaktive Element zeigt einen sichtbaren weißen Fokus-Ring', async ({ page }) => {
   await page.goto('/')
   const ziele = page.locator('a, button, input, select')
   const anzahl = await ziele.count()
@@ -35,7 +58,7 @@ test('jedes interaktive Element zeigt einen sichtbaren Fokus-Ring in Gold', asyn
     })
     expect(stil.stil, stil.wer).not.toBe('none')
     expect(parseFloat(stil.breite), stil.wer).toBeGreaterThanOrEqual(2)
-    expect(stil.farbe, stil.wer).toBe('rgb(138, 102, 32)')
+    expect(stil.farbe, stil.wer).toBe('rgb(255, 255, 255)')
   }
 })
 
@@ -50,6 +73,22 @@ test('Fußzeile nennt Adresse und Telefon und verlinkt beide Rechtsseiten', asyn
   )
   await expect(fuss.getByRole('link', { name: 'Impressum' })).toBeVisible()
   await expect(fuss.getByRole('link', { name: 'Datenschutz' })).toBeVisible()
+  await expect(fuss.getByRole('link', { name: '@alpine.cutz' })).toHaveAttribute(
+    'href',
+    'https://www.instagram.com/alpine.cutz/',
+  )
+})
+
+test('von der Animation ist nichts uebrig', async ({ page }) => {
+  const angefragt: string[] = []
+  page.on('request', (r) => {
+    if (r.url().includes('/frames/') || r.url().includes('clipper-poster')) angefragt.push(r.url())
+  })
+  await page.goto('/')
+  await page.waitForTimeout(1500)
+  expect(angefragt, angefragt.join(' | ')).toHaveLength(0)
+  await expect(page.locator('canvas')).toHaveCount(0)
+  await expect(page.locator('.stage')).toHaveCount(0)
 })
 
 for (const breite of [360, 768, 1024, 1440]) {
