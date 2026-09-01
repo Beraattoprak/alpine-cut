@@ -71,7 +71,9 @@ export const datenschutz: Rechtsabschnitt[] = [
     titel: 'Cookies und Reichweitenmessung',
     absaetze: [
       'Diese Seite setzt keine Cookies zu Analyse- oder Werbezwecken. Es findet keine Reichweitenmessung und kein Tracking statt. Deshalb gibt es auch kein Einwilligungsbanner.',
-      'Der Kartendienst ist bewusst nicht eingebettet. Der Link „Route planen" öffnet Google Maps erst, wenn Sie ihn anklicken — vorher werden keine Daten an Google übertragen.',
+      'Die Karte im Abschnitt „Anfahrt" ist standardmäßig nicht geladen. Zu sehen ist zunächst nur ein Platzhalter; erst wenn Sie auf „Karte laden" klicken, wird die Karte von Google Maps nachgeladen. Ohne diesen Klick geht keine Anfrage an Google.',
+      'Mit dem Klick übermittelt Ihr Browser Daten an Google Ireland Limited, Gordon House, Barrow Street, Dublin 4, Irland, darunter Ihre IP-Adresse, Angaben zu Ihrem Gerät und die aufgerufene Seite. Eine Übermittlung in die USA ist dabei nicht ausgeschlossen. Rechtsgrundlage ist Ihre Einwilligung nach Art. 6 Abs. 1 lit. a DSGVO, die Sie mit dem Klick erteilen und für künftige Besuche jederzeit widerrufen können, indem Sie die Karte nicht erneut laden.',
+      'Der Link „Route planen" öffnet Google Maps erst beim Anklicken in einem neuen Tab — vorher werden keine Daten an Google übertragen.',
       'Der Link zu Instagram öffnet die Seite ebenfalls erst beim Anklicken. Es ist kein Instagram-Inhalt eingebettet, es wird also nichts an Meta übertragen, solange Sie den Link nicht nutzen.',
       'Schriften werden von unserem eigenen Server ausgeliefert, nicht von einem Drittanbieter.',
     ],

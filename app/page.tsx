@@ -1,8 +1,9 @@
 import { Hero } from '@/components/hero/Hero'
 import { Laufband } from '@/components/Laufband'
+import { Anfahrt } from '@/components/anfahrt'
 import { Arbeiten } from '@/components/sections/Arbeiten'
 import { Leistungen } from '@/components/sections/Leistungen'
-import { OeffnungszeitenAnfahrt } from '@/components/sections/OeffnungszeitenAnfahrt'
+import { Oeffnungszeiten } from '@/components/sections/Oeffnungszeiten'
 import { UeberDenSalon } from '@/components/sections/UeberDenSalon'
 
 export default function Startseite() {
@@ -13,7 +14,8 @@ export default function Startseite() {
       <Arbeiten />
       <Leistungen />
       <UeberDenSalon />
-      <OeffnungszeitenAnfahrt />
+      <Oeffnungszeiten />
+      <Anfahrt />
     </>
   )
 }

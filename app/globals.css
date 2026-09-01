@@ -316,6 +316,32 @@ textarea:focus {
   }
 }
 
+/* --- Karte ---------------------------------------------------------------
+   Platzhalter und geladene Karte teilen sich dieselbe Hoehe, damit beim
+   Laden nichts springt. */
+.karte {
+  aspect-ratio: 4 / 3;
+}
+@media (min-width: 640px) {
+  .karte {
+    aspect-ratio: 16 / 9;
+  }
+}
+
+/* Auf Touchgeraeten faengt das iframe sonst die Wischgeste ab: Der Besucher
+   scrollt die Karte statt der Seite und kommt nicht an ihr vorbei. Erst ein
+   Antippen macht sie bedienbar. Auf Zeigergeraeten entfaellt die Sperre. */
+@media (pointer: coarse) {
+  .karte iframe[data-bedienbar='nein'] {
+    pointer-events: none;
+  }
+}
+@media (pointer: fine) {
+  .karte-freigabe {
+    display: none;
+  }
+}
+
 /* --- Zeile mit Fuellpunkten: Leistung ... Preis, Tag ... Zeit ------------- */
 .preisreihe {
   display: flex;

@@ -5,6 +5,7 @@ const sprungmarken = [
   { id: 'leistungen', text: 'Leistungen' },
   { id: 'salon', text: 'Salon' },
   { id: 'zeiten', text: 'Zeiten' },
+  { id: 'anfahrt', text: 'Anfahrt' },
 ]
 
 export function SiteHeader() {
