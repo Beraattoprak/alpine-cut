@@ -44,6 +44,12 @@
 }
 
 :root {
+  /* Sagt dem Browser, dass die Seite dunkel ist. Ohne das rendert Chrome seine
+     eingebauten Bedienelemente im Hellmodus: Das Kalendersymbol im Datumsfeld
+     waere dunkel auf schwarzem Grund und der Datumswaehler ginge als weisses
+     Popup auf. Betrifft auch Bildlaufleisten und die Autofill-Darstellung. */
+  color-scheme: dark;
+
   /* --- Palette. Streng monochrom, wie das Logo. Kontraste in Klammern. --- */
   --bg: #000000;
   --bg-2: #0D0D0D;
@@ -182,6 +188,35 @@ html {
 :focus-visible {
   outline: 2px solid var(--fg);
   outline-offset: 2px;
+}
+
+/* Formularfelder zusaetzlich auf :focus, nicht nur :focus-visible.
+   Beim Tabben in ein <input type="date"> setzt Chrome den Fokus auf ein
+   inneres Segment; :focus-visible greift dann am Feld selbst nicht mehr und
+   der Ring bliebe unsichtbar. Bei Eingabefeldern ist ein Ring auch nach
+   Mausklick richtig — man will sehen, wo man schreibt. */
+input:focus,
+select:focus,
+textarea:focus {
+  outline: 2px solid var(--fg);
+  outline-offset: 2px;
+}
+
+/* Das Kalendersymbol im Datumsfeld ist eine eigene Tab-Station in Chromes
+   Shadow-DOM. Der Ring des Wirtselements greift dort nicht, also bekommt es
+   einen eigenen. Ohne diese Regel gaebe es eine Station ohne Fokusanzeige. */
+input[type='date']::-webkit-calendar-picker-indicator {
+  cursor: pointer;
+  opacity: 0.75;
+  border-radius: 1px;
+}
+input[type='date']::-webkit-calendar-picker-indicator:hover {
+  opacity: 1;
+}
+input[type='date']::-webkit-calendar-picker-indicator:focus {
+  outline: 2px solid var(--fg);
+  outline-offset: 2px;
+  opacity: 1;
 }
 
 /* In @layer components, damit Utilities wie text-fg oder text-fg-muted sie

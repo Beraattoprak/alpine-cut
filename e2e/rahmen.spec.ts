@@ -38,28 +38,89 @@ test('Skip-Link ist der erste Fokus und springt zum Hauptinhalt', async ({ page 
   await expect(link).toHaveAttribute('href', '#inhalt')
 })
 
-test('jedes interaktive Element zeigt einen sichtbaren weißen Fokus-Ring', async ({ page }) => {
+/**
+ * Echtes Tabben, nicht el.focus(): Beide Wege unterscheiden sich. Ein
+ * <input type="date"> ist beim Tabben vier Stationen — Tag, Monat, Jahr und
+ * das Kalendersymbol —, waehrend focus() nur das Feld als Ganzes anspringt.
+ * Genau die vierte Station hatte keinen Fokus-Ring, und mit programmatischem
+ * focus() faellt das nicht auf.
+ */
+test('jede Tab-Station zeigt einen sichtbaren weißen Fokus-Ring', async ({ page }) => {
   await page.goto('/')
-  const ziele = page.locator('a, button, input, select')
-  const anzahl = await ziele.count()
-  expect(anzahl).toBeGreaterThan(0)
-  for (let i = 0; i < anzahl; i++) {
-    const el = ziele.nth(i)
-    if (!(await el.isVisible())) continue
-    await el.focus()
-    const stil = await el.evaluate((n) => {
-      const s = getComputedStyle(n)
+  await page.locator('body').click({ position: { x: 2, y: 2 } })
+
+  // Feste Anzahl Tabs statt Abbruch bei Wiederholung: Mehrere Elemente teilen
+  // sich dasselbe Markup (die Fotoplätze, die Navigationslinks). Ein Abbruch
+  // beim ersten "schon gesehen" beendete den Durchlauf vor dem Formular — und
+  // genau dort saß der Fehler, den dieser Test finden soll.
+  let stationen = 0
+  for (let i = 0; i < 32; i++) {
+    await page.keyboard.press('Tab')
+    const stil = await page.evaluate(() => {
+      const el = document.activeElement as HTMLElement | null
+      if (!el || el === document.body) return null
+      const s = getComputedStyle(el)
       return {
         breite: s.outlineWidth,
         farbe: s.outlineColor,
         stil: s.outlineStyle,
-        wer: (n as HTMLElement).outerHTML.slice(0, 120),
+        istDatum: el.tagName === 'INPUT' && el.getAttribute('type') === 'date',
+        wer: el.outerHTML.slice(0, 110),
       }
     })
+    if (!stil) continue
+    stationen++
+
+    // Chromes Kalendersymbol im Datumsfeld ist eine eigene Tab-Station im
+    // Shadow-DOM. document.activeElement meldet das Wirtselement, dessen
+    // Fokus-Ring dort nicht greift — der Ring sitzt auf dem Shadow-Teil und
+    // ist von aussen nicht messbar. Er wird in globals.css gesetzt und weiter
+    // unten gesondert geprueft.
+    if (stil.istDatum && stil.stil === 'none') continue
+
     expect(stil.stil, stil.wer).not.toBe('none')
     expect(parseFloat(stil.breite), stil.wer).toBeGreaterThanOrEqual(2)
     expect(stil.farbe, stil.wer).toBe('rgb(255, 255, 255)')
   }
+
+  // Das Formular liegt weit unten im Tab-Weg. Wird es nicht erreicht, hat der
+  // Test seinen Zweck verfehlt, auch wenn er gruen ist.
+  expect(stationen, 'zu wenige Tab-Stationen erreicht').toBeGreaterThan(20)
+  await expect(page.locator('input[type="date"]')).toHaveCount(1)
+})
+
+test('die Seite meldet sich dem Browser als dunkel', async ({ page }) => {
+  await page.goto('/')
+  // Ohne color-scheme: dark rendert Chrome seine eingebauten Bedienelemente
+  // hell: dunkles Kalendersymbol auf schwarzem Grund, weisses Datumswaehler-Popup.
+  const schema = await page.evaluate(
+    () => getComputedStyle(document.documentElement).colorScheme,
+  )
+  expect(schema).toBe('dark')
+})
+
+test('das Kalendersymbol im Datumsfeld hat einen eigenen Fokus-Ring', async ({ page }) => {
+  await page.goto('/')
+  // Der Shadow-Teil ist von aussen nicht messbar, die Regel dafuer aber schon.
+  const regeln = await page.evaluate(() => {
+    const treffer: string[] = []
+    for (const blatt of Array.from(document.styleSheets)) {
+      let regelListe: CSSRuleList
+      try {
+        regelListe = blatt.cssRules
+      } catch {
+        continue
+      }
+      for (const r of Array.from(regelListe)) {
+        const s = (r as CSSStyleRule).selectorText
+        if (s?.includes('calendar-picker-indicator') && s.includes(':focus')) {
+          treffer.push(s + ' { ' + (r as CSSStyleRule).style.cssText.slice(0, 60) + ' }')
+        }
+      }
+    }
+    return treffer
+  })
+  expect(regeln.join(' | ')).toContain('outline')
 })
 
 test('Fußzeile nennt Adresse und Telefon und verlinkt beide Rechtsseiten', async ({ page }) => {
