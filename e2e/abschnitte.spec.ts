@@ -60,49 +60,91 @@ test('die Telefonnummer steht bei den Oeffnungszeiten', async ({ page }) => {
   ).toBeVisible()
 })
 
-test.describe('Karte mit Zwei-Klick-Loesung', () => {
-  test('laedt nichts von Google, solange nicht geklickt wurde', async ({ page }) => {
+test.describe('Karte', () => {
+  /** Die Karte laedt ohne Klick, aber erst wenn der Abschnitt in Sichtweite kommt. */
+  async function zurKarteScrollen(page: import('@playwright/test').Page) {
+    await page.goto('/')
+    await page.locator('#anfahrt').scrollIntoViewIfNeeded()
+  }
+
+  test('laedt beim Seitenaufruf noch nicht — sie kostet dort nichts', async ({ page }) => {
     const anGoogle: string[] = []
     page.on('request', (r) => {
       if (/google|gstatic|googleapis/i.test(r.url())) anGoogle.push(r.url())
     })
-
     await page.goto('/')
-    await page.locator('#anfahrt').scrollIntoViewIfNeeded()
-    await page.waitForTimeout(1500)
-
+    await page.waitForTimeout(1200)
     await expect(page.locator('#anfahrt iframe')).toHaveCount(0)
     expect(anGoogle, anGoogle.join(' | ')).toHaveLength(0)
   })
 
-  test('zeigt einen Platzhalter, der Zweck und Folge benennt', async ({ page }) => {
-    await page.goto('/')
-    const abschnitt = page.locator('#anfahrt')
-    await expect(abschnitt).toContainText('Karte von Google Maps')
-    await expect(abschnitt).toContainText('Daten an Google übertragen')
-    await expect(abschnitt.getByRole('button', { name: 'Karte laden' })).toBeVisible()
-  })
-
-  test('mountet das iframe erst nach dem Klick', async ({ page }) => {
-    await page.goto('/')
-    await page.locator('#anfahrt').getByRole('button', { name: 'Karte laden' }).click()
-
+  test('erscheint ohne Klick, sobald der Abschnitt in Sicht kommt', async ({ page }) => {
+    await zurKarteScrollen(page)
     const rahmen = page.locator('#anfahrt iframe')
     await expect(rahmen).toHaveCount(1)
     await expect(rahmen).toHaveAttribute('loading', 'lazy')
     await expect(rahmen).toHaveAttribute('referrerpolicy', 'no-referrer-when-downgrade')
     await expect(rahmen).toHaveAttribute('title', /Karte mit dem Standort/)
     await expect(rahmen).toHaveAttribute('src', /output=embed/)
+    await expect(rahmen).toHaveAttribute('allowfullscreen', '')
   })
 
-  test('der Platzhalter ist genauso hoch wie die Karte — kein Layout-Sprung', async ({ page }) => {
-    await page.goto('/')
+  /**
+   * Ein fremdes iframe laesst sich von der Wirtsseite aus nicht als fokussiert
+   * erkennen: iframe:focus und :focus-within matchen nicht, focus-Ereignisse
+   * kommen nicht an, und Chrome zeichnet keinen eigenen Ring. Eine Tab-Station
+   * ohne sichtbaren Fokus verstiesse gegen WCAG 2.4.7 — deshalb ist die Karte
+   * bewusst nicht anspringbar. Der gleichwertige Weg steht daneben.
+   */
+  test('ist nicht per Tastatur anspringbar, hat aber eine gleichwertige Alternative', async ({
+    page,
+  }) => {
+    await zurKarteScrollen(page)
+    await expect(page.locator('#anfahrt iframe')).toHaveAttribute('tabindex', '-1')
+
+    await page.evaluate(() => window.scrollTo(0, 0))
+    await page.locator('body').click({ position: { x: 2, y: 2 } })
+    let aufKarte = false
+    for (let i = 0; i < 32; i++) {
+      await page.keyboard.press('Tab')
+      if (await page.evaluate(() => document.activeElement?.tagName === 'IFRAME')) {
+        aufKarte = true
+        break
+      }
+    }
+    expect(aufKarte, 'Tab landet auf der Karte, ohne dass ein Ring sichtbar waere').toBe(false)
+
+    const abschnitt = page.locator('#anfahrt')
+    await expect(abschnitt).toContainText('Dorf-Platz 1')
+    await expect(abschnitt.getByRole('link', { name: 'Route planen' })).toBeVisible()
+  })
+
+  test('hat ihre Flaeche schon vor dem Zeichnen — kein Layout-Sprung', async ({ page }) => {
+    await page.goto('/', { waitUntil: 'commit' })
     const rahmen = page.locator('#anfahrt .karte')
-    const vorher = await rahmen.boundingBox()
-    await page.locator('#anfahrt').getByRole('button', { name: 'Karte laden' }).click()
+    await rahmen.waitFor()
+    const frueh = await rahmen.boundingBox()
+    await page.waitForLoadState('networkidle')
+    const spaet = await rahmen.boundingBox()
+    expect(Math.abs(spaet!.height - frueh!.height)).toBeLessThan(2)
+  })
+
+  /**
+   * Die Karte laedt jetzt ohne Einwilligung. Damit muss die
+   * Datenschutzerklaerung das auch sagen — sonst beschreibt sie einen
+   * Zustand, den es nicht mehr gibt. Dieser Test haelt beides zusammen.
+   */
+  test('wird in der Datenschutzerklaerung zutreffend beschrieben', async ({ page }) => {
+    await zurKarteScrollen(page)
     await expect(page.locator('#anfahrt iframe')).toHaveCount(1)
-    const nachher = await rahmen.boundingBox()
-    expect(Math.abs(nachher!.height - vorher!.height)).toBeLessThan(2)
+
+    await page.goto('/datenschutz')
+    const text = await page.locator('main').innerText()
+    expect(text).toContain('Google Maps')
+    expect(text).toContain('IP-Adresse')
+    expect(text).toMatch(/in Sichtweite kommt/i)
+    // Ohne Klick gibt es keine Einwilligung — die Erklaerung darf keine behaupten.
+    expect(text).not.toMatch(/lit\. a DSGVO/)
   })
 
   test('Route planen fuehrt zu Google Maps und oeffnet einen neuen Tab', async ({ page }) => {

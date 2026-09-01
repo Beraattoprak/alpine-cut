@@ -1,17 +1,49 @@
 'use client'
 
-import { useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { Reveal } from '@/components/Reveal'
 import { SectionHeading } from '@/components/SectionHeading'
 import { salon } from '@/content'
 import { adresseEinzeilig, kartenEinbettungUrl, routenUrl } from '@/lib/adresse'
 
 export function Anfahrt() {
-  const [karteGeladen, setKarteGeladen] = useState(false)
   // Auf Touchgeräten fängt die Karte sonst das Wischen ab und der Besucher
   // kommt nicht mehr an ihr vorbei. Sie wird deshalb erst durch Antippen
   // bedienbar. Auf Zeigergeräten spielt das keine Rolle.
   const [karteBedienbar, setKarteBedienbar] = useState(false)
+
+  /**
+   * Die Karte lädt ohne Zutun, aber erst kurz bevor sie ins Bild kommt.
+   *
+   * Kein Klick — und trotzdem kostet sie beim Seitenaufruf nichts. Googles
+   * Skripte belasten den Hauptthread erheblich: Mit Karte direkt im Markup
+   * schwankte die Total Blocking Time über drei Messungen zwischen 60 und
+   * 1440 ms und der Lighthouse-Wert zwischen 98 und 65. `loading="lazy"`
+   * allein genügte dafür nicht.
+   */
+  const rahmenRef = useRef<HTMLDivElement>(null)
+  const [karteNah, setKarteNah] = useState(false)
+
+  useEffect(() => {
+    const el = rahmenRef.current
+    if (!el) return
+
+    if (!('IntersectionObserver' in window)) {
+      setKarteNah(true)
+      return
+    }
+
+    const beobachter = new IntersectionObserver(
+      ([eintrag]) => {
+        if (!eintrag.isIntersecting) return
+        setKarteNah(true)
+        beobachter.disconnect()
+      },
+      { rootMargin: '300px' },
+    )
+    beobachter.observe(el)
+    return () => beobachter.disconnect()
+  }, [])
 
   return (
     <section id="anfahrt" aria-labelledby="anfahrt-titel" className="abschnitt">
@@ -47,53 +79,43 @@ export function Anfahrt() {
                 </a>
               </p>
               <p className="mt-3 max-w-[40ch] text-[length:var(--mass-meta)] text-fg-muted">
-                Öffnet Google Maps in einem neuen Tab. Vorher werden keine Daten übertragen.
+                Öffnet Google Maps in einem neuen Tab.
               </p>
             </div>
 
-            {/* Feste Höhe über aspect-ratio, damit Platzhalter und Karte exakt
-                gleich hoch sind — sonst springt das Layout beim Laden. */}
-            <div className="karte relative w-full border border-line bg-bg-2">
-              {karteGeladen ? (
-                <>
-                  <iframe
-                    src={kartenEinbettungUrl}
-                    title={`Karte mit dem Standort von ${salon.name}, ${adresseEinzeilig}`}
-                    loading="lazy"
-                    allowFullScreen
-                    referrerPolicy="no-referrer-when-downgrade"
-                    className="absolute inset-0 h-full w-full border-0"
-                    data-bedienbar={karteBedienbar ? 'ja' : 'nein'}
-                  />
-                  {!karteBedienbar && (
-                    <button
-                      type="button"
-                      onClick={() => setKarteBedienbar(true)}
-                      className="karte-freigabe absolute inset-0 grid place-items-end justify-center pb-5"
-                    >
-                      <span className="label bg-bg px-3 py-2 text-fg">
-                        Zum Bewegen antippen
-                      </span>
-                    </button>
-                  )}
-                </>
-              ) : (
-                <div className="absolute inset-0 grid place-items-center p-6 text-center">
-                  <div className="flex max-w-[36ch] flex-col items-center gap-4">
-                    <p className="label">Karte von Google Maps</p>
-                    <p className="text-[length:var(--mass-meta)] text-fg-muted">
-                      Beim Laden werden Daten an Google übertragen, darunter Ihre IP-Adresse.
-                      Die Karte lädt erst, wenn Sie hier klicken.
-                    </p>
-                    <button
-                      type="button"
-                      onClick={() => setKarteGeladen(true)}
-                      className="mt-1 bg-fg px-6 py-3 text-sm font-medium tracking-wide text-bg transition-opacity hover:opacity-80"
-                    >
-                      Karte laden
-                    </button>
-                  </div>
-                </div>
+            {/* Feste Höhe über aspect-ratio, damit die Fläche schon steht,
+                bevor die Karte gezeichnet ist — sonst springt das Layout. */}
+            <div ref={rahmenRef} className="karte relative w-full border border-line bg-bg-2">
+              {/*
+                tabIndex={-1}: Die Karte ist bewusst nicht per Tastatur
+                anspringbar. Ein fremdes iframe laesst sich von der Wirtsseite
+                aus nicht als fokussiert erkennen — weder iframe:focus noch
+                :focus-within matchen, und focus-Ereignisse kommen gar nicht
+                erst an; beides nachgemessen. Chrome zeichnet dort auch keinen
+                eigenen Ring. Eine Tab-Station ohne sichtbaren Fokus verstoesst
+                gegen WCAG 2.4.7. Alles, was die Karte zeigt, steht daneben als
+                Adresse und hinter "Route planen" — dort ist der Fokus sichtbar.
+              */}
+              {karteNah && (
+                <iframe
+                  src={kartenEinbettungUrl}
+                  title={`Karte mit dem Standort von ${salon.name}, ${adresseEinzeilig}`}
+                  loading="lazy"
+                  allowFullScreen
+                  tabIndex={-1}
+                  referrerPolicy="no-referrer-when-downgrade"
+                  className="absolute inset-0 h-full w-full border-0"
+                  data-bedienbar={karteBedienbar ? 'ja' : 'nein'}
+                />
+              )}
+              {karteNah && !karteBedienbar && (
+                <button
+                  type="button"
+                  onClick={() => setKarteBedienbar(true)}
+                  className="karte-freigabe absolute inset-0 grid place-items-end justify-center pb-5"
+                >
+                  <span className="label bg-bg px-3 py-2 text-fg">Zum Bewegen antippen</span>
+                </button>
               )}
             </div>
           </div>
