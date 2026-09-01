@@ -5,7 +5,7 @@ const teile = [
   `${salon.strasse}`,
   `${salon.plz} ${salon.ort}`,
   salon.telefon,
-  'Termin nach Vereinbarung',
+  'Ohne Termin',
 ]
 
 /**

@@ -2,6 +2,9 @@
 
 Website des Friseursalons Alpine Cut, Dorf-Platz 1, 6263 Fügen, Tirol.
 
+Der Salon nimmt **Laufkundschaft** — keine Terminvergabe. Die Seite hat deshalb
+kein Formular; sie nennt Öffnungszeiten, Adresse und Telefonnummer.
+
 ## Inhalte ändern
 
 Alles Redaktionelle liegt unter `content/`. TypeScript meldet Tippfehler beim
@@ -9,12 +12,26 @@ Build, statt sie live gehen zu lassen.
 
 | Datei | Inhalt |
 |---|---|
-| `content/salon.ts` | Name, Adresse, Telefon, E-Mail |
+| `content/salon.ts` | Name, Adresse, Telefon, Instagram, E-Mail |
 | `content/leistungen.ts` | Leistungen mit Preisen |
-| `content/team.ts` | Namen und Rollen |
 | `content/oeffnungszeiten.ts` | Öffnungszeiten |
+| `content/fotos.ts` | Fotos für Hero, Arbeiten und Salon |
 | `content/texte.ts` | Hero-Texte, Über-Text, Meta-Beschreibung |
 | `content/rechtliches.ts` | Impressum und Datenschutz |
+
+### Fotos einsetzen
+
+Dateien nach `public/fotos/` legen, dann in `content/fotos.ts` eintragen. Ein
+Beispiel steht dort als Kommentar. Erwartete Formate:
+
+| Platz | Seitenverhältnis | Mindestbreite | Anzahl |
+|---|---|---|---|
+| Hero | 3:2 quer | 2000 px | 1 |
+| Arbeiten | 3:4 hochkant | 1200 px | 5–8 |
+| Salon | 16:9 quer | 1600 px | 1 |
+
+Solange ein Platz leer ist, steht dort ein gerahmter Hinweis mit Format und
+Zweck — kein grauer Kasten.
 
 ### Offene Stellen
 
@@ -25,14 +42,10 @@ auf.
 **Vor dem Livegang** im Vercel-Projekt `STRICT_CONTENT=1` setzen. Der Build
 bricht dann ab, solange irgendwo noch ein Platzhalter steht.
 
-Sobald `content/leistungen.ts` echte Leistungen enthält, wird aus dem freien
-Textfeld im Terminformular automatisch eine Auswahlliste daraus.
-
 ## Umgebungsvariablen
 
-Siehe `.env.example`. Ohne `RESEND_API_KEY` und `ANFRAGE_EMPFAENGER` zeigt das
-Formular eine ehrliche Fehlermeldung mit der Telefonnummer als Ausweg — es
-schweigt nicht und tut auch nicht so, als sei etwas versendet worden.
+Siehe `.env.example`. Es wird nur `NEXT_PUBLIC_SITE_URL` gebraucht, für
+kanonische Adressen, Sitemap und JSON-LD. Kein Mailversand, kein API-Schlüssel.
 
 ## Befehle
 
@@ -41,32 +54,27 @@ schweigt nicht und tut auch nicht so, als sei etwas versendet worden.
     npm test                Unit-Tests (Vitest)
     npm run test:e2e        Browser-Tests (Playwright)
     npm run check:content   offene TODO-Marker auflisten
-    npm run assets:frames   Video -> 145 WebP-Frames (braucht ffmpeg)
-    npm run assets:images   Poster, Salonfoto und OG-Bild
+    npm run assets:images   Logo-Ableitungen und OG-Bild neu erzeugen
 
-## Hero-Animation
+`npm run test:e2e` startet einen eigenen Produktionsbuild. Läuft parallel schon
+`npm run dev` auf Port 3000, verwendet Playwright den Dev-Server — dort
+kompiliert Next Routen erst beim ersten Aufruf, was einzelne Tests flackern
+lässt. Vor dem Testlauf also den Dev-Server beenden.
 
-Die Maschine zerfällt entlang der Scrollposition und fügt sich beim
-Zurückscrollen wieder zusammen. Technisch ist das eine vorgeladene Sequenz aus
-145 WebP-Frames auf einem `<canvas>`, kein Video-Scrubbing — das Quellvideo hat
-nur einen einzigen Keyframe und wäre zum Seeken unbrauchbar.
+## Gestaltung
 
-Die Rechenlogik liegt als reine Funktionen in `lib/scrub.ts` und ist unter
-`lib/__tests__/scrub.test.ts` vollständig getestet, einschließlich der
-Umkehrbarkeit.
-
-Kein Scrubbing gibt es unter 768 px Viewportbreite, bei
-`prefers-reduced-motion: reduce` und im Datensparmodus. Dort steht ein
-statisches Poster, und die 200vh Scrollstrecke entsteht gar nicht erst. In
-diesen Fällen wird auch kein einziger Frame geladen.
+Streng monochrom auf Schwarz, abgeleitet aus dem Logo (`assets/source/`).
+Space Grotesk für Überschriften und Labels, Geist Sans für Fließtext. Keine
+Akzentfarbe: Aktionen heben sich über Fläche und Größe ab.
 
 Zwei Stellen, die man beim Weiterbauen leicht kaputtmacht:
 
-- Die Höhe der Bühne kommt **ausschließlich** aus Media Queries in
-  `globals.css`. Setzt man sie per JavaScript, entsteht ein Layout-Shift.
-- `data-scrub` wird von einem Inline-Skript im `<head>` gesetzt, vor dem ersten
-  Paint. Verschiebt man das nach React, springen die beiden Hero-Textblöcke bei
-  der Hydration.
+- **`color-scheme: dark` in `:root`.** Ohne diese Zeile rendert Chrome seine
+  eingebauten Bedienelemente im Hellmodus — Bildlaufleisten, Autofill und
+  jedes künftige Formularfeld sähen falsch aus.
+- **Elementregeln gehören in `@layer base`, Hilfsklassen in `@layer
+  components`.** Ungelayerte Regeln schlagen jede Tailwind-Utility. Nur der
+  Fokus-Ring steht bewusst ungelayert, damit ihn nichts überschreibt.
 
 ## Rechtliches
 
@@ -74,9 +82,13 @@ Impressum und Datenschutzerklärung sind fachlich sorgfältig auf das abgestimmt
 was diese Seite tatsächlich tut — sie sind aber **keine Rechtsberatung**. Vor
 dem Livegang anwaltlich prüfen lassen.
 
+Die Seite bettet nichts von Dritten ein: keine Karte, kein Instagram-Widget,
+keine Schriften von fremden Servern, kein Analytics. Deshalb kein
+Einwilligungsbanner.
+
 ## Bekannte Meldungen
 
-`npm audit` meldet drei Funde in Paketen **innerhalb** von Next.js
+`npm audit` meldet Funde in Paketen **innerhalb** von Next.js
 (`next/node_modules/postcss` und `.../sharp`). Der angebotene Fix wäre ein
 Downgrade auf Next 9.3.3. Beide sind Build-Zeit-Abhängigkeiten, die hier keine
 fremden Eingaben verarbeiten. Sie verschwinden mit dem nächsten Next-Release.

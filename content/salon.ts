@@ -12,5 +12,6 @@ export const salon: Salon = {
   telefonHref: 'tel:+436766786333',
   instagram: 'https://www.instagram.com/alpine.cutz/',
   instagramHandle: '@alpine.cutz',
-  email: todo('E-Mail-Adresse des Salons eintragen — auch Empfänger der Terminanfragen'),
+  // Für Impressum und Datenschutz gesetzlich nötig, auch ohne Kontaktformular.
+  email: todo('E-Mail-Adresse des Salons eintragen — Pflichtangabe im Impressum'),
 }

@@ -39,11 +39,10 @@ test('Skip-Link ist der erste Fokus und springt zum Hauptinhalt', async ({ page 
 })
 
 /**
- * Echtes Tabben, nicht el.focus(): Beide Wege unterscheiden sich. Ein
- * <input type="date"> ist beim Tabben vier Stationen — Tag, Monat, Jahr und
- * das Kalendersymbol —, waehrend focus() nur das Feld als Ganzes anspringt.
- * Genau die vierte Station hatte keinen Fokus-Ring, und mit programmatischem
- * focus() faellt das nicht auf.
+ * Echtes Tabben, nicht el.focus(): Beide Wege unterscheiden sich. Als die
+ * Seite noch ein Datumsfeld hatte, war das beim Tabben vier Stationen — die
+ * vierte, Chromes Kalendersymbol, hatte keinen Ring, und mit programmatischem
+ * focus() fiel das nicht auf. Das Feld ist inzwischen weg, die Lehre bleibt.
  */
 test('jede Tab-Station zeigt einen sichtbaren weißen Fokus-Ring', async ({ page }) => {
   await page.goto('/')
@@ -64,29 +63,21 @@ test('jede Tab-Station zeigt einen sichtbaren weißen Fokus-Ring', async ({ page
         breite: s.outlineWidth,
         farbe: s.outlineColor,
         stil: s.outlineStyle,
-        istDatum: el.tagName === 'INPUT' && el.getAttribute('type') === 'date',
         wer: el.outerHTML.slice(0, 110),
       }
     })
     if (!stil) continue
     stationen++
 
-    // Chromes Kalendersymbol im Datumsfeld ist eine eigene Tab-Station im
-    // Shadow-DOM. document.activeElement meldet das Wirtselement, dessen
-    // Fokus-Ring dort nicht greift — der Ring sitzt auf dem Shadow-Teil und
-    // ist von aussen nicht messbar. Er wird in globals.css gesetzt und weiter
-    // unten gesondert geprueft.
-    if (stil.istDatum && stil.stil === 'none') continue
-
     expect(stil.stil, stil.wer).not.toBe('none')
     expect(parseFloat(stil.breite), stil.wer).toBeGreaterThanOrEqual(2)
     expect(stil.farbe, stil.wer).toBe('rgb(255, 255, 255)')
   }
 
-  // Das Formular liegt weit unten im Tab-Weg. Wird es nicht erreicht, hat der
-  // Test seinen Zweck verfehlt, auch wenn er gruen ist.
-  expect(stationen, 'zu wenige Tab-Stationen erreicht').toBeGreaterThan(20)
-  await expect(page.locator('input[type="date"]')).toHaveCount(1)
+  // Untergrenze, damit der Test nicht gruen wird, weil er nichts erreicht hat:
+  // Kopfzeile, Hero, Arbeiten, Anfahrt und Fusszeile bringen zusammen deutlich
+  // mehr als zehn Stationen mit.
+  expect(stationen, 'zu wenige Tab-Stationen erreicht').toBeGreaterThan(10)
 })
 
 test('die Seite meldet sich dem Browser als dunkel', async ({ page }) => {
@@ -99,29 +90,6 @@ test('die Seite meldet sich dem Browser als dunkel', async ({ page }) => {
   expect(schema).toBe('dark')
 })
 
-test('das Kalendersymbol im Datumsfeld hat einen eigenen Fokus-Ring', async ({ page }) => {
-  await page.goto('/')
-  // Der Shadow-Teil ist von aussen nicht messbar, die Regel dafuer aber schon.
-  const regeln = await page.evaluate(() => {
-    const treffer: string[] = []
-    for (const blatt of Array.from(document.styleSheets)) {
-      let regelListe: CSSRuleList
-      try {
-        regelListe = blatt.cssRules
-      } catch {
-        continue
-      }
-      for (const r of Array.from(regelListe)) {
-        const s = (r as CSSStyleRule).selectorText
-        if (s?.includes('calendar-picker-indicator') && s.includes(':focus')) {
-          treffer.push(s + ' { ' + (r as CSSStyleRule).style.cssText.slice(0, 60) + ' }')
-        }
-      }
-    }
-    return treffer
-  })
-  expect(regeln.join(' | ')).toContain('outline')
-})
 
 test('Fußzeile nennt Adresse und Telefon und verlinkt beide Rechtsseiten', async ({ page }) => {
   await page.goto('/')

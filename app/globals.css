@@ -202,22 +202,6 @@ textarea:focus {
   outline-offset: 2px;
 }
 
-/* Das Kalendersymbol im Datumsfeld ist eine eigene Tab-Station in Chromes
-   Shadow-DOM. Der Ring des Wirtselements greift dort nicht, also bekommt es
-   einen eigenen. Ohne diese Regel gaebe es eine Station ohne Fokusanzeige. */
-input[type='date']::-webkit-calendar-picker-indicator {
-  cursor: pointer;
-  opacity: 0.75;
-  border-radius: 1px;
-}
-input[type='date']::-webkit-calendar-picker-indicator:hover {
-  opacity: 1;
-}
-input[type='date']::-webkit-calendar-picker-indicator:focus {
-  outline: 2px solid var(--fg);
-  outline-offset: 2px;
-  opacity: 1;
-}
 
 /* In @layer components, damit Utilities wie text-fg oder text-fg-muted sie
    ueberschreiben koennen. */

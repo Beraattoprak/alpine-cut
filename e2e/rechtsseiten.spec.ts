@@ -15,10 +15,15 @@ test('Impressum markiert die noch fehlenden Pflichtangaben sichtbar', async ({ p
 test('Datenschutz beschreibt genau die Verarbeitung, die stattfindet', async ({ page }) => {
   await page.goto('/datenschutz')
   const text = await page.locator('main').innerText()
-  expect(text).toContain('Resend')
   expect(text).toContain('Vercel')
   expect(text).toContain('Art. 6')
   expect(text).toMatch(/kein.{0,30}(Analyse|Analytics|Tracking)/i)
+
+  // Seit dem Wegfall des Formulars gibt es keinen Mailversand und damit auch
+  // keinen Auftragsverarbeiter dafür. Stünde Resend noch drin, waere die
+  // Erklaerung schlicht falsch.
+  expect(text).not.toContain('Resend')
+  expect(text).toMatch(/kein Kontakt- oder Terminformular/i)
 })
 
 test('beide Rechtsseiten sind aus der Fusszeile erreichbar', async ({ page }) => {

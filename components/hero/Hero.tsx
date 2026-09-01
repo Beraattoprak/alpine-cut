@@ -29,11 +29,13 @@ export function Hero() {
         <p className="lead mt-8 max-w-[42ch]">{texte.heroUnterzeile}</p>
 
         <div className="mt-12 flex flex-wrap items-center gap-x-10 gap-y-4">
+          {/* Ohne Terminvergabe ist die naechstliegende Frage "wann und wo?",
+              nicht "wie buche ich?". Der Verweis bleibt deshalb auf der Seite. */}
           <a
-            href="#termin"
+            href="#zeiten"
             className="bg-fg px-8 py-4 text-sm font-medium tracking-wide text-bg no-underline transition-opacity hover:opacity-80"
           >
-            Termin anfragen
+            Zeiten &amp; Anfahrt
           </a>
           <a href={salon.telefonHref} className="label text-fg no-underline hover:underline">
             {salon.telefon}

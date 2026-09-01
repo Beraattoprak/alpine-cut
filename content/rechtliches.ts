@@ -54,19 +54,17 @@ export const datenschutz: Rechtsabschnitt[] = [
     ],
   },
   {
-    titel: 'Terminanfragen über das Formular',
+    titel: 'Welche Daten diese Seite verarbeitet',
     absaetze: [
-      'Wenn Sie das Formular absenden, verarbeiten wir Ihren Namen, Ihre Telefonnummer, die gewünschte Leistung und Ihren Wunschtermin.',
-      'Rechtsgrundlage ist Art. 6 Abs. 1 lit. b DSGVO — die Anfrage ist eine vorvertragliche Maßnahme — sowie Art. 6 Abs. 1 lit. f DSGVO, unser berechtigtes Interesse an der Bearbeitung von Terminwünschen.',
-      'Die Angaben erreichen uns per E-Mail. Wir bewahren sie so lange auf, wie es für die Terminvereinbarung nötig ist, und löschen sie spätestens nach sechs Monaten, sofern keine gesetzliche Aufbewahrungspflicht besteht.',
-      'Die Angabe der Daten ist freiwillig. Ohne Namen und Telefonnummer können wir den Termin allerdings nicht bestätigen.',
+      'Diese Seite enthält kein Kontakt- oder Terminformular. Wir erheben keine Daten, die Sie selbst eingeben, und speichern nichts über Ihren Besuch hinaus.',
+      'Wer Kontakt aufnehmen möchte, ruft an oder kommt vorbei. Für Anrufe gelten die üblichen Verbindungsdaten Ihres Telefonanbieters; darauf haben wir keinen Einfluss.',
     ],
   },
   {
-    titel: 'Auftragsverarbeiter',
+    titel: 'Hosting',
     absaetze: [
-      'Den Versand der Formular-E-Mails übernimmt Resend (Plus Five Five, Inc., San Francisco, USA). Dabei werden die von Ihnen eingegebenen Daten in die USA übermittelt. Grundlage sind die Standardvertragsklauseln der Europäischen Kommission.',
       'Die Seite wird von Vercel Inc. gehostet. Beim Aufruf verarbeitet Vercel technisch notwendige Server-Logs, insbesondere IP-Adresse, Zeitpunkt, abgerufene Seite und Browserkennung. Rechtsgrundlage ist Art. 6 Abs. 1 lit. f DSGVO, unser berechtigtes Interesse an einem sicheren und störungsfreien Betrieb.',
+      'Dabei werden Daten auch in die USA übermittelt. Grundlage sind die Standardvertragsklauseln der Europäischen Kommission.',
     ],
   },
   {
@@ -74,6 +72,7 @@ export const datenschutz: Rechtsabschnitt[] = [
     absaetze: [
       'Diese Seite setzt keine Cookies zu Analyse- oder Werbezwecken. Es findet keine Reichweitenmessung und kein Tracking statt. Deshalb gibt es auch kein Einwilligungsbanner.',
       'Der Kartendienst ist bewusst nicht eingebettet. Der Link „Route planen" öffnet Google Maps erst, wenn Sie ihn anklicken — vorher werden keine Daten an Google übertragen.',
+      'Der Link zu Instagram öffnet die Seite ebenfalls erst beim Anklicken. Es ist kein Instagram-Inhalt eingebettet, es wird also nichts an Meta übertragen, solange Sie den Link nicht nutzen.',
       'Schriften werden von unserem eigenen Server ausgeliefert, nicht von einem Drittanbieter.',
     ],
   },

@@ -3,8 +3,6 @@ import { Laufband } from '@/components/Laufband'
 import { Arbeiten } from '@/components/sections/Arbeiten'
 import { Leistungen } from '@/components/sections/Leistungen'
 import { OeffnungszeitenAnfahrt } from '@/components/sections/OeffnungszeitenAnfahrt'
-import { Team } from '@/components/sections/Team'
-import { Terminanfrage } from '@/components/sections/Terminanfrage'
 import { UeberDenSalon } from '@/components/sections/UeberDenSalon'
 
 export default function Startseite() {
@@ -15,9 +13,7 @@ export default function Startseite() {
       <Arbeiten />
       <Leistungen />
       <UeberDenSalon />
-      <Team />
       <OeffnungszeitenAnfahrt />
-      <Terminanfrage />
     </>
   )
 }

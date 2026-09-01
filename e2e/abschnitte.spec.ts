@@ -2,7 +2,7 @@ import { expect, test } from '@playwright/test'
 
 test('jede Sprungmarke im Kopf findet ihr Ziel', async ({ page }) => {
   await page.goto('/')
-  for (const id of ['arbeiten', 'leistungen', 'salon', 'team', 'zeiten', 'termin']) {
+  for (const id of ['arbeiten', 'leistungen', 'salon', 'zeiten']) {
     await expect(page.locator(`#${id}`)).toHaveCount(1)
   }
 })
@@ -62,9 +62,23 @@ test('es gibt keine eingebettete Karte, die vor der Einwilligung laedt', async (
   await expect(page.locator('iframe')).toHaveCount(0)
 })
 
+test('die Seite verspricht keine Terminvergabe', async ({ page }) => {
+  await page.goto('/')
+  const text = (await page.locator('body').innerText()).toLowerCase()
+  expect(text).not.toContain('nach vereinbarung')
+  expect(text).not.toContain('terminanfrage')
+  expect(text).toContain('kein termin nötig')
+})
+
+test('es gibt kein Formular mehr, das Daten entgegennimmt', async ({ page }) => {
+  await page.goto('/')
+  await expect(page.locator('form')).toHaveCount(0)
+  await expect(page.locator('input, textarea, select')).toHaveCount(0)
+})
+
 test('jeder Abschnitt ist ueber seine Ueberschrift benannt', async ({ page }) => {
   await page.goto('/')
-  for (const id of ['arbeiten', 'leistungen', 'salon', 'team', 'zeiten', 'termin']) {
+  for (const id of ['arbeiten', 'leistungen', 'salon', 'zeiten']) {
     await expect(page.locator(`#${id}`)).toHaveAttribute('aria-labelledby', `${id}-titel`)
   }
 })

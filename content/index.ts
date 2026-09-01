@@ -1,6 +1,5 @@
 export { salon } from './salon'
 export { leistungen } from './leistungen'
-export { team } from './team'
 export { oeffnungszeiten } from './oeffnungszeiten'
 export { texte } from './texte'
 export { arbeiten, heroFoto, salonFoto } from './fotos'

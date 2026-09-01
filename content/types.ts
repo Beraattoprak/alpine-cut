@@ -16,7 +16,6 @@ export type Salon = {
 
 export type Leistung = { bezeichnung: string; preis: string; hinweis?: string }
 export type Leistungskategorie = { titel: string; leistungen: Leistung[] }
-export type Teammitglied = { name: string; rolle: string }
 
 export type Wochentag =
   | 'Montag'

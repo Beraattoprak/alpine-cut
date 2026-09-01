@@ -12,7 +12,7 @@ export function OeffnungszeitenAnfahrt() {
     <section id="zeiten" aria-labelledby="zeiten-titel" className="abschnitt">
       <div className="container-seite">
         <Reveal>
-          <SectionHeading id="zeiten" nummer="05" eyebrow="Zeiten" titel="Öffnungszeiten & Anfahrt" />
+          <SectionHeading id="zeiten" nummer="04" eyebrow="Zeiten" titel="Öffnungszeiten & Anfahrt" />
         </Reveal>
 
         <Reveal verzoegerung={80}>
@@ -35,7 +35,12 @@ export function OeffnungszeitenAnfahrt() {
             </div>
 
             <div>
+              {/* Ohne Terminvergabe ist das hier der Abschluss der Seite und
+                  zugleich die eigentliche Handlungsaufforderung. */}
               <p className="label mb-6">Wo Sie uns finden</p>
+              <p className="mb-6 font-display text-[length:var(--mass-h3)] uppercase">
+                Einfach vorbeikommen
+              </p>
               <address className="not-italic text-[length:var(--mass-lead)] leading-snug">
                 {salon.strasse}
                 <br />
