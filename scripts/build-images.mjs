@@ -1,4 +1,4 @@
-import { existsSync } from 'node:fs'
+import { existsSync, mkdirSync } from 'node:fs'
 import path from 'node:path'
 import { fileURLToPath } from 'node:url'
 import sharp from 'sharp'
@@ -20,17 +20,23 @@ async function melden(pfad, name) {
 }
 
 // --- Logo -----------------------------------------------------------------
-// Die Vorlage hat schwarzen Grund und viel Rand. `trim` schneidet den Rand
-// weg, indem es von den Ecken aus gleichfarbige Flaechen abtraegt. Freistellen
-// mit Alphakanal geht aus einem JPEG nicht verlustfrei — noetig ist es auch
-// nicht, denn die Seite ist ebenfalls schwarz.
+// Die Vorlage ist weiss auf schwarz, mit viel Rand. `trim` nimmt den Rand weg.
+//
+// Freigestellt wird ueber die Helligkeit: Das Motiv ist rein weiss, der Grund
+// rein schwarz, also taugt der Graustufenwert unveraendert als Alphakanal. Ein
+// weisses Rechteck bekommt ihn per joinChannel angehaengt. Ergebnis ist ein
+// weisses Logo auf durchsichtigem Grund — noetig, seit es ueber dem Hero-Foto
+// steht; auf schwarzem Grund fiel der schwarze Kasten vorher nicht auf.
 for (const [breite, name] of [
   [512, 'logo.png'],
   [1024, 'logo-gross.png'],
 ]) {
-  await sharp(logo)
-    .trim({ threshold: 12 })
-    .resize({ width: breite })
+  const beschnitten = sharp(logo).trim({ threshold: 12 }).resize({ width: breite })
+  const maske = await beschnitten.clone().greyscale().toColourspace('b-w').toBuffer()
+  const { width, height } = await sharp(maske).metadata()
+
+  await sharp({ create: { width, height, channels: 3, background: '#ffffff' } })
+    .joinChannel(maske)
     .png({ compressionLevel: 9 })
     .toFile(path.join(pub, name))
   await melden(path.join(pub, name), name)
@@ -39,6 +45,30 @@ for (const [breite, name] of [
 // Das Werkzeugfoto wird nicht mehr abgeleitet: Es hat weissen Grund und
 // waere auf der schwarzen Seite ein leuchtender Kasten. Das Original bleibt
 // unter assets/source/ liegen.
+
+// --- Salonfotos -----------------------------------------------------------
+// Die Originale sind ~2048 px breite JPEGs direkt aus dem Telefon. Sie werden
+// auf zwei Breiten als WebP abgelegt; next/image liefert daraus die passende
+// Groesse aus. Kein Beschnitt — das Seitenverhaeltnis bestimmt die Seite ueber
+// aspect-ratio, damit die Bildaussage nicht beschnitten wird.
+const fotos = ['salon-aussen', 'salon-lounge', 'salon-plaetze', 'salon-waschen']
+const fotoZiel = path.join(pub, 'fotos')
+mkdirSync(fotoZiel, { recursive: true })
+
+for (const name of fotos) {
+  const quelle = path.join(wurzel, 'assets/source/fotos', `${name}.jpeg`)
+  if (!existsSync(quelle)) {
+    console.error(`Foto fehlt: ${quelle}`)
+    process.exit(1)
+  }
+  const m = await sharp(quelle).metadata()
+
+  await sharp(quelle)
+    .resize({ width: Math.min(1800, m.width), withoutEnlargement: true })
+    .webp({ quality: 82 })
+    .toFile(path.join(fotoZiel, `${name}.webp`))
+  await melden(path.join(fotoZiel, `${name}.webp`), `fotos/${name}.webp`)
+}
 
 // --- Open-Graph-Bild ------------------------------------------------------
 // Bewusst statisch vorgeneriert: @vercel/og laedt auf dieser Windows-Maschine

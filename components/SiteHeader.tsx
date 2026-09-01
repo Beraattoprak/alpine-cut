@@ -1,7 +1,7 @@
 import { salon } from '@/content'
 
 const sprungmarken = [
-  { id: 'arbeiten', text: 'Arbeiten' },
+  { id: 'einblick', text: 'Einblick' },
   { id: 'leistungen', text: 'Leistungen' },
   { id: 'salon', text: 'Salon' },
   { id: 'zeiten', text: 'Zeiten' },
@@ -10,9 +10,10 @@ const sprungmarken = [
 
 export function SiteHeader() {
   return (
-    // Im normalen Fluss statt absolut: bricht die Navigation auf schmalen
-    // Geräten um, schiebt sie den Hero nach unten, statt ihn zu überlagern.
-    <header className="relative z-50">
+    // Auf schmalen Geräten im normalen Fluss: Dort bricht die Navigation um und
+    // würde den Hero überlagern. Ab 768px liegt sie über dem Hero-Foto — siehe
+    // .kopf-ueber-hero in globals.css.
+    <header className="kopf-ueber-hero relative z-50">
       <div className="container-seite flex flex-wrap items-center justify-between gap-x-8 gap-y-3 py-6">
         {/* Wortmarke als Schrift, nicht als Bild: Das Logo steht gross im Hero
             direkt darunter — zweimal waere eine Dopplung. Die weite Sperrung

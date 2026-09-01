@@ -10,17 +10,37 @@ test('die Seite bleibt streng monochrom', async ({ page }) => {
   await page.goto('/')
   // Jede sichtbare Text- und Flaechenfarbe muss grau sein, also R = G = B.
   // Faengt versehentlich eingeschleppte Akzentfarben ab.
+  //
+  // Die Farbwerte werden ueber ein Canvas normalisiert statt aus dem String
+  // gelesen: Tailwind kompiliert Angaben wie text-white/[0.07] zu
+  // oklab(0.999994 0.0000455678 … / 0.07). Ein Ziffern-Regex zieht daraus
+  // "999994, 455678, 200868" und haelt reines Weiss fuer bunt.
   const bunt = await page.evaluate(() => {
     const treffer: string[] = []
-    const zerlegen = (v: string) => v.match(/\d+/g)?.slice(0, 3).map(Number)
+    const c = document.createElement('canvas')
+    c.width = c.height = 1
+    const ctx = c.getContext('2d', { willReadFrequently: true })!
+
+    const alsRgb = (wert: string) => {
+      ctx.clearRect(0, 0, 1, 1)
+      ctx.fillStyle = '#000000'
+      ctx.fillStyle = wert
+      ctx.fillRect(0, 0, 1, 1)
+      const [r, g, b, a] = ctx.getImageData(0, 0, 1, 1).data
+      return { r, g, b, a }
+    }
+
     for (const el of Array.from(document.querySelectorAll('body *'))) {
       if (el.closest('[data-todo]')) continue // Marker sind absichtlich rot
       const s = getComputedStyle(el)
       for (const eigenschaft of ['color', 'backgroundColor', 'borderTopColor'] as const) {
-        const rgb = zerlegen(s[eigenschaft])
-        if (!rgb || s[eigenschaft].includes('rgba(0, 0, 0, 0)')) continue
-        if (rgb[0] !== rgb[1] || rgb[1] !== rgb[2]) {
-          treffer.push(`${el.tagName}.${el.className} ${eigenschaft}=${s[eigenschaft]}`)
+        const wert = s[eigenschaft]
+        if (!wert) continue
+        const { r, g, b, a } = alsRgb(wert)
+        if (a === 0) continue // unsichtbar, Farbe egal
+        // Toleranz 2: Farbraumumrechnung rundet.
+        if (Math.abs(r - g) > 2 || Math.abs(g - b) > 2) {
+          treffer.push(`${el.tagName}.${el.className} ${eigenschaft}=${wert} -> ${r},${g},${b}`)
         }
       }
     }

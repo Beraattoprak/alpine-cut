@@ -2,7 +2,7 @@ import { expect, test } from '@playwright/test'
 
 test('jede Sprungmarke im Kopf findet ihr Ziel', async ({ page }) => {
   await page.goto('/')
-  for (const id of ['arbeiten', 'leistungen', 'salon', 'zeiten', 'anfahrt']) {
+  for (const id of ['einblick', 'leistungen', 'salon', 'zeiten', 'anfahrt']) {
     await expect(page.locator(`#${id}`)).toHaveCount(1)
   }
 })
@@ -11,8 +11,10 @@ test('offene Inhalte zeigen einen sichtbaren TODO-Marker statt erfundener Werte'
   page,
 }) => {
   await page.goto('/')
+  // Drei sichtbare Marker: Leistungen, Über-Text, Öffnungszeiten. Die
+  // Fotoplätze sind weggefallen, seit echte Salonfotos vorliegen.
   const marker = page.locator('[data-todo]')
-  expect(await marker.count()).toBeGreaterThanOrEqual(4)
+  expect(await marker.count()).toBeGreaterThanOrEqual(3)
   await expect(marker.first()).toBeVisible()
 })
 
@@ -24,11 +26,68 @@ test('das Laufband nennt nur gesicherte Daten', async ({ page }) => {
   await expect(band).toContainText('+43 676 6786333')
 })
 
-test('die Arbeiten verweisen auf Instagram', async ({ page }) => {
+test('der Einblick verweist auf Instagram', async ({ page }) => {
   await page.goto('/')
   await expect(
-    page.locator('#arbeiten').getByRole('link', { name: '@alpine.cutz' }),
+    page.locator('#einblick').getByRole('link', { name: '@alpine.cutz' }),
   ).toHaveAttribute('href', 'https://www.instagram.com/alpine.cutz/')
+})
+
+test.describe('Einblick: Bildreihe an der Scrollposition', () => {
+  test('zeigt alle Salonfotos mit Alt-Text und Bildunterschrift', async ({ page }) => {
+    await page.goto('/')
+    const bilder = page.locator('#einblick .einblick-bild')
+    await expect(bilder).toHaveCount(3)
+    for (let i = 0; i < 3; i++) {
+      const alt = await bilder.nth(i).locator('img').getAttribute('alt')
+      expect(alt, `Bild ${i + 1} ohne Alt-Text`).toBeTruthy()
+      expect(alt!.length, `Alt-Text ${i + 1} zu knapp`).toBeGreaterThan(20)
+      await expect(bilder.nth(i).locator('figcaption')).not.toBeEmpty()
+    }
+  })
+
+  test('die Reihe wandert beim Scrollen waagrecht durch', async ({ page }, info) => {
+    test.skip(info.project.name !== 'desktop', 'nur mit Festhalten, also ab 768px')
+    await page.goto('/')
+    const spur = page.locator('.einblick-spur')
+
+    const versatz = async () =>
+      spur.evaluate((el) => new DOMMatrix(getComputedStyle(el).transform).m41)
+
+    const buehne = await page.evaluate(() => {
+      const el = document.querySelector('.einblick-buehne') as HTMLElement
+      return { top: el.offsetTop, hoehe: el.offsetHeight }
+    })
+    const strecke = buehne.hoehe - 900
+
+    await page.evaluate((y) => window.scrollTo(0, y), buehne.top)
+    await page.waitForTimeout(500)
+    const anfang = await versatz()
+
+    await page.evaluate((y) => window.scrollTo(0, y), buehne.top + strecke)
+    await page.waitForTimeout(700)
+    const ende = await versatz()
+
+    expect(anfang, 'am Anfang soll die Reihe unverschoben stehen').toBeCloseTo(0, 0)
+    expect(ende, 'am Ende soll die Reihe nach links gewandert sein').toBeLessThan(-100)
+
+    // Und wieder zurueck: die Kopplung darf keine Vorzugsrichtung haben.
+    await page.evaluate((y) => window.scrollTo(0, y), buehne.top)
+    await page.waitForTimeout(700)
+    expect(await versatz()).toBeCloseTo(0, 0)
+  })
+
+  test('mobil gibt es keine Scrollstrecke, nur eine Wischreihe', async ({ page }, info) => {
+    test.skip(info.project.name !== 'mobil', 'nur mobil')
+    await page.goto('/')
+    const hoehe = await page.evaluate(
+      () => (document.querySelector('.einblick-buehne') as HTMLElement).offsetHeight,
+    )
+    const viewport = page.viewportSize()!.height
+    expect(hoehe, 'mobil darf keine zusaetzliche Scrollstrecke entstehen').toBeLessThan(
+      viewport * 2,
+    )
+  })
 })
 
 test('nirgends stehen erfundene Preise, Namen oder Zeiten', async ({ page }) => {
@@ -182,7 +241,7 @@ test('es gibt kein Formular mehr, das Daten entgegennimmt', async ({ page }) => 
 
 test('jeder Abschnitt ist ueber seine Ueberschrift benannt', async ({ page }) => {
   await page.goto('/')
-  for (const id of ['arbeiten', 'leistungen', 'salon', 'zeiten', 'anfahrt']) {
+  for (const id of ['einblick', 'leistungen', 'salon', 'zeiten', 'anfahrt']) {
     await expect(page.locator(`#${id}`)).toHaveAttribute('aria-labelledby', `${id}-titel`)
   }
 })

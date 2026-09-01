@@ -1,36 +1,48 @@
 import Image from 'next/image'
 import { Bergkamm } from '@/components/Bergkamm'
-import { Fotoplatz } from '@/components/Fotoplatz'
+import { HeroParallaxe } from '@/components/hero/HeroParallaxe'
 import { salon, texte } from '@/content'
 import { heroFoto } from '@/content/fotos'
 
 export function Hero() {
   return (
-    <section className="relative overflow-hidden pt-10 pb-[var(--abschnitt)] sm:pt-16">
-      {/* Bergkamm, riesig und sehr dunkel. Rein grafisch, kein Inhalt. */}
+    <section className="hero relative isolate overflow-hidden">
+      {/* Das Foto liegt hinter allem und wandert beim Scrollen langsamer als
+          die Seite. Der Verlauf darüber hält die Schrift lesbar — ohne ihn
+          steht Weiß auf hellem Himmel. */}
+      <HeroParallaxe>
+        <Image
+          src={`/fotos/${heroFoto.datei}`}
+          alt={heroFoto.alt}
+          fill
+          priority
+          sizes="100vw"
+          className="object-cover"
+        />
+        <div className="hero-schleier" aria-hidden="true" />
+      </HeroParallaxe>
+
       <Bergkamm
-        className="pointer-events-none absolute -top-4 left-1/2 w-[160%] max-w-none -translate-x-1/2 text-[#141414] sm:w-[120%]"
+        className="pointer-events-none absolute -top-6 left-1/2 z-10 w-[150%] max-w-none -translate-x-1/2 text-white/[0.07] sm:w-[115%]"
         strichstaerke={3}
       />
 
-      <div className="container-seite relative">
+      <div className="container-seite relative z-20 flex min-h-[86svh] flex-col justify-end pt-16 pb-[clamp(3rem,7vw,6rem)]">
         <Image
           src="/logo-gross.png"
           alt="Alpine Cut"
           width={1024}
           height={739}
           priority
-          sizes="(min-width: 640px) 280px, 200px"
-          className="h-auto w-[200px] sm:w-[280px]"
+          sizes="(min-width: 640px) 260px, 180px"
+          className="h-auto w-[180px] sm:w-[260px]"
         />
 
-        <h1 className="mt-10 max-w-[16ch] uppercase">{texte.heroHeadline}</h1>
+        <h1 className="mt-8 max-w-[16ch] uppercase">{texte.heroHeadline}</h1>
 
-        <p className="lead mt-8 max-w-[42ch]">{texte.heroUnterzeile}</p>
+        <p className="lead mt-6 max-w-[44ch] text-white/80">{texte.heroUnterzeile}</p>
 
-        <div className="mt-12 flex flex-wrap items-center gap-x-10 gap-y-4">
-          {/* Ohne Terminvergabe ist die naechstliegende Frage "wann und wo?",
-              nicht "wie buche ich?". Der Verweis bleibt deshalb auf der Seite. */}
+        <div className="mt-10 flex flex-wrap items-center gap-x-8 gap-y-4">
           <a
             href="#zeiten"
             className="bg-fg px-8 py-4 text-sm font-medium tracking-wide text-bg no-underline transition-opacity hover:opacity-80"
@@ -40,34 +52,6 @@ export function Hero() {
           <a href={salon.telefonHref} className="label text-fg no-underline hover:underline">
             {salon.telefon}
           </a>
-        </div>
-
-        <div className="mt-20 grid gap-10 lg:grid-cols-[1.6fr_1fr] lg:items-end">
-          <Fotoplatz
-            wert={heroFoto}
-            seitenverhaeltnis="3 / 2"
-            format="3:2 quer, ab 2000 px"
-            sizes="(min-width: 1024px) 60vw, 100vw"
-            prioritaet
-          />
-          <dl className="grid gap-6 border-t border-line pt-8 lg:border-t-0 lg:pt-0">
-            <div>
-              <dt className="label">Adresse</dt>
-              <dd className="mt-2">
-                {salon.strasse}
-                <br />
-                {salon.plz} {salon.ort}, {salon.region}
-              </dd>
-            </div>
-            <div>
-              <dt className="label">Instagram</dt>
-              <dd className="mt-2">
-                <a href={salon.instagram} target="_blank" rel="noreferrer noopener">
-                  @alpine.cutz
-                </a>
-              </dd>
-            </div>
-          </dl>
         </div>
       </div>
     </section>

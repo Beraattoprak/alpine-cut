@@ -317,6 +317,124 @@ textarea:focus {
   }
 }
 
+/* --- Hero ----------------------------------------------------------------
+   Das Bild sitzt hinter dem Inhalt und wird von HeroParallaxe verschoben.
+   Es ist absichtlich hoeher als die Buehne, damit beim Wandern unten nichts
+   frei wird. --parallaxe hat einen Startwert, damit es auch ohne JavaScript
+   sitzt. */
+.hero {
+  --parallaxe: 0px;
+  background: var(--bg);
+}
+
+/* Ab 768px legt sich die Kopfzeile ueber das Hero-Foto, statt darueber zu
+   sitzen. Darunter bleibt sie im Fluss: Dort bricht die Navigation um und
+   wuerde sonst das Logo im Hero verdecken. */
+@media (min-width: 768px) {
+  .kopf-ueber-hero {
+    position: absolute;
+    inset-inline: 0;
+    top: 0;
+  }
+  .kopf-ueber-hero + main .hero {
+    margin-top: 0;
+  }
+}
+
+.hero-bild {
+  position: absolute;
+  inset: -18% 0 0 0;
+  z-index: 0;
+  transform: translate3d(0, var(--parallaxe), 0);
+  will-change: transform;
+}
+
+/* Ohne diesen Verlauf steht weisse Schrift auf hellem Himmel. Unten laeuft er
+   ins Seitenschwarz aus, damit der Uebergang zum naechsten Abschnitt nahtlos
+   ist. */
+.hero-schleier {
+  position: absolute;
+  inset: 0;
+  background:
+    linear-gradient(to top, var(--bg) 2%, rgb(0 0 0 / 0.35) 46%, rgb(0 0 0 / 0.72) 100%),
+    linear-gradient(to right, rgb(0 0 0 / 0.75), rgb(0 0 0 / 0.15) 62%);
+}
+
+/* --- Einblick: waagrechte Bildreihe an der Scrollposition -----------------
+   Die Hoehe kommt aus CSS, nie aus JavaScript — sonst springt das Layout beim
+   ersten Frame. Unter 768px und bei reduzierter Bewegung entsteht die
+   Scrollstrecke gar nicht erst; dort ist es eine normale Wischreihe. */
+.einblick-buehne {
+  position: relative;
+}
+
+.einblick-pin {
+  padding-block: var(--abschnitt);
+}
+
+.einblick-fenster {
+  overflow: hidden;
+  padding-inline: var(--gasse);
+}
+
+.einblick-spur {
+  display: flex;
+  gap: clamp(1rem, 2.5vw, 2rem);
+  will-change: transform;
+}
+
+/* Alle Bilder gleich hoch, die Breite ergibt sich aus dem Seitenverhaeltnis.
+   Dadurch stehen Quer- und Hochformat in einer Reihe, nichts wird beschnitten
+   und die Bildunterschriften liegen auf einer Linie. */
+.einblick-bild {
+  flex: 0 0 auto;
+  margin: 0;
+}
+
+.einblick-rahmen {
+  position: relative;
+  height: clamp(15rem, 46vh, 22rem);
+  width: auto;
+  background: var(--bg-2);
+}
+
+@media (max-width: 767px), (prefers-reduced-motion: reduce) {
+  /* Ohne Festhalten: normale Reihe, die man mit dem Finger schiebt. */
+  .einblick-fenster {
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+    /* Ohne scroll-padding rastet die erste Kachel am Scrollport-Anfang ein und
+       hebt das Innenpolster auf: Das Bild klebt dann am Displayrand, waehrend
+       die Ueberschrift daneben eine Gasse hat. */
+    scroll-padding-inline: var(--gasse);
+    scrollbar-width: thin;
+    scrollbar-color: var(--line) transparent;
+    padding-bottom: 1.25rem;
+  }
+  .einblick-bild {
+    scroll-snap-align: start;
+  }
+}
+
+@media (min-width: 768px) and (prefers-reduced-motion: no-preference) {
+  .einblick-buehne {
+    /* 100svh Buehne plus Strecke, ueber die die Reihe durchwandert. */
+    height: calc(100svh + 120vh);
+  }
+  .einblick-pin {
+    position: sticky;
+    top: 0;
+    height: 100svh;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    padding-block: 0;
+  }
+  .einblick-rahmen {
+    height: clamp(18rem, 52vh, 30rem);
+  }
+}
+
 /* --- Karte ---------------------------------------------------------------
    Platzhalter und geladene Karte teilen sich dieselbe Hoehe, damit beim
    Laden nichts springt. */
