@@ -204,6 +204,25 @@
     .raum__b { width: 62%; justify-self: end; }
     .raum__c { width: 34%; justify-self: center; }
   }
+  /* ---- Akt 6: Kundenfeedback, dunkel, seitlich laufende Karten -------- */
+  .stimmen { display: flex; align-items: stretch; height: 100%;
+             gap: clamp(1rem, 2vw, 1.5rem); }
+  .stimmen__lead { flex: 0 0 min(80vw, 19rem); align-self: center; }
+  .note { font-family: var(--sc-font-display); font-size: clamp(2.6rem, 6vw, 4.4rem);
+          line-height: 1; letter-spacing: -.03em; margin: 0; }
+  .sterne { color: var(--sc-accent); letter-spacing: .18em; font-size: 1.05rem; }
+  .karte { flex: 0 0 clamp(15rem, 21vw, 19rem); align-self: center;
+           background: var(--sc-surface); padding: clamp(1.1rem, 2vw, 1.5rem);
+           display: flex; flex-direction: column; gap: .8rem; }
+  .karte__kopf { display: flex; align-items: center; gap: .7rem; }
+  .karte__kreis { width: 2.4rem; height: 2.4rem; border-radius: 50%;
+                  display: grid; place-items: center; flex: 0 0 auto;
+                  background: var(--sc-accent); color: var(--sc-accent-ink);
+                  font-family: var(--sc-font-display); font-weight: 700; }
+  .karte__name { font-family: var(--sc-font-display); font-weight: 600; font-size: .95rem; }
+  .karte__wann { font-size: .78rem; color: var(--sc-ink-soft); }
+  .karte__text { margin: 0; font-size: .92rem; line-height: 1.5; }
+
   /* ---- Akt 6: Kontakt, dunkel ---------------------------------------- */
   .kontakt { display: grid; place-items: center; text-align: center; height: 100%; }
   .kontakt__inner { display: grid; gap: 1.5rem; justify-items: center;
@@ -247,7 +266,7 @@
              data-sc-src-mobile="assets/clipper-m.mp4" muted playsinline></video>
       <div class="scrim-hell" aria-hidden="true"></div>
       <div class="sc-copy sc-copy--lead" data-sc-cue="0 0.8 0">
-        <h1 class="sc-display sc-display--xl" data-sc-kinetic="lines">Friseur im Zillertal</h1>
+        <h1 class="sc-display sc-display--xl" data-sc-kinetic="lines">Dein Friseur im Zillertal</h1>
         <p class="sc-body hero__sub">Damen und Herren. Kein Termin nötig, einfach vorbeikommen.</p>
       </div>
     </div>
@@ -382,8 +401,8 @@
   <section class="sc-section hell" data-sc-act="flow" data-sc-drift="#F7F4EE">
     <div class="sc-wrap">
       <div class="sc-stack" style="margin-bottom:clamp(2.5rem,5vw,4rem)">
-        <h2 class="sc-display sc-display--md">Der Raum</h2>
-        <p class="sc-body" style="color:var(--sc-ink-soft)">Dunkle Wände, Messing, viel Licht.</p>
+        <h2 class="sc-display sc-display--md">Unser Salon</h2>
+        <p class="sc-body" style="color:var(--sc-ink-soft)">Angenehme Atmosphäre für Ihren Aufenthalt.</p>
       </div>
       <div class="raum">
         <figure class="raum__a" data-sc-reveal="left" data-sc-reveal-at="0.04 0.30">
@@ -398,6 +417,61 @@
           <img src="assets/salon-waschen.webp" width="1536" height="2048" alt="Waschbereich mit zwei Waschbecken, Ringspiegeln und schwarzen Ledersesseln.">
           <figcaption>Waschbereich</figcaption>
         </figure>
+      </div>
+    </div>
+  </section>
+  <!-- 6 · STIMMEN: pan, DUNKEL. Karten laufen seitwaerts durch.
+       Bewusst ohne Google-Logo und ohne Verifiziert-Siegel: Solange die
+       Bewertungen nicht nachweislich von dort stammen, waere beides eine
+       Echtheitsbehauptung, die die Seite nicht einloesen kann. -->
+  <section id="stimmen" class="dunkel" data-sc-act="pan" data-sc-span="2.6" data-sc-drift="#0A0A0A">
+    <div data-sc-stage>
+      <div class="stimmen" data-sc-pan="0.06" style="padding-inline:clamp(1rem,4vw,2.5rem)">
+        <div class="stimmen__lead sc-stack">
+          <p class="label">Kundenfeedback</p>
+          <h2 class="sc-display sc-display--md">Was sagen unsere Kunden?</h2>
+          <p class="sc-body" style="color:var(--sc-ink-soft)"><span class="marker">TODO: Gesamtnote und Anzahl der Bewertungen</span></p>
+        </div>
+          <article class="karte">
+            <div class="karte__kopf">
+              <span class="karte__kreis" aria-hidden="true">?</span>
+              <div>
+                <div class="karte__name">Name</div>
+                <div class="karte__wann">Datum</div>
+              </div>
+            </div>
+            <p class="karte__text"><span class="marker">Bewertung 1 folgt</span></p>
+          </article>
+          <article class="karte">
+            <div class="karte__kopf">
+              <span class="karte__kreis" aria-hidden="true">?</span>
+              <div>
+                <div class="karte__name">Name</div>
+                <div class="karte__wann">Datum</div>
+              </div>
+            </div>
+            <p class="karte__text"><span class="marker">Bewertung 2 folgt</span></p>
+          </article>
+          <article class="karte">
+            <div class="karte__kopf">
+              <span class="karte__kreis" aria-hidden="true">?</span>
+              <div>
+                <div class="karte__name">Name</div>
+                <div class="karte__wann">Datum</div>
+              </div>
+            </div>
+            <p class="karte__text"><span class="marker">Bewertung 3 folgt</span></p>
+          </article>
+          <article class="karte">
+            <div class="karte__kopf">
+              <span class="karte__kreis" aria-hidden="true">?</span>
+              <div>
+                <div class="karte__name">Name</div>
+                <div class="karte__wann">Datum</div>
+              </div>
+            </div>
+            <p class="karte__text"><span class="marker">Bewertung 4 folgt</span></p>
+          </article>
       </div>
     </div>
   </section>
