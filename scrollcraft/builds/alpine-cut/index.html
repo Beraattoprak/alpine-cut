@@ -172,12 +172,13 @@
     .preise th, .preise td { padding: .45rem .35rem; font-size: .88rem; }
   }
 
-  /* ---- Akt 4: Arbeiten, dunkel, Raster ------------------------------- */
-  /* Die Schnittfotos haben alle 3:4, ein Raster ist hier also ruhiger als
-     ein Band und laesst das seitliche Scrollen fuer die Salonfotos frei.
-     Der Skill verbietet denselben Effekt zweimal hintereinander. */
+  /* ---- Akt 4: Arbeiten, dunkel, Tiefe durch Parallaxe ---------------- */
+  /* Vier Hochformate in einer Reihe, jedes mit eigener Rate. Die Saeulen
+     wandern unterschiedlich schnell, das liest sich als Tiefe statt als
+     Effekt. Werte laut Skill: rate * 100 px Gesamtweg, 0,3 bis 1,5 ist
+     der brauchbare Bereich, darueber wirkt es wie ein Fehler. */
   .schnitte { display: grid; gap: clamp(1rem, 2vw, 1.6rem);
-              grid-template-columns: repeat(2, 1fr); }
+              grid-template-columns: repeat(2, 1fr); align-items: start; }
   @media (min-width: 900px) { .schnitte { grid-template-columns: repeat(4, 1fr); } }
   .schnitt { margin: 0; }
   .schnitt img { width: 100%; height: auto; display: block; }
@@ -185,23 +186,24 @@
                         font-size: .7rem; letter-spacing: .18em; text-transform: uppercase;
                         color: var(--sc-ink-soft); }
 
-  /* ---- Akt 5: der Raum, hell, seitlich laufendes Band ----------------- */
-  /* Die Ueberschrift bleibt stehen, nur die Bildreihe wandert darunter durch.
-     Steckt die Ueberschrift im Band, faehrt sie mit nach links weg und man
-     weiss nicht mehr, was man ansieht. Deshalb sitzt sie ausserhalb der
-     bewegten Spur, und ein Fenster mit overflow hidden schneidet die Reihe
-     an der Gasse ab statt am Bildschirmrand. */
-  .raum { display: flex; flex-direction: column; justify-content: center;
-          height: 100%; gap: clamp(1.5rem, 3vw, 2.5rem); }
-  .raum__kopf { padding-inline: clamp(1rem, 4vw, 2.5rem); }
-  .raum__fenster { overflow: hidden; padding-inline: clamp(1rem, 4vw, 2.5rem); }
-  .raumband { display: flex; align-items: flex-end;
-              gap: clamp(1rem, 2.4vw, 2rem); will-change: transform; }
-  .raumbild { flex: 0 0 auto; margin: 0; }
-  .raumbild img { height: clamp(15rem, 56vh, 32rem); width: auto; display: block; }
-  .raumbild figcaption { margin-top: .8rem; font-family: var(--sc-font-display);
-                         font-size: .7rem; letter-spacing: .18em; text-transform: uppercase;
-                         color: var(--sc-ink-soft); }
+  /* ---- Akt 5: der Raum, hell, drei Aufdeckungen ---------------------- */
+  /* Jedes Foto deckt aus einer anderen Richtung auf: von links, von rechts,
+     von oben. Die Fenster liegen hintereinander statt gleichzeitig, damit man
+     jede Bewegung einzeln sieht.
+     Wichtig laut Skill: clip-path bezieht sich auf die Randbox. Deshalb sitzt
+     data-sc-reveal auf der figure und nicht auf dem Bild, damit die
+     Bildunterschrift nicht mitgeschnitten wird. */
+  .raum { display: grid; gap: clamp(3rem, 8vw, 7rem); }
+  .raum figure { margin: 0; }
+  .raum img { width: 100%; height: auto; display: block; }
+  .raum figcaption { margin-top: .9rem; font-family: var(--sc-font-display);
+                     font-size: .7rem; letter-spacing: .18em; text-transform: uppercase;
+                     color: var(--sc-ink-soft); }
+  @media (min-width: 900px) {
+    .raum__a { width: 62%; justify-self: start; }
+    .raum__b { width: 62%; justify-self: end; }
+    .raum__c { width: 34%; justify-self: center; }
+  }
   /* ---- Akt 6: Kontakt, dunkel ---------------------------------------- */
   .kontakt { display: grid; place-items: center; text-align: center; height: 100%; }
   .kontakt__inner { display: grid; gap: 1.5rem; justify-items: center;
@@ -348,28 +350,27 @@
     </div>
   </section>
 
-  <!-- 4 · DIE ARBEIT: flow, DUNKEL. Raster, damit das seitliche Laufen
-       dem Salon-Abschnitt vorbehalten bleibt. -->
+  <!-- 4 · DIE ARBEIT: flow, DUNKEL. Parallaxe: vier Saeulen, vier Raten. -->
   <section id="arbeiten" class="sc-section dunkel" data-sc-act="flow" data-sc-drift="#0A0A0A">
     <div class="sc-wrap">
       <div class="sc-stack" style="margin-bottom:clamp(2rem,4vw,3rem)">
         <h2 class="sc-display sc-display--md">Aus dem Stuhl</h2>
         <p class="sc-body" style="color:var(--sc-ink-soft)">Arbeiten aus dem Salon, nicht gestellt.</p>
       </div>
-      <div class="schnitte" data-sc-in data-sc-stagger="80">
-          <figure class="schnitt">
+      <div class="schnitte">
+          <figure class="schnitt" data-sc-parallax="-0.9">
             <img src="assets/herren-fade.webp" width="1000" height="1333" alt="Herrenschnitt, hoher Fade an der Seite, längeres Deckhaar nach hinten frisiert.">
             <figcaption>Fade</figcaption>
           </figure>
-          <figure class="schnitt">
+          <figure class="schnitt" data-sc-parallax="0.5">
             <img src="assets/herren-crop.webp" width="1000" height="1333" alt="Herrenschnitt, texturierter Crop mit Bart, Übergang an der Schläfe.">
             <figcaption>Crop mit Bart</figcaption>
           </figure>
-          <figure class="schnitt">
+          <figure class="schnitt" data-sc-parallax="-0.4">
             <img src="assets/herren-taper.webp" width="1000" height="1333" alt="Herrenschnitt, weicher Übergang im Nacken, welliges Deckhaar.">
             <figcaption>Taper</figcaption>
           </figure>
-          <figure class="schnitt">
+          <figure class="schnitt" data-sc-parallax="0.8">
             <img src="assets/damen-lang.webp" width="1000" height="1333" alt="Damenschnitt, langes blondiertes Haar mit weichem Verlauf, von hinten.">
             <figcaption>Lang, blondiert</figcaption>
           </figure>
@@ -377,31 +378,26 @@
     </div>
   </section>
 
-  <!-- 5 · DER RAUM: pan, HELL. Die Ueberschrift steht still, nur die
-       Bildreihe wandert beim Scrollen seitwaerts durch. -->
-  <section class="hell" data-sc-act="pan" data-sc-span="2.8" data-sc-drift="#F7F4EE">
-    <div data-sc-stage>
+  <!-- 5 · DER RAUM: flow, HELL. Drei Aufdeckungen, drei Richtungen. -->
+  <section class="sc-section hell" data-sc-act="flow" data-sc-drift="#F7F4EE">
+    <div class="sc-wrap">
+      <div class="sc-stack" style="margin-bottom:clamp(2.5rem,5vw,4rem)">
+        <h2 class="sc-display sc-display--md">Der Raum</h2>
+        <p class="sc-body" style="color:var(--sc-ink-soft)">Dunkle Wände, Messing, viel Licht.</p>
+      </div>
       <div class="raum">
-        <div class="raum__kopf sc-stack">
-          <h2 class="sc-display sc-display--md">Der Raum</h2>
-          <p class="sc-body" style="color:var(--sc-ink-soft)">Dunkle Wände, Messing, viel Licht.</p>
-        </div>
-        <div class="raum__fenster">
-          <div class="raumband" data-sc-pan="0.06">
-            <figure class="raumbild">
-              <img src="assets/salon-plaetze.webp" width="1600" height="1200" alt="Drei Bedienplätze mit weiß-goldenen Stühlen unter wabenförmiger Deckenbeleuchtung.">
-              <figcaption>Die Bedienplätze</figcaption>
-            </figure>
-            <figure class="raumbild">
-              <img src="assets/salon-waschen.webp" width="1536" height="2048" alt="Waschbereich mit zwei Waschbecken, Ringspiegeln und schwarzen Ledersesseln.">
-              <figcaption>Waschbereich</figcaption>
-            </figure>
-            <figure class="raumbild">
-              <img src="assets/salon-lounge.webp" width="1600" height="1200" alt="Wartebereich mit schwarzen Chesterfield-Sofas und Messingfüßen am Schaufenster.">
-              <figcaption>Warten wie im Wohnzimmer</figcaption>
-            </figure>
-          </div>
-        </div>
+        <figure class="raum__a" data-sc-reveal="left" data-sc-reveal-at="0.04 0.30">
+          <img src="assets/salon-plaetze.webp" width="1600" height="1200" alt="Drei Bedienplätze mit weiß-goldenen Stühlen unter wabenförmiger Deckenbeleuchtung.">
+          <figcaption>Die Bedienplätze</figcaption>
+        </figure>
+        <figure class="raum__b" data-sc-reveal="right" data-sc-reveal-at="0.34 0.60">
+          <img src="assets/salon-lounge.webp" width="1600" height="1200" alt="Wartebereich mit schwarzen Chesterfield-Sofas und Messingfüßen am Schaufenster.">
+          <figcaption>Warten wie im Wohnzimmer</figcaption>
+        </figure>
+        <figure class="raum__c" data-sc-reveal="up" data-sc-reveal-at="0.62 0.88">
+          <img src="assets/salon-waschen.webp" width="1536" height="2048" alt="Waschbereich mit zwei Waschbecken, Ringspiegeln und schwarzen Ledersesseln.">
+          <figcaption>Waschbereich</figcaption>
+        </figure>
       </div>
     </div>
   </section>
