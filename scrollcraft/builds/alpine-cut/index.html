@@ -219,11 +219,12 @@
   .karte { flex: 0 0 clamp(15rem, 21vw, 19rem);
            background: var(--sc-surface); padding: clamp(1.1rem, 2vw, 1.5rem);
            display: flex; flex-direction: column; gap: .8rem; }
-  .karte__kopf { display: flex; align-items: center; gap: .7rem; }
+  .karte__kopf { display: flex; align-items: flex-start; gap: .7rem; }
   .karte__kreis { width: 2.4rem; height: 2.4rem; border-radius: 50%;
                   display: grid; place-items: center; flex: 0 0 auto;
                   background: var(--sc-accent); color: var(--sc-accent-ink);
                   font-family: var(--sc-font-display); font-weight: 700; }
+  .karte__kopf > div { display: grid; align-content: start; }
   .karte__name { font-family: var(--sc-font-display); font-weight: 600; font-size: .95rem; }
   .karte__wann { font-size: .78rem; color: var(--sc-ink-soft); }
   .karte__text { margin: 0; font-size: .92rem; line-height: 1.5; }
@@ -514,6 +515,16 @@
             </div>
             <p class="sterne" aria-label="5 von 5 Sternen">★★★★★</p>
             <p class="karte__text">Super Service, super Preise! Vielen Dank! Beim nächsten Mal sehr gerne wieder.</p>
+          </article>
+          <article class="karte">
+            <div class="karte__kopf">
+              <span class="karte__kreis" aria-hidden="true">B</span>
+              <div>
+                <div class="karte__name">Berat Toprak</div>
+              </div>
+            </div>
+            <p class="sterne" aria-label="5 von 5 Sternen">★★★★★</p>
+            <p class="karte__text">Guada Bua, super Aufenthalt.</p>
           </article>
           <article class="karte">
             <div class="karte__kopf">
