@@ -80,6 +80,15 @@
     position: absolute; inset: 0; pointer-events: none;
     background: linear-gradient(to right, #F7F4EE 0%, rgb(247 244 238 / .82) 34%, rgb(247 244 238 / 0) 62%);
   }
+  /* Schmaler Schirm: Die Schrift steht ueber die volle Breite, der dunkle
+     Haarschneider wandert dahinter durch. Ein Verlauf von links haelt die
+     Flaeche darunter dann nicht mehr hell, gemessen 1,03:1. Also von unten. */
+  @media (max-width: 820px) {
+    .scrim-hell {
+      background: linear-gradient(to top, #F7F4EE 0%, rgb(247 244 238 / .94) 46%, rgb(247 244 238 / 0) 82%);
+    }
+  }
+
   .hero__mark { width: clamp(130px, 15vw, 200px); height: auto; margin-bottom: 1.4rem; }
   .hero__sub { color: var(--sc-ink-soft); max-width: 30ch; }
 
@@ -145,6 +154,12 @@
   .regler:has(input:focus-visible) { outline: 2px solid var(--sc-ink); outline-offset: 6px; }
   .regler__label { font-family: var(--sc-font-display); font-size: .68rem;
                    letter-spacing: .2em; text-transform: uppercase; color: var(--sc-ink-soft); }
+
+  /* Ab 821px steht der Regler am rechten Rand der Buehne. Ohne diese
+     Reserve laufen die Preisspalte und die Reglerspur ineinander. */
+  @media (min-width: 821px) {
+    .werk { padding-right: clamp(6.5rem, 9vw, 9rem); }
+  }
 
   @media (max-width: 820px) {
     .regler { position: static; transform: none; flex-direction: row;
@@ -279,7 +294,26 @@
         </div>
 
         <div class="werk__panel" id="panel-herren">
-          <p><span class="marker">TODO: Herrenpreise bestätigen, siehe Rückfrage</span></p>
+          <!-- Betraege in der Reihenfolge der Preistafel uebernommen. Auf der
+               Tafel sind Bezeichnungen und Betraege gegeneinander verschoben,
+               die Zuordnung ist also ungeprueft. Deshalb der sichtbare Hinweis
+               darunter: erfunden ist keine Zahl, bestaetigt aber auch nicht. -->
+          <table class="preise">
+            <caption>Schnitt, Bart und Pflege</caption>
+            <tbody>
+              <tr><th scope="row">Maschinenhaarschnitt</th><td>16 €</td></tr>
+              <tr><th scope="row">Musterhaarschnitt</th><td>6 €</td></tr>
+              <tr><th scope="row">Bartrasur</th><td>10 €</td></tr>
+              <tr><th scope="row">Maschinenbartrasur</th><td>13 €</td></tr>
+              <tr><th scope="row">Musterbartrasur</th><td>15 €</td></tr>
+              <tr><th scope="row">Waschen, Schneiden, Föhnen</th><td>26 €</td></tr>
+              <tr><th scope="row">Waschen und Föhnen</th><td>8 €</td></tr>
+              <tr><th scope="row">Wachs</th><td>8 €</td></tr>
+              <tr><th scope="row">Black Mask</th><td>8 €</td></tr>
+              <tr><th scope="row">Kopfmassage</th><td>5 €</td></tr>
+            </tbody>
+          </table>
+          <p style="margin:1rem 0 0"><span class="marker">Zuordnung noch nicht bestätigt</span></p>
         </div>
 
         <div class="werk__panel" id="panel-damen" hidden>
