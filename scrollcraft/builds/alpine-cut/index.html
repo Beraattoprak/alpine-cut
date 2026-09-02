@@ -186,13 +186,17 @@
                         color: var(--sc-ink-soft); }
 
   /* ---- Akt 5: der Raum, hell, seitlich laufendes Band ----------------- */
-  /* Einheitliche Hoehe, Breite aus dem Seitenverhaeltnis: So stehen Quer-
-     und Hochformat in einer Reihe, ohne dass etwas beschnitten wird. */
-  /* height 100% und align-items center: Ohne das klebt die Reihe am oberen
-     Rand der Buehne und darunter bleibt eine halbe Bildschirmhoehe leer. */
-  .raumband { display: flex; align-items: center; height: 100%;
-              gap: clamp(1rem, 2.4vw, 2rem); padding-inline: clamp(1rem, 4vw, 2.5rem); }
-  .raumband__lead { flex: 0 0 min(78vw, 20rem); }
+  /* Die Ueberschrift bleibt stehen, nur die Bildreihe wandert darunter durch.
+     Steckt die Ueberschrift im Band, faehrt sie mit nach links weg und man
+     weiss nicht mehr, was man ansieht. Deshalb sitzt sie ausserhalb der
+     bewegten Spur, und ein Fenster mit overflow hidden schneidet die Reihe
+     an der Gasse ab statt am Bildschirmrand. */
+  .raum { display: flex; flex-direction: column; justify-content: center;
+          height: 100%; gap: clamp(1.5rem, 3vw, 2.5rem); }
+  .raum__kopf { padding-inline: clamp(1rem, 4vw, 2.5rem); }
+  .raum__fenster { overflow: hidden; padding-inline: clamp(1rem, 4vw, 2.5rem); }
+  .raumband { display: flex; align-items: flex-end;
+              gap: clamp(1rem, 2.4vw, 2rem); will-change: transform; }
   .raumbild { flex: 0 0 auto; margin: 0; }
   .raumbild img { height: clamp(15rem, 56vh, 32rem); width: auto; display: block; }
   .raumbild figcaption { margin-top: .8rem; font-family: var(--sc-font-display);
@@ -373,27 +377,31 @@
     </div>
   </section>
 
-  <!-- 5 · DER RAUM: pan, HELL. Die Bildreihe laeuft beim Scrollen seitwaerts
-       durch. Einheitliche Hoehe, nichts beschnitten. -->
+  <!-- 5 · DER RAUM: pan, HELL. Die Ueberschrift steht still, nur die
+       Bildreihe wandert beim Scrollen seitwaerts durch. -->
   <section class="hell" data-sc-act="pan" data-sc-span="2.8" data-sc-drift="#F7F4EE">
     <div data-sc-stage>
-      <div class="raumband" data-sc-pan="0.06">
-        <div class="raumband__lead sc-stack">
+      <div class="raum">
+        <div class="raum__kopf sc-stack">
           <h2 class="sc-display sc-display--md">Der Raum</h2>
           <p class="sc-body" style="color:var(--sc-ink-soft)">Dunkle Wände, Messing, viel Licht.</p>
         </div>
-          <figure class="raumbild">
-            <img src="assets/salon-plaetze.webp" width="1600" height="1200" alt="Drei Bedienplätze mit weiß-goldenen Stühlen unter wabenförmiger Deckenbeleuchtung.">
-            <figcaption>Die Bedienplätze</figcaption>
-          </figure>
-          <figure class="raumbild">
-            <img src="assets/salon-waschen.webp" width="1536" height="2048" alt="Waschbereich mit zwei Waschbecken, Ringspiegeln und schwarzen Ledersesseln.">
-            <figcaption>Waschbereich</figcaption>
-          </figure>
-          <figure class="raumbild">
-            <img src="assets/salon-lounge.webp" width="1600" height="1200" alt="Wartebereich mit schwarzen Chesterfield-Sofas und Messingfüßen am Schaufenster.">
-            <figcaption>Warten wie im Wohnzimmer</figcaption>
-          </figure>
+        <div class="raum__fenster">
+          <div class="raumband" data-sc-pan="0.06">
+            <figure class="raumbild">
+              <img src="assets/salon-plaetze.webp" width="1600" height="1200" alt="Drei Bedienplätze mit weiß-goldenen Stühlen unter wabenförmiger Deckenbeleuchtung.">
+              <figcaption>Die Bedienplätze</figcaption>
+            </figure>
+            <figure class="raumbild">
+              <img src="assets/salon-waschen.webp" width="1536" height="2048" alt="Waschbereich mit zwei Waschbecken, Ringspiegeln und schwarzen Ledersesseln.">
+              <figcaption>Waschbereich</figcaption>
+            </figure>
+            <figure class="raumbild">
+              <img src="assets/salon-lounge.webp" width="1600" height="1200" alt="Wartebereich mit schwarzen Chesterfield-Sofas und Messingfüßen am Schaufenster.">
+              <figcaption>Warten wie im Wohnzimmer</figcaption>
+            </figure>
+          </div>
+        </div>
       </div>
     </div>
   </section>
