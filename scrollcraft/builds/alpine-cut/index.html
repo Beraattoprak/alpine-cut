@@ -5,27 +5,57 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Alpine Cut · Friseur in Fügen</title>
 <meta name="description" content="Friseur am Dorf-Platz 1 in Fügen, Tirol. Kein Termin nötig, einfach vorbeikommen.">
-<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 32 32%27%3E%3Crect width=%2732%27 height=%2732%27 fill=%27%23050505%27/%3E%3Cpath d=%27M4 25 L12 10 L16 16 L20 8 L28 25%27 fill=%27none%27 stroke=%27%23C8A159%27 stroke-width=%272.5%27/%3E%3C/svg%3E">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 32 32%27%3E%3Crect width=%2732%27 height=%2732%27 fill=%27%23F7F4EE%27/%3E%3Cpath d=%27M4 25 L12 10 L16 16 L20 8 L28 25%27 fill=%27none%27 stroke=%27%2314120F%27 stroke-width=%272.5%27/%3E%3C/svg%3E">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;600;700&family=Geist:wght@400;500&display=swap">
 <link rel="stylesheet" href="scrollcraft.css">
 <style>
-  /* Die ganze Marke: sechs Farben und zwei Schriften.
-     Ivory auf Anthrazit statt Weiss auf Schwarz, wie im Briefing verlangt:
-     reines Weiss auf reinem Schwarz schneidet in den Augen. */
+  /* Die Seite wechselt abschnittweise zwischen hellem und dunklem Grund.
+     Umgesetzt ueber zwei Klassen, die die Engine-Tokens lokal umschreiben:
+     data-sc-drift faerbt den Grund, .hell / .dunkel drehen Schrift und Akzent
+     mit. Ohne das Mitdrehen stuende heller Text auf hellem Grund. */
   :root {
-    --sc-canvas:     #050505;
-    --sc-surface:    #131210;
-    --sc-ink:        #F2EDE3;
-    --sc-ink-soft:   #9E968A;
-    --sc-accent:     #C8A159;
-    --sc-accent-ink: #0A0806;
+    --sc-canvas:     #F7F4EE;
+    --sc-surface:    #EDE8DF;
+    --sc-ink:        #14120F;
+    --sc-ink-soft:   #5A544C;
+    --sc-accent:     #8A6620;
+    --sc-accent-ink: #FFFFFF;
     --sc-font-display: "Archivo", system-ui, sans-serif;
     --sc-font-text:    "Geist", system-ui, sans-serif;
   }
 
+  /* Heller Abschnitt: dunkles Gold, damit der Akzent auf Elfenbein
+     lesbar bleibt. #C8A159 haette dort nur 2,3:1. */
+  .hell {
+    --sc-canvas:     #F7F4EE;
+    --sc-surface:    #EDE8DF;
+    --sc-ink:        #14120F;
+    --sc-ink-soft:   #5A544C;
+    --sc-accent:     #8A6620;
+    --sc-accent-ink: #FFFFFF;
+  }
+  /* Dunkler Abschnitt: helles Messing, wie im Salon. */
+  .dunkel {
+    --sc-canvas:     #0A0A0A;
+    --sc-surface:    #161513;
+    --sc-ink:        #F2EDE3;
+    --sc-ink-soft:   #9E968A;
+    --sc-accent:     #C8A159;
+    --sc-accent-ink: #0A0806;
+  }
+  /* Jeder Abschnitt malt seinen eigenen deckenden Grund. Ohne das blendet
+     data-sc-drift den Grund weich ueber, waehrend die Schriftfarbe mit der
+     Klasse hart umspringt: waehrend des Uebergangs stand dunkler Text auf
+     noch dunklem Grund, gemessen 1,05:1. Harte Schnitte sind hier ohnehin
+     richtig, die Abschnitte sollen getrennte Szenen sein. */
+  .hell, .dunkel { color: var(--sc-ink); background: var(--sc-canvas); }
+  .hell [data-sc-stage], .dunkel [data-sc-stage] { background: var(--sc-canvas); }
+
   /* ---- Kopfzeile ---------------------------------------------------- */
+  /* difference kehrt sich ueber hellem und dunklem Grund von selbst um,
+     die Leiste bleibt also auf beiden lesbar, ohne Umschaltlogik. */
   .bar {
     position: fixed; inset-inline: 0; top: 0; z-index: 40;
     display: flex; align-items: center; justify-content: space-between;
@@ -43,11 +73,17 @@
     border-bottom: 1px solid currentColor; padding-bottom: .2rem;
   }
 
-  /* ---- Akt 1: Hero --------------------------------------------------- */
-  .hero__mark { width: clamp(140px, 17vw, 230px); height: auto; margin-bottom: 1.6rem; }
+  /* ---- Akt 1: Hero, hell --------------------------------------------- */
+  /* Kein dunkler Scrim: Der Clip ist ein dunkler Haarschneider auf Weiss.
+     Ein heller Verlauf von links haelt die Flaeche unter der Schrift ruhig. */
+  .scrim-hell {
+    position: absolute; inset: 0; pointer-events: none;
+    background: linear-gradient(to right, #F7F4EE 0%, rgb(247 244 238 / .82) 34%, rgb(247 244 238 / 0) 62%);
+  }
+  .hero__mark { width: clamp(130px, 15vw, 200px); height: auto; margin-bottom: 1.4rem; }
   .hero__sub { color: var(--sc-ink-soft); max-width: 30ch; }
 
-  /* ---- Akt 2: der Ort, bewusst still --------------------------------- */
+  /* ---- Akt 2: der Ort, dunkel, bewusst still ------------------------- */
   .ort { display: grid; gap: clamp(2rem, 5vw, 4rem); align-items: end; }
   @media (min-width: 900px) { .ort { grid-template-columns: 1fr 1.15fr; } }
   .ort figure { margin: 0; }
@@ -55,42 +91,53 @@
   .ort__zeile { font-family: var(--sc-font-display); font-size: clamp(1.6rem, 3.4vw, 2.6rem);
                 line-height: 1.12; letter-spacing: -.02em; max-width: 18ch; }
 
-  /* ---- Akt 3: der Peak, Laengenregler + Preise ------------------------ */
-  .werk { display: grid; gap: 2rem; align-content: center; height: 100%;
+  /* ---- Akt 3: der Peak, Laengenregler + Schnittpreise ---------------- */
+  .werk { display: grid; gap: 1.6rem; align-content: center; height: 100%;
           width: min(100%, 1200px); margin-inline: auto;
           padding-inline: clamp(1rem, 4vw, 2.5rem);
-          /* oben Platz fuer die feste Kopfzeile, sonst liegt der Titel darauf */
           padding-block: clamp(5rem, 10vh, 7rem) clamp(2rem, 5vh, 4rem); }
-  .werk__kopf { display: flex; align-items: baseline; gap: 1.2rem;
-                border-bottom: 1px solid rgb(200 161 89 / .35); padding-bottom: .9rem; }
+  .werk__kopf { display: flex; align-items: baseline; gap: 1.2rem; flex-wrap: wrap;
+                border-bottom: 1px solid color-mix(in srgb, var(--sc-accent) 45%, transparent);
+                padding-bottom: .9rem; }
   .werk__titel { font-family: var(--sc-font-display); font-weight: 600;
                  font-size: clamp(1.5rem, 3vw, 2.2rem); letter-spacing: -.01em; margin: 0; }
   .werk__mm { font-family: var(--sc-font-display); font-variant-numeric: tabular-nums;
               color: var(--sc-accent); letter-spacing: .12em; font-size: .95rem; }
   .werk__panel[hidden] { display: none; }
-  .werk__leer { font-family: var(--sc-font-display); font-weight: 500;
-                font-size: clamp(2rem, 5vw, 3.6rem); line-height: 1.05;
-                letter-spacing: -.02em; margin: 0 0 1rem; max-width: 16ch; }
-  .werk__hinweis { color: var(--sc-ink-soft); max-width: 34ch; margin: 0 0 1.6rem; }
+  .werk__hinweis { color: var(--sc-ink-soft); margin: 0; font-size: .92rem; }
+
+  .preise { width: 100%; border-collapse: collapse; font-variant-numeric: tabular-nums; }
+  .preise caption { text-align: left; font-family: var(--sc-font-display);
+                    font-size: .72rem; letter-spacing: .2em; text-transform: uppercase;
+                    color: var(--sc-ink-soft); padding-bottom: .7rem; }
+  .preise th, .preise td { text-align: right; padding: .6rem .5rem;
+                           border-bottom: 1px solid color-mix(in srgb, var(--sc-ink) 14%, transparent); }
+  .preise th[scope="col"] { font-family: var(--sc-font-display); font-weight: 500;
+                            font-size: .68rem; letter-spacing: .12em; text-transform: uppercase;
+                            color: var(--sc-ink-soft); vertical-align: bottom; }
+  .preise th[scope="row"] { text-align: left; font-weight: 400; font-family: var(--sc-font-text); }
+  .preise tbody tr:last-child th, .preise tbody tr:last-child td { border-bottom: 0; }
+
   .marker { display: inline-block; border: 1px solid var(--sc-accent);
             color: var(--sc-accent); padding: .55rem .85rem; font-size: .8rem;
             letter-spacing: .08em; }
 
-  /* Der Regler. Ein echtes input[type=range], optisch als Hebel.
-     Echtes Formularelement, damit Tastatur und Screenreader es bedienen. */
+  /* Der Regler. Ein echtes input[type=range], optisch als Hebel. */
   .regler { position: absolute; right: clamp(.75rem, 3vw, 2.5rem); top: 50%;
             transform: translateY(-50%); display: flex; flex-direction: column-reverse;
             align-items: center; gap: .8rem; z-index: 5; }
-  .regler__skala { position: relative; height: clamp(190px, 34vh, 300px); width: 54px; }
+  .regler__skala { position: relative; height: clamp(190px, 32vh, 280px); width: 54px; }
   .regler__spur { position: absolute; left: 50%; top: 0; bottom: 0; width: 2px;
-                  transform: translateX(-50%); background: rgb(200 161 89 / .3); }
+                  transform: translateX(-50%);
+                  background: color-mix(in srgb, var(--sc-accent) 45%, transparent); }
   .regler__tick { position: absolute; left: 50%; width: 12px; height: 1px;
-                  transform: translateX(-50%); background: rgb(242 237 227 / .3); }
+                  transform: translateX(-50%);
+                  background: color-mix(in srgb, var(--sc-ink) 28%, transparent); }
   .regler__griff { position: absolute; left: 50%; top: 50%; width: 44px; height: 26px;
                    transform: translate(-50%, -50%); pointer-events: none; }
   .regler input[type="range"] {
     position: absolute; left: 50%; top: 50%;
-    width: clamp(190px, 34vh, 300px); height: 54px;
+    width: clamp(190px, 32vh, 280px); height: 54px;
     transform: translate(-50%, -50%) rotate(-90deg);
     margin: 0; opacity: 0; cursor: grab;
   }
@@ -99,17 +146,25 @@
   .regler__label { font-family: var(--sc-font-display); font-size: .68rem;
                    letter-spacing: .2em; text-transform: uppercase; color: var(--sc-ink-soft); }
 
-  @media (max-width: 700px) {
+  @media (max-width: 820px) {
     .regler { position: static; transform: none; flex-direction: row;
-              justify-content: center; margin-bottom: 1.5rem; gap: 1rem; }
-    .regler__skala { height: 54px; width: min(260px, 66vw); }
+              justify-content: flex-start; margin-bottom: .5rem; gap: 1rem; }
+    .regler__skala { height: 46px; width: min(240px, 60vw); }
     .regler__spur { left: 0; right: 0; top: 50%; bottom: auto; width: auto; height: 2px;
                     transform: translateY(-50%); }
     .regler__tick { top: 50%; left: auto; width: 1px; height: 12px; transform: translateY(-50%); }
-    .regler input[type="range"] { width: min(260px, 66vw); transform: translate(-50%, -50%); }
+    .regler input[type="range"] { width: min(240px, 60vw); transform: translate(-50%, -50%); }
+    .preise th, .preise td { padding: .45rem .35rem; font-size: .88rem; }
   }
 
-  /* ---- Akt 4: Arbeiten ------------------------------------------------ */
+  /* ---- Alle Preise, heller Fliesstext-Abschnitt ---------------------- */
+  .alle { display: grid; gap: clamp(2rem, 4vw, 3rem); }
+  @media (min-width: 820px) { .alle { grid-template-columns: 1fr 1fr; } }
+  .block { break-inside: avoid; }
+  .block h3 { font-family: var(--sc-font-display); font-size: .72rem; letter-spacing: .2em;
+              text-transform: uppercase; color: var(--sc-ink-soft); margin: 0 0 .6rem; }
+
+  /* ---- Akt 4: Arbeiten, dunkel --------------------------------------- */
   .rail { display: flex; gap: clamp(1rem, 2.4vw, 2rem); align-items: flex-end;
           padding-inline: clamp(1rem, 4vw, 2.5rem); }
   .rail__lead { flex: 0 0 min(80vw, 22rem); }
@@ -119,16 +174,16 @@
                         font-size: .72rem; letter-spacing: .2em; text-transform: uppercase;
                         color: var(--sc-ink-soft); }
 
-  /* ---- Akt 5: der Raum ------------------------------------------------ */
+  /* ---- Akt 5: der Raum, hell ----------------------------------------- */
   .raum { display: grid; gap: clamp(1rem, 2.5vw, 2rem); }
   @media (min-width: 900px) { .raum { grid-template-columns: 1.4fr 1fr; align-items: start; } }
   .raum figure { margin: 0; overflow: hidden; }
-  .raum img { width: 100%; height: auto; display: block; filter: brightness(.82); }
+  .raum img { width: 100%; height: auto; display: block; }
   .raum__stapel { display: grid; gap: clamp(1rem, 2.5vw, 2rem); }
 
-  /* ---- Akt 6: Kontakt, voll aufgedreht -------------------------------- */
+  /* ---- Akt 6: Kontakt, dunkel ---------------------------------------- */
   .kontakt { display: grid; place-items: center; text-align: center; height: 100%; }
-  .kontakt__inner { display: grid; gap: 1.6rem; justify-items: center;
+  .kontakt__inner { display: grid; gap: 1.5rem; justify-items: center;
                     padding-inline: clamp(1rem, 4vw, 2.5rem); }
   .kontakt__adresse { font-family: var(--sc-font-display); font-size: clamp(1.1rem, 2vw, 1.45rem);
                       line-height: 1.35; color: var(--sc-ink); margin: 0; }
@@ -138,7 +193,8 @@
            letter-spacing: .12em; text-transform: uppercase; text-decoration: none;
            padding: 1rem 1.8rem; }
   .knopf--leer { background: transparent; color: var(--sc-ink);
-                 box-shadow: inset 0 0 0 1px rgb(242 237 227 / .4); }
+                 box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--sc-ink) 40%, transparent); }
+  .zeiten { color: var(--sc-ink-soft); font-size: .92rem; line-height: 1.6; margin: 0; }
   .foot { position: absolute; inset-inline: 0; bottom: 0; display: flex; flex-wrap: wrap;
           gap: 1rem; justify-content: space-between; align-items: center;
           padding: 1.2rem clamp(1rem, 4vw, 2.5rem); font-size: .78rem;
@@ -158,26 +214,27 @@
 
 <main id="top">
 
-  <!-- 1 · ANKUNFT: scrub. Der Haarschneider zerlegt sich unter der eigenen Hand. -->
-  <section data-sc-act="scrub" data-sc-span="2.4" data-sc-dwell="0.34" data-sc-drift="#050505">
+  <!-- 1 · ANKUNFT: scrub, HELL. Der Clip ist unveraendert aus der Quelle:
+       dunkler Haarschneider auf weissem Grund, also passt er auf den hellen
+       Abschnitt ohne jede Nachbearbeitung. -->
+  <section class="hell" data-sc-act="scrub" data-sc-span="2.4" data-sc-dwell="0.34" data-sc-drift="#F7F4EE">
     <div data-sc-stage>
       <img class="sc-stage__poster" src="assets/clipper-poster.webp" alt="">
       <video data-sc-scrub data-sc-src="assets/clipper.mp4"
              data-sc-src-mobile="assets/clipper-m.mp4" muted playsinline></video>
-      <div class="sc-scrim sc-scrim--lead" aria-hidden="true"></div>
+      <div class="scrim-hell" aria-hidden="true"></div>
       <div class="sc-copy sc-copy--lead" data-sc-cue="0 0.8 0">
-        <img class="hero__mark" src="assets/logo.png" alt="Alpine Cut" width="512" height="370">
         <h1 class="sc-display sc-display--xl" data-sc-kinetic="lines">Friseur in Fügen</h1>
         <p class="sc-body hero__sub">Kein Termin. Einfach vorbeikommen, Dorf-Platz 1.</p>
       </div>
     </div>
   </section>
 
-  <!-- 2 · DER ORT: flow. Die beabsichtigte Stille vor dem Peak. Ein Bild,
-       ein Satz, sonst nichts. -->
-  <section class="sc-section" data-sc-act="flow" data-sc-drift="#0A0A0A">
+  <!-- 2 · DER ORT: flow, DUNKEL. Die beabsichtigte Stille vor dem Peak. -->
+  <section class="sc-section dunkel" data-sc-act="flow" data-sc-drift="#0A0A0A">
     <div class="sc-wrap ort">
       <div class="sc-stack" data-sc-in data-sc-stagger="80">
+        <img class="hero__mark" src="assets/logo.png" alt="Alpine Cut" width="512" height="370">
         <p class="ort__zeile">Am Dorf-Platz, mitten im Ort.</p>
         <p class="sc-body" style="color:var(--sc-ink-soft);max-width:34ch">
           Von außen Holz und ein Fenster mit dem Berg darauf.
@@ -191,10 +248,9 @@
     </div>
   </section>
 
-  <!-- 3 · DAS HANDWERK: pin. PEAK. Groesste Scrollstrecke der Seite.
-       Der Laengenregler ist die Signature-Bewegung: ein Bauteil des
-       Haarschneiders wird zum Bedienelement der Preisliste. -->
-  <section id="preise" data-sc-act="pin" data-sc-span="3.4" data-sc-drift="#101010">
+  <!-- 3 · DAS HANDWERK: pin, HELL. PEAK. Der Laengenregler schaltet die
+       Schnittpreise zwischen Herren und Damen. -->
+  <section id="preise" class="hell" data-sc-act="pin" data-sc-span="3.4" data-sc-drift="#F7F4EE">
     <div data-sc-stage>
       <div class="werk" data-sc-cue="0 1 0 0">
 
@@ -208,8 +264,8 @@
             <span class="regler__tick" style="top:75%" aria-hidden="true"></span>
             <span class="regler__tick" style="top:100%" aria-hidden="true"></span>
             <svg class="regler__griff" id="griff" viewBox="0 0 44 26" fill="none" aria-hidden="true">
-              <rect x=".5" y=".5" width="43" height="25" rx="2" fill="#1B1917" stroke="#C8A159"/>
-              <path d="M8 6.5h28M8 13h28M8 19.5h28" stroke="#C8A159" stroke-width="1.4" opacity=".8"/>
+              <rect x=".5" y=".5" width="43" height="25" rx="2" fill="#14120F" stroke="#8A6620"/>
+              <path d="M8 6.5h28M8 13h28M8 19.5h28" stroke="#C8A159" stroke-width="1.4" opacity=".9"/>
             </svg>
             <input id="mm" type="range" min="0" max="24" step="3" value="6"
                    aria-label="Schnittlänge in Millimetern. Kurz zeigt die Herrenpreise, lang die Damenpreise.">
@@ -219,30 +275,161 @@
         <div class="werk__kopf">
           <h2 class="werk__titel" id="werk-titel">Herren</h2>
           <span class="werk__mm" id="mm-anzeige">6 mm</span>
+          <p class="werk__hinweis" id="werk-hinweis">Regler nach oben zeigt die Damenpreise.</p>
         </div>
 
         <div class="werk__panel" id="panel-herren">
-          <p class="werk__leer">Kurz gehalten.</p>
-          <p class="werk__hinweis">Den Regler nach oben schieben zeigt die Damenpreise.</p>
-          <p><span class="marker">TODO: Herrenpreise eintragen</span></p>
+          <p><span class="marker">TODO: Herrenpreise bestätigen, siehe Rückfrage</span></p>
         </div>
+
         <div class="werk__panel" id="panel-damen" hidden>
-          <p class="werk__leer">Auf Länge gearbeitet.</p>
-          <p class="werk__hinweis">Den Regler nach unten schieben zeigt die Herrenpreise.</p>
-          <p><span class="marker">TODO: Damenpreise eintragen</span></p>
+          <table class="preise">
+            <caption>Schnitt und Styling, nach Haarlänge</caption>
+            <thead>
+              <tr>
+                <th scope="col" style="text-align:left">Behandlung</th>
+                <th scope="col">Kurz<br>bis Ohr</th>
+                <th scope="col">Mittel<br>bis Schulter</th>
+                <th scope="col">Lang<br>ab Schulter</th>
+                <th scope="col">Extra lang<br>bis Linie</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr><th scope="row">Waschen &amp; Föhnen</th><td>25 €</td><td>45 €</td><td>55 €</td><td>65 €</td></tr>
+              <tr><th scope="row">Waschen &amp; Legen</th><td>45 €</td><td>55 €</td><td>65 €</td><td>75 €</td></tr>
+              <tr><th scope="row">Waschen, Schneiden &amp; Föhnen</th><td>55 €</td><td>65 €</td><td>75 €</td><td>85 €</td></tr>
+              <tr><th scope="row">Waschen &amp; Schneiden</th><td>35 €</td><td>45 €</td><td>55 €</td><td>65 €</td></tr>
+            </tbody>
+          </table>
         </div>
 
       </div>
     </div>
   </section>
 
-  <!-- 4 · DIE ARBEIT: pan. Seitwaerts liest sich als Breite. -->
-  <section id="arbeiten" data-sc-act="pan" data-sc-span="2.4" data-sc-drift="#14130F">
+  <!-- 3b · ALLE PREISE: flow, HELL. Der gepinnte Peak fasst nur die
+       Schnittpreise; alles Weitere haette dort keinen Platz. -->
+  <section id="alle-preise" class="sc-section hell" data-sc-act="flow" data-sc-drift="#EFEAE1">
+    <div class="sc-wrap">
+      <h2 class="sc-display sc-display--md" style="margin-bottom:2rem">Alle Preise</h2>
+      <div class="alle" data-sc-in data-sc-stagger="60">
+
+        <div class="block">
+          <h3>Pflege</h3>
+          <table class="preise">
+            <tbody>
+              <tr><th scope="row">Haarpflege</th><td>10 €</td></tr>
+              <tr><th scope="row">Haarmaske</th><td>15 €</td></tr>
+              <tr><th scope="row">K 18</th><td>20 €</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="block">
+          <h3>Farbe</h3>
+          <table class="preise">
+            <thead>
+              <tr><th scope="col" style="text-align:left">&nbsp;</th><th scope="col">Kurz</th><th scope="col">Mittel</th><th scope="col">Lang</th><th scope="col">Extra</th></tr>
+            </thead>
+            <tbody>
+              <tr><th scope="row">Ansatz</th><td>50 €</td><td></td><td></td><td></td></tr>
+              <tr><th scope="row">Haarfarbe komplett</th><td>50 €</td><td>60 €</td><td>70 €</td><td>80 €</td></tr>
+              <tr><th scope="row">Intensivtönung</th><td>50 €</td><td>60 €</td><td>70 €</td><td>80 €</td></tr>
+              <tr><th scope="row">Tönung</th><td>40 €</td><td>50 €</td><td>60 €</td><td></td></tr>
+              <tr><th scope="row">Grauhaar-Kaschierung</th><td>30 €</td><td>35 €</td><td>40 €</td><td>45 €</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="block">
+          <h3>Strähnen</h3>
+          <table class="preise">
+            <thead>
+              <tr><th scope="col" style="text-align:left">&nbsp;</th><th scope="col">Kurz</th><th scope="col">Mittel</th><th scope="col">Lang</th><th scope="col">Extra</th></tr>
+            </thead>
+            <tbody>
+              <tr><th scope="row">Strähnen Oberkopf</th><td>50 €</td><td>60 €</td><td>70 €</td><td>80 €</td></tr>
+              <tr><th scope="row">Strähnen komplett</th><td>80 €</td><td>90 €</td><td>100 €</td><td>110 €</td></tr>
+              <tr><th scope="row">Balayage</th><td colspan="4">ab 100 €</td></tr>
+              <tr><th scope="row">Ombré</th><td colspan="4">ab 100 €</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="block">
+          <h3>Dauerwelle</h3>
+          <table class="preise">
+            <thead>
+              <tr><th scope="col" style="text-align:left">&nbsp;</th><th scope="col">Kurz</th><th scope="col">Mittel</th><th scope="col">Lang</th></tr>
+            </thead>
+            <tbody>
+              <tr><th scope="row">Komplett mit Pflege &amp; Stylen</th><td>100 €</td><td>120 €</td><td>140 €</td></tr>
+              <tr><th scope="row">Oberkopf mit Pflege &amp; Stylen</th><td>55 €</td><td>65 €</td><td>85 €</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="block">
+          <h3>Hochstecken</h3>
+          <table class="preise">
+            <tbody>
+              <tr><th scope="row">Hochstecken, mittel</th><td>50 €</td></tr>
+              <tr><th scope="row">Hochstecken, lang</th><td>60 €</td></tr>
+              <tr><th scope="row">Hochstecken, extra lang</th><td>70 €</td></tr>
+              <tr><th scope="row">Brautsteckfrisur, ohne Probe</th><td>100 €</td></tr>
+              <tr><th scope="row">Brautsteckfrisur, mit Probe</th><td>200 €</td></tr>
+              <tr><th scope="row">Zopf flechten</th><td>ab 25 €</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="block">
+          <h3>Make-up</h3>
+          <table class="preise">
+            <tbody>
+              <tr><th scope="row">Tages-Make-up</th><td>40 €</td></tr>
+              <tr><th scope="row">Spezial</th><td>60 €</td></tr>
+              <tr><th scope="row">Braut</th><td>80 bis 100 €</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="block">
+          <h3>Augenservice</h3>
+          <table class="preise">
+            <tbody>
+              <tr><th scope="row">Zupfen</th><td>15 €</td></tr>
+              <tr><th scope="row">Zupfen mit Färben</th><td>20 €</td></tr>
+              <tr><th scope="row">Oberlippe</th><td>15 €</td></tr>
+              <tr><th scope="row">Augenbrauen färben</th><td>10 €</td></tr>
+              <tr><th scope="row">Wimpern färben</th><td>15 €</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="block">
+          <h3>Kinder</h3>
+          <table class="preise">
+            <tbody>
+              <tr><th scope="row">bis 3 Jahre, Schnitt</th><td>10 €</td></tr>
+              <tr><th scope="row">bis 6 Jahre, Schnitt</th><td>20 €</td></tr>
+              <tr><th scope="row">bis 12 Jahre, mit Waschen, Föhnen, Stylen</th><td>30 €</td></tr>
+              <tr><th scope="row">bis 16 Jahre, mit Waschen, Föhnen, Stylen</th><td>40 €</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- 4 · DIE ARBEIT: pan, DUNKEL. -->
+  <section id="arbeiten" class="dunkel" data-sc-act="pan" data-sc-span="2.4" data-sc-drift="#0A0A0A">
     <div data-sc-stage>
       <div class="rail" data-sc-pan="0.06">
         <div class="rail__lead sc-stack">
           <h2 class="sc-display sc-display--md">Aus dem Stuhl</h2>
-          <p class="sc-body" style="color:var(--sc-ink-soft)">Vier Arbeiten, nicht gestellt.</p>
+          <p class="sc-body" style="color:var(--sc-ink-soft)">Arbeiten aus dem Salon, nicht gestellt.</p>
         </div>
         <figure class="schnitt">
           <img src="assets/herren-fade.webp" width="1000" height="1333"
@@ -268,9 +455,8 @@
     </div>
   </section>
 
-  <!-- 5 · DER RAUM: flow + reveal. Fotos dunkel ausbelichtet, damit sie
-       nicht als helle Bloecke aus der Seite springen. -->
-  <section class="sc-section" data-sc-act="flow" data-sc-drift="#1B1913">
+  <!-- 5 · DER RAUM: flow, HELL. -->
+  <section class="sc-section hell" data-sc-act="flow" data-sc-drift="#F7F4EE">
     <div class="sc-wrap raum">
       <figure data-sc-reveal="left" data-sc-reveal-at="0.1 0.55">
         <img src="assets/salon-plaetze.webp" width="1600" height="1200"
@@ -289,21 +475,24 @@
     </div>
   </section>
 
-  <!-- 6 · KOMM VORBEI: pin + spotlight + magnet. Letztes Element der Seite.
-       Einwertige Cues, damit nichts vor dem Seitenende ausblendet. -->
-  <section id="kontakt" data-sc-act="pin" data-sc-span="1.6" data-sc-drift="#241F17">
+  <!-- 6 · KOMM VORBEI: pin, DUNKEL. Letztes Element der Seite. -->
+  <section id="kontakt" class="dunkel" data-sc-act="pin" data-sc-span="1.6" data-sc-drift="#0A0A0A">
     <div data-sc-stage class="kontakt" data-sc-spotlight>
       <div class="kontakt__inner">
         <h2 class="sc-display sc-display--lg" data-sc-cue="0.05" data-sc-kinetic="lines">Einfach vorbeikommen</h2>
         <p class="kontakt__adresse" data-sc-cue="0.1">
           Dorf-Platz 1<br>6263 Fügen, Tirol
         </p>
-        <div class="kontakt__wege" data-sc-cue="0.14">
+        <p class="zeiten" data-sc-cue="0.13">
+          Montag 10 bis 18 Uhr<br>
+          Dienstag bis Freitag 9 bis 18 Uhr<br>
+          Samstag 9 bis 16 Uhr
+        </p>
+        <div class="kontakt__wege" data-sc-cue="0.16">
           <a class="knopf" href="tel:+436766786333" data-sc-magnet="0.26" data-sc-rise="0">+43 676 6786333</a>
           <a class="knopf knopf--leer" href="https://wa.me/436766786333" target="_blank" rel="noopener noreferrer">WhatsApp</a>
           <a class="knopf knopf--leer" href="https://www.google.com/maps/dir/?api=1&amp;destination=Dorf-Platz%201%2C%206263%20F%C3%BCgen%2C%20%C3%96sterreich" target="_blank" rel="noopener noreferrer">Route planen</a>
         </div>
-        <p data-sc-cue="0.18"><span class="marker">TODO: Öffnungszeiten eintragen</span></p>
       </div>
       <footer class="foot">
         <span>Alpine Cut · Dorf-Platz 1 · 6263 Fügen</span>
@@ -319,19 +508,19 @@
   ScrollCraft.mount(document.body);
 
   /* Signature-Bewegung: der Laengenregler.
-     Bespoke, in der Seite, nicht in der Engine. Traeger ist ein echtes
-     input[type=range]. Damit funktionieren Tastatur, Screenreader und Touch
-     ohne eigenen Code, und der Hebel ist nur die Optik darueber. */
+     Traeger ist ein echtes input[type=range]. Damit funktionieren Tastatur,
+     Screenreader und Touch ohne eigenen Code, der Hebel ist nur die Optik. */
   (function () {
     var eingabe = document.getElementById('mm');
     var griff   = document.getElementById('griff');
     var anzeige = document.getElementById('mm-anzeige');
     var titel   = document.getElementById('werk-titel');
+    var hinweis = document.getElementById('werk-hinweis');
     var herren  = document.getElementById('panel-herren');
     var damen   = document.getElementById('panel-damen');
     if (!eingabe) return;
 
-    var quer = window.matchMedia('(max-width: 700px)');
+    var quer = window.matchMedia('(max-width: 820px)');
 
     function zeichnen() {
       var mm = Number(eingabe.value);
@@ -346,8 +535,11 @@
       }
       anzeige.textContent = mm + ' mm';
 
-      var istDamen  = mm >= 12;
-      titel.textContent = istDamen ? 'Damen' : 'Herren';
+      var istDamen = mm >= 12;
+      titel.textContent   = istDamen ? 'Damen' : 'Herren';
+      hinweis.textContent = istDamen
+        ? 'Regler nach unten zeigt die Herrenpreise.'
+        : 'Regler nach oben zeigt die Damenpreise.';
       herren.hidden = istDamen;
       damen.hidden  = !istDamen;
     }
