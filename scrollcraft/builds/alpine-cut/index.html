@@ -89,42 +89,12 @@
     }
   }
 
-  /* ---- Wortmarke im Hero: Sprayschicht durch die Logoform -------------
-     Zwei ineinandergelegte Masken. Aussen die Logodatei, die aus der Flaeche
-     die Buchstaben mit der Schere als U ausschneidet. Innen eine dreifach
-     hohe Farbflaeche mit fest eingebackener Sprayfront.
-
-     Bewegt wird nur diese innere Flaeche, und zwar per transform. Die Maske
-     darauf bleibt unveraendert und wird einmal gerastert; waeren es
-     mask-position oder ein Filter, rechnete der Browser die Front in jedem
-     Bild neu. Genau daran hat schon einmal die Animation gehangen. */
-  .wortmarke { width: clamp(240px, 78vw, 560px); aspect-ratio: 512 / 370;
-               margin: 0 0 clamp(1rem, 2vw, 1.6rem); overflow: hidden;
-               -webkit-mask: url(assets/logo.png) center / contain no-repeat;
-                       mask: url(assets/logo.png) center / contain no-repeat; }
-  /* Der Auftritt gehoert ans Ankommen, nicht an den Scrollfortschritt: haengt
-     er am Akt, steht beim Laden eine Seite ohne Namen da. Einmal beim Laden,
-     knapp ueber eine Sekunde, dann steht die Marke. */
-  @keyframes spruehen { from { transform: translateY(0); }
-                          to { transform: translateY(-66.667%); } }
-  .wortmarke__farbe {
-    display: block; width: 100%; height: 300%;
-    background: var(--sc-ink); will-change: transform;
-    animation: spruehen 1300ms cubic-bezier(.45, .05, .25, 1) 220ms both;
-    -webkit-mask: url(assets/spray.webp) center / 100% 100% no-repeat;
-            mask: url(assets/spray.webp) center / 100% 100% no-repeat;
-  }
-  /* Ohne Bewegung kein Auftritt: die Marke steht fertig da. */
-  @media (prefers-reduced-motion: reduce) {
-    .wortmarke__farbe { animation: none; transform: none; height: 100%;
-                        -webkit-mask-image: none; mask-image: none; }
-  }
-  /* Der Textblock ist als Block so breit wie die Buehne. Mit der grossen
-     Marke reicht sein Kasten seitlich bis unter den dunklen Haarschneider,
-     wo dunkle Schrift nicht mehr lesbar waere. Es steht dort zwar nichts,
-     aber ein Kasten, der weiter reicht als sein Inhalt, ist trotzdem falsch. */
-  .hero__kopie { width: fit-content; max-width: 100%; }
-  .hero__sub { color: var(--sc-ink-soft); max-width: 30ch; }
+  .hero__mark { width: clamp(130px, 15vw, 200px); height: auto; margin-bottom: 1.4rem; }
+  /* Die Zeilenhoehe der xl-Ueberschrift ist enger als ihre Schriftgroesse,
+     und der Absatz darunter hat keinen eigenen Abstand: die Unterlaengen von
+     "Zillertal" stossen sonst an die Kleinzeile. */
+  .hero__sub { color: var(--sc-ink-soft); max-width: 30ch;
+               margin-top: clamp(.9rem, 1.6vw, 1.5rem); }
 
   /* ---- Akt 2: der Ort, dunkel, bewusst still ------------------------- */
   .ort { display: grid; gap: clamp(2rem, 5vw, 4rem); align-items: end; }
@@ -326,9 +296,9 @@
       <video data-sc-scrub data-sc-src="assets/clipper.mp4"
              data-sc-src-mobile="assets/clipper-m.mp4" muted playsinline></video>
       <div class="scrim-hell" aria-hidden="true"></div>
-      <div class="sc-copy sc-copy--lead hero__kopie" data-sc-cue="0 0.8 0">
-        <h1 class="wortmarke"><span class="vh">Alpine Cut</span><span class="wortmarke__farbe" aria-hidden="true"></span></h1>
-        <p class="sc-body hero__sub">Dein Friseur im Zillertal</p>
+      <div class="sc-copy sc-copy--lead" data-sc-cue="0 0.8 0">
+        <h1 class="sc-display sc-display--xl" data-sc-kinetic="lines">Dein Friseur im Zillertal</h1>
+        <p class="sc-body hero__sub">Ohne Termin, einfach vorbeikommen</p>
       </div>
     </div>
   </section>
