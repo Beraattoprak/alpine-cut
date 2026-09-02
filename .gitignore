@@ -49,3 +49,7 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# scrollcraft: Prueflauf-Artefakte und Abhaengigkeiten
+scrollcraft/builds/*/lab/
+scrollcraft/builds/*/node_modules/

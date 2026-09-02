@@ -1,0 +1,9 @@
+{
+  "name": "alpine-cut-scrollcraft",
+  "private": true,
+  "version": "0.1.0",
+  "description": "Eigenstaendige scrollcraft-Seite. Eigene package.json, damit npm i hier nicht in das Next.js-Projekt darueber schreibt.",
+  "devDependencies": {
+    "playwright-core": "^1.62.1"
+  }
+}

@@ -1,0 +1,362 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Alpine Cut · Friseur in Fügen</title>
+<meta name="description" content="Friseur am Dorf-Platz 1 in Fügen, Tirol. Kein Termin nötig, einfach vorbeikommen.">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 32 32%27%3E%3Crect width=%2732%27 height=%2732%27 fill=%27%23050505%27/%3E%3Cpath d=%27M4 25 L12 10 L16 16 L20 8 L28 25%27 fill=%27none%27 stroke=%27%23C8A159%27 stroke-width=%272.5%27/%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;600;700&family=Geist:wght@400;500&display=swap">
+<link rel="stylesheet" href="scrollcraft.css">
+<style>
+  /* Die ganze Marke: sechs Farben und zwei Schriften.
+     Ivory auf Anthrazit statt Weiss auf Schwarz, wie im Briefing verlangt:
+     reines Weiss auf reinem Schwarz schneidet in den Augen. */
+  :root {
+    --sc-canvas:     #050505;
+    --sc-surface:    #131210;
+    --sc-ink:        #F2EDE3;
+    --sc-ink-soft:   #9E968A;
+    --sc-accent:     #C8A159;
+    --sc-accent-ink: #0A0806;
+    --sc-font-display: "Archivo", system-ui, sans-serif;
+    --sc-font-text:    "Geist", system-ui, sans-serif;
+  }
+
+  /* ---- Kopfzeile ---------------------------------------------------- */
+  .bar {
+    position: fixed; inset-inline: 0; top: 0; z-index: 40;
+    display: flex; align-items: center; justify-content: space-between;
+    gap: 1.5rem; padding: 1rem clamp(1rem, 4vw, 2.5rem);
+    mix-blend-mode: difference;
+  }
+  .bar__mark { text-decoration: none; }
+  .bar__mark b {
+    font-family: var(--sc-font-display); font-weight: 700; font-size: .95rem;
+    letter-spacing: .26em; color: #fff; text-transform: uppercase;
+  }
+  .bar__cta {
+    font-family: var(--sc-font-display); font-size: .78rem; letter-spacing: .2em;
+    text-transform: uppercase; color: #fff; text-decoration: none;
+    border-bottom: 1px solid currentColor; padding-bottom: .2rem;
+  }
+
+  /* ---- Akt 1: Hero --------------------------------------------------- */
+  .hero__mark { width: clamp(140px, 17vw, 230px); height: auto; margin-bottom: 1.6rem; }
+  .hero__sub { color: var(--sc-ink-soft); max-width: 30ch; }
+
+  /* ---- Akt 2: der Ort, bewusst still --------------------------------- */
+  .ort { display: grid; gap: clamp(2rem, 5vw, 4rem); align-items: end; }
+  @media (min-width: 900px) { .ort { grid-template-columns: 1fr 1.15fr; } }
+  .ort figure { margin: 0; }
+  .ort img { width: 100%; height: auto; display: block; }
+  .ort__zeile { font-family: var(--sc-font-display); font-size: clamp(1.6rem, 3.4vw, 2.6rem);
+                line-height: 1.12; letter-spacing: -.02em; max-width: 18ch; }
+
+  /* ---- Akt 3: der Peak, Laengenregler + Preise ------------------------ */
+  .werk { display: grid; gap: 2rem; align-content: center; height: 100%;
+          width: min(100%, 1200px); margin-inline: auto;
+          padding-inline: clamp(1rem, 4vw, 2.5rem);
+          /* oben Platz fuer die feste Kopfzeile, sonst liegt der Titel darauf */
+          padding-block: clamp(5rem, 10vh, 7rem) clamp(2rem, 5vh, 4rem); }
+  .werk__kopf { display: flex; align-items: baseline; gap: 1.2rem;
+                border-bottom: 1px solid rgb(200 161 89 / .35); padding-bottom: .9rem; }
+  .werk__titel { font-family: var(--sc-font-display); font-weight: 600;
+                 font-size: clamp(1.5rem, 3vw, 2.2rem); letter-spacing: -.01em; margin: 0; }
+  .werk__mm { font-family: var(--sc-font-display); font-variant-numeric: tabular-nums;
+              color: var(--sc-accent); letter-spacing: .12em; font-size: .95rem; }
+  .werk__panel[hidden] { display: none; }
+  .werk__leer { font-family: var(--sc-font-display); font-weight: 500;
+                font-size: clamp(2rem, 5vw, 3.6rem); line-height: 1.05;
+                letter-spacing: -.02em; margin: 0 0 1rem; max-width: 16ch; }
+  .werk__hinweis { color: var(--sc-ink-soft); max-width: 34ch; margin: 0 0 1.6rem; }
+  .marker { display: inline-block; border: 1px solid var(--sc-accent);
+            color: var(--sc-accent); padding: .55rem .85rem; font-size: .8rem;
+            letter-spacing: .08em; }
+
+  /* Der Regler. Ein echtes input[type=range], optisch als Hebel.
+     Echtes Formularelement, damit Tastatur und Screenreader es bedienen. */
+  .regler { position: absolute; right: clamp(.75rem, 3vw, 2.5rem); top: 50%;
+            transform: translateY(-50%); display: flex; flex-direction: column-reverse;
+            align-items: center; gap: .8rem; z-index: 5; }
+  .regler__skala { position: relative; height: clamp(190px, 34vh, 300px); width: 54px; }
+  .regler__spur { position: absolute; left: 50%; top: 0; bottom: 0; width: 2px;
+                  transform: translateX(-50%); background: rgb(200 161 89 / .3); }
+  .regler__tick { position: absolute; left: 50%; width: 12px; height: 1px;
+                  transform: translateX(-50%); background: rgb(242 237 227 / .3); }
+  .regler__griff { position: absolute; left: 50%; top: 50%; width: 44px; height: 26px;
+                   transform: translate(-50%, -50%); pointer-events: none; }
+  .regler input[type="range"] {
+    position: absolute; left: 50%; top: 50%;
+    width: clamp(190px, 34vh, 300px); height: 54px;
+    transform: translate(-50%, -50%) rotate(-90deg);
+    margin: 0; opacity: 0; cursor: grab;
+  }
+  .regler input[type="range"]:active { cursor: grabbing; }
+  .regler:has(input:focus-visible) { outline: 2px solid var(--sc-ink); outline-offset: 6px; }
+  .regler__label { font-family: var(--sc-font-display); font-size: .68rem;
+                   letter-spacing: .2em; text-transform: uppercase; color: var(--sc-ink-soft); }
+
+  @media (max-width: 700px) {
+    .regler { position: static; transform: none; flex-direction: row;
+              justify-content: center; margin-bottom: 1.5rem; gap: 1rem; }
+    .regler__skala { height: 54px; width: min(260px, 66vw); }
+    .regler__spur { left: 0; right: 0; top: 50%; bottom: auto; width: auto; height: 2px;
+                    transform: translateY(-50%); }
+    .regler__tick { top: 50%; left: auto; width: 1px; height: 12px; transform: translateY(-50%); }
+    .regler input[type="range"] { width: min(260px, 66vw); transform: translate(-50%, -50%); }
+  }
+
+  /* ---- Akt 4: Arbeiten ------------------------------------------------ */
+  .rail { display: flex; gap: clamp(1rem, 2.4vw, 2rem); align-items: flex-end;
+          padding-inline: clamp(1rem, 4vw, 2.5rem); }
+  .rail__lead { flex: 0 0 min(80vw, 22rem); }
+  .schnitt { flex: 0 0 clamp(15rem, 24vw, 21rem); margin: 0; }
+  .schnitt img { width: 100%; height: auto; display: block; }
+  .schnitt figcaption { margin-top: .8rem; font-family: var(--sc-font-display);
+                        font-size: .72rem; letter-spacing: .2em; text-transform: uppercase;
+                        color: var(--sc-ink-soft); }
+
+  /* ---- Akt 5: der Raum ------------------------------------------------ */
+  .raum { display: grid; gap: clamp(1rem, 2.5vw, 2rem); }
+  @media (min-width: 900px) { .raum { grid-template-columns: 1.4fr 1fr; align-items: start; } }
+  .raum figure { margin: 0; overflow: hidden; }
+  .raum img { width: 100%; height: auto; display: block; filter: brightness(.82); }
+  .raum__stapel { display: grid; gap: clamp(1rem, 2.5vw, 2rem); }
+
+  /* ---- Akt 6: Kontakt, voll aufgedreht -------------------------------- */
+  .kontakt { display: grid; place-items: center; text-align: center; height: 100%; }
+  .kontakt__inner { display: grid; gap: 1.6rem; justify-items: center;
+                    padding-inline: clamp(1rem, 4vw, 2.5rem); }
+  .kontakt__adresse { font-family: var(--sc-font-display); font-size: clamp(1.1rem, 2vw, 1.45rem);
+                      line-height: 1.35; color: var(--sc-ink); margin: 0; }
+  .kontakt__wege { display: flex; flex-wrap: wrap; gap: 1rem; justify-content: center; }
+  .knopf { display: inline-block; background: var(--sc-accent); color: var(--sc-accent-ink);
+           font-family: var(--sc-font-display); font-weight: 600; font-size: .9rem;
+           letter-spacing: .12em; text-transform: uppercase; text-decoration: none;
+           padding: 1rem 1.8rem; }
+  .knopf--leer { background: transparent; color: var(--sc-ink);
+                 box-shadow: inset 0 0 0 1px rgb(242 237 227 / .4); }
+  .foot { position: absolute; inset-inline: 0; bottom: 0; display: flex; flex-wrap: wrap;
+          gap: 1rem; justify-content: space-between; align-items: center;
+          padding: 1.2rem clamp(1rem, 4vw, 2.5rem); font-size: .78rem;
+          color: var(--sc-ink-soft); }
+  .foot a { color: inherit; }
+</style>
+</head>
+<body>
+
+<span data-sc-progress></span>
+<div class="sc-grain" aria-hidden="true"></div>
+
+<header class="bar">
+  <a class="bar__mark" href="#top"><b>Alpine Cut</b></a>
+  <a class="bar__cta" href="#kontakt">Vorbeikommen</a>
+</header>
+
+<main id="top">
+
+  <!-- 1 · ANKUNFT: scrub. Der Haarschneider zerlegt sich unter der eigenen Hand. -->
+  <section data-sc-act="scrub" data-sc-span="2.4" data-sc-dwell="0.34" data-sc-drift="#050505">
+    <div data-sc-stage>
+      <img class="sc-stage__poster" src="assets/clipper-poster.webp" alt="">
+      <video data-sc-scrub data-sc-src="assets/clipper.mp4"
+             data-sc-src-mobile="assets/clipper-m.mp4" muted playsinline></video>
+      <div class="sc-scrim sc-scrim--lead" aria-hidden="true"></div>
+      <div class="sc-copy sc-copy--lead" data-sc-cue="0 0.8 0">
+        <img class="hero__mark" src="assets/logo.png" alt="Alpine Cut" width="512" height="370">
+        <h1 class="sc-display sc-display--xl" data-sc-kinetic="lines">Friseur in Fügen</h1>
+        <p class="sc-body hero__sub">Kein Termin. Einfach vorbeikommen, Dorf-Platz 1.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- 2 · DER ORT: flow. Die beabsichtigte Stille vor dem Peak. Ein Bild,
+       ein Satz, sonst nichts. -->
+  <section class="sc-section" data-sc-act="flow" data-sc-drift="#0A0A0A">
+    <div class="sc-wrap ort">
+      <div class="sc-stack" data-sc-in data-sc-stagger="80">
+        <p class="ort__zeile">Am Dorf-Platz, mitten im Ort.</p>
+        <p class="sc-body" style="color:var(--sc-ink-soft);max-width:34ch">
+          Von außen Holz und ein Fenster mit dem Berg darauf.
+        </p>
+        <p><span class="marker">TODO: zwei bis drei Sätze über den Salon</span></p>
+      </div>
+      <figure data-sc-reveal="up" data-sc-reveal-at="0.12 0.6">
+        <img src="assets/salon-aussen.webp" width="1600" height="1200"
+             alt="Der Salon von außen: Holzfassade am Dorf-Platz, das Alpine-Cut-Logo im Schaufenster.">
+      </figure>
+    </div>
+  </section>
+
+  <!-- 3 · DAS HANDWERK: pin. PEAK. Groesste Scrollstrecke der Seite.
+       Der Laengenregler ist die Signature-Bewegung: ein Bauteil des
+       Haarschneiders wird zum Bedienelement der Preisliste. -->
+  <section id="preise" data-sc-act="pin" data-sc-span="3.4" data-sc-drift="#101010">
+    <div data-sc-stage>
+      <div class="werk" data-sc-cue="0 1 0 0">
+
+        <div class="regler" id="regler">
+          <span class="regler__label">Länge</span>
+          <div class="regler__skala">
+            <span class="regler__spur" aria-hidden="true"></span>
+            <span class="regler__tick" style="top:0%" aria-hidden="true"></span>
+            <span class="regler__tick" style="top:25%" aria-hidden="true"></span>
+            <span class="regler__tick" style="top:50%" aria-hidden="true"></span>
+            <span class="regler__tick" style="top:75%" aria-hidden="true"></span>
+            <span class="regler__tick" style="top:100%" aria-hidden="true"></span>
+            <svg class="regler__griff" id="griff" viewBox="0 0 44 26" fill="none" aria-hidden="true">
+              <rect x=".5" y=".5" width="43" height="25" rx="2" fill="#1B1917" stroke="#C8A159"/>
+              <path d="M8 6.5h28M8 13h28M8 19.5h28" stroke="#C8A159" stroke-width="1.4" opacity=".8"/>
+            </svg>
+            <input id="mm" type="range" min="0" max="24" step="3" value="6"
+                   aria-label="Schnittlänge in Millimetern. Kurz zeigt die Herrenpreise, lang die Damenpreise.">
+          </div>
+        </div>
+
+        <div class="werk__kopf">
+          <h2 class="werk__titel" id="werk-titel">Herren</h2>
+          <span class="werk__mm" id="mm-anzeige">6 mm</span>
+        </div>
+
+        <div class="werk__panel" id="panel-herren">
+          <p class="werk__leer">Kurz gehalten.</p>
+          <p class="werk__hinweis">Den Regler nach oben schieben zeigt die Damenpreise.</p>
+          <p><span class="marker">TODO: Herrenpreise eintragen</span></p>
+        </div>
+        <div class="werk__panel" id="panel-damen" hidden>
+          <p class="werk__leer">Auf Länge gearbeitet.</p>
+          <p class="werk__hinweis">Den Regler nach unten schieben zeigt die Herrenpreise.</p>
+          <p><span class="marker">TODO: Damenpreise eintragen</span></p>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- 4 · DIE ARBEIT: pan. Seitwaerts liest sich als Breite. -->
+  <section id="arbeiten" data-sc-act="pan" data-sc-span="2.4" data-sc-drift="#14130F">
+    <div data-sc-stage>
+      <div class="rail" data-sc-pan="0.06">
+        <div class="rail__lead sc-stack">
+          <h2 class="sc-display sc-display--md">Aus dem Stuhl</h2>
+          <p class="sc-body" style="color:var(--sc-ink-soft)">Vier Arbeiten, nicht gestellt.</p>
+        </div>
+        <figure class="schnitt">
+          <img src="assets/herren-fade.webp" width="1000" height="1333"
+               alt="Herrenschnitt, hoher Fade an der Seite, längeres Deckhaar nach hinten frisiert.">
+          <figcaption>Fade</figcaption>
+        </figure>
+        <figure class="schnitt">
+          <img src="assets/herren-crop.webp" width="1000" height="1333"
+               alt="Herrenschnitt, texturierter Crop mit Bart, Übergang an der Schläfe.">
+          <figcaption>Crop mit Bart</figcaption>
+        </figure>
+        <figure class="schnitt">
+          <img src="assets/herren-taper.webp" width="1000" height="1333"
+               alt="Herrenschnitt, weicher Übergang im Nacken, welliges Deckhaar.">
+          <figcaption>Taper</figcaption>
+        </figure>
+        <figure class="schnitt">
+          <img src="assets/damen-lang.webp" width="1000" height="1333"
+               alt="Damenschnitt, langes blondiertes Haar mit weichem Verlauf, von hinten.">
+          <figcaption>Lang, blondiert</figcaption>
+        </figure>
+      </div>
+    </div>
+  </section>
+
+  <!-- 5 · DER RAUM: flow + reveal. Fotos dunkel ausbelichtet, damit sie
+       nicht als helle Bloecke aus der Seite springen. -->
+  <section class="sc-section" data-sc-act="flow" data-sc-drift="#1B1913">
+    <div class="sc-wrap raum">
+      <figure data-sc-reveal="left" data-sc-reveal-at="0.1 0.55">
+        <img src="assets/salon-plaetze.webp" width="1600" height="1200"
+             alt="Drei Bedienplätze mit weiß-goldenen Stühlen unter wabenförmiger Deckenbeleuchtung.">
+      </figure>
+      <div class="raum__stapel">
+        <figure data-sc-reveal="up" data-sc-reveal-at="0.2 0.66">
+          <img src="assets/salon-lounge.webp" width="1600" height="1200"
+               alt="Wartebereich mit schwarzen Chesterfield-Sofas und Messingfüßen am Schaufenster.">
+        </figure>
+        <figure data-sc-reveal="up" data-sc-reveal-at="0.3 0.76">
+          <img src="assets/salon-waschen.webp" width="1536" height="2048"
+               alt="Waschbereich mit zwei Waschbecken, Ringspiegeln und schwarzen Ledersesseln.">
+        </figure>
+      </div>
+    </div>
+  </section>
+
+  <!-- 6 · KOMM VORBEI: pin + spotlight + magnet. Letztes Element der Seite.
+       Einwertige Cues, damit nichts vor dem Seitenende ausblendet. -->
+  <section id="kontakt" data-sc-act="pin" data-sc-span="1.6" data-sc-drift="#241F17">
+    <div data-sc-stage class="kontakt" data-sc-spotlight>
+      <div class="kontakt__inner">
+        <h2 class="sc-display sc-display--lg" data-sc-cue="0.05" data-sc-kinetic="lines">Einfach vorbeikommen</h2>
+        <p class="kontakt__adresse" data-sc-cue="0.1">
+          Dorf-Platz 1<br>6263 Fügen, Tirol
+        </p>
+        <div class="kontakt__wege" data-sc-cue="0.14">
+          <a class="knopf" href="tel:+436766786333" data-sc-magnet="0.26" data-sc-rise="0">+43 676 6786333</a>
+          <a class="knopf knopf--leer" href="https://wa.me/436766786333" target="_blank" rel="noopener noreferrer">WhatsApp</a>
+          <a class="knopf knopf--leer" href="https://www.google.com/maps/dir/?api=1&amp;destination=Dorf-Platz%201%2C%206263%20F%C3%BCgen%2C%20%C3%96sterreich" target="_blank" rel="noopener noreferrer">Route planen</a>
+        </div>
+        <p data-sc-cue="0.18"><span class="marker">TODO: Öffnungszeiten eintragen</span></p>
+      </div>
+      <footer class="foot">
+        <span>Alpine Cut · Dorf-Platz 1 · 6263 Fügen</span>
+        <a href="https://www.instagram.com/alpine.cutz/" target="_blank" rel="noopener noreferrer">@alpine.cutz</a>
+      </footer>
+    </div>
+  </section>
+
+</main>
+
+<script src="scrollcraft.js"></script>
+<script>
+  ScrollCraft.mount(document.body);
+
+  /* Signature-Bewegung: der Laengenregler.
+     Bespoke, in der Seite, nicht in der Engine. Traeger ist ein echtes
+     input[type=range]. Damit funktionieren Tastatur, Screenreader und Touch
+     ohne eigenen Code, und der Hebel ist nur die Optik darueber. */
+  (function () {
+    var eingabe = document.getElementById('mm');
+    var griff   = document.getElementById('griff');
+    var anzeige = document.getElementById('mm-anzeige');
+    var titel   = document.getElementById('werk-titel');
+    var herren  = document.getElementById('panel-herren');
+    var damen   = document.getElementById('panel-damen');
+    if (!eingabe) return;
+
+    var quer = window.matchMedia('(max-width: 700px)');
+
+    function zeichnen() {
+      var mm = Number(eingabe.value);
+      var t  = mm / Number(eingabe.max);          /* 0 = kurz, 1 = lang */
+      if (quer.matches) {
+        griff.style.left = (t * 100) + '%';
+        griff.style.top  = '50%';
+      } else {
+        /* oben = lang, unten = kurz: der Hebel sitzt wie am Geraet */
+        griff.style.top  = ((1 - t) * 100) + '%';
+        griff.style.left = '50%';
+      }
+      anzeige.textContent = mm + ' mm';
+
+      var istDamen  = mm >= 12;
+      titel.textContent = istDamen ? 'Damen' : 'Herren';
+      herren.hidden = istDamen;
+      damen.hidden  = !istDamen;
+    }
+
+    eingabe.addEventListener('input', zeichnen);
+    quer.addEventListener('change', zeichnen);
+    window.addEventListener('resize', zeichnen);
+    zeichnen();
+  })();
+</script>
+</body>
+</html>
