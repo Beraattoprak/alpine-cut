@@ -172,13 +172,6 @@
     .preise th, .preise td { padding: .45rem .35rem; font-size: .88rem; }
   }
 
-  /* ---- Alle Preise, heller Fliesstext-Abschnitt ---------------------- */
-  .alle { display: grid; gap: clamp(2rem, 4vw, 3rem); }
-  @media (min-width: 820px) { .alle { grid-template-columns: 1fr 1fr; } }
-  .block { break-inside: avoid; }
-  .block h3 { font-family: var(--sc-font-display); font-size: .72rem; letter-spacing: .2em;
-              text-transform: uppercase; color: var(--sc-ink-soft); margin: 0 0 .6rem; }
-
   /* ---- Akt 4: Arbeiten, dunkel --------------------------------------- */
   .rail { display: flex; gap: clamp(1rem, 2.4vw, 2rem); align-items: flex-end;
           padding-inline: clamp(1rem, 4vw, 2.5rem); }
@@ -190,11 +183,27 @@
                         color: var(--sc-ink-soft); }
 
   /* ---- Akt 5: der Raum, hell ----------------------------------------- */
-  .raum { display: grid; gap: clamp(1rem, 2.5vw, 2rem); }
-  @media (min-width: 900px) { .raum { grid-template-columns: 1.4fr 1fr; align-items: start; } }
-  .raum figure { margin: 0; overflow: hidden; }
-  .raum img { width: 100%; height: auto; display: block; }
-  .raum__stapel { display: grid; gap: clamp(1rem, 2.5vw, 2rem); }
+  /* Vorher lagen die drei Fotos in einem zweispaltigen Raster: der Abschnitt
+     war 1277px hoch bei 900px Viewport, die Bilder 355 bis 631px. Man scrollte
+     in anderthalb Bildschirmen daran vorbei. Jetzt bekommt jedes Foto eine
+     eigene Zeile mit rund 72vh und wechselnder Breite, damit die Reihe nicht
+     monoton wird.
+     object-fit: cover an fester Hoehe schneidet zu, statt das Bild zu
+     stauchen; die Bildaussage sitzt bei allen dreien mittig. */
+  .raum { display: grid; gap: clamp(3rem, 7vw, 6rem); }
+  .raum figure { margin: 0; }
+  .raum img { width: 100%; height: clamp(19rem, 72vh, 46rem);
+              object-fit: cover; object-position: center; display: block; }
+  .raum figcaption { margin-top: .9rem; font-family: var(--sc-font-display);
+                     font-size: .72rem; letter-spacing: .2em; text-transform: uppercase;
+                     color: var(--sc-ink-soft); }
+  @media (min-width: 900px) {
+    /* justify-self statt margin-left: auto: Im Grid ist das der verlaessliche
+       Weg, ein Item an den Rand zu setzen. Mit auto-Rand blieb das Bild links. */
+    .raum__breit  { width: 100%; }
+    .raum__rechts { width: 74%; justify-self: end; }
+    .raum__links  { width: 86%; justify-self: start; }
+  }
 
   /* ---- Akt 6: Kontakt, dunkel ---------------------------------------- */
   .kontakt { display: grid; place-items: center; text-align: center; height: 100%; }
@@ -251,10 +260,11 @@
       <div class="sc-stack" data-sc-in data-sc-stagger="80">
         <img class="hero__mark" src="assets/logo.png" alt="Alpine Cut" width="512" height="370">
         <p class="ort__zeile">Am Dorf-Platz, mitten im Ort.</p>
-        <p class="sc-body" style="color:var(--sc-ink-soft);max-width:34ch">
-          Von außen Holz und ein Fenster mit dem Berg darauf.
+        <p class="sc-body" style="color:var(--sc-ink-soft);max-width:40ch">
+          Von außen Holz und ein Fenster mit dem Berg darauf. Innen dunkle Wände,
+          Messing und über jedem Stuhl ein eigenes Licht. Damen und Herren, ohne
+          Termin: Sie kommen, wenn es Ihnen passt.
         </p>
-        <p><span class="marker">TODO: zwei bis drei Sätze über den Salon</span></p>
       </div>
       <figure data-sc-reveal="up" data-sc-reveal-at="0.12 0.6">
         <img src="assets/salon-aussen.webp" width="1600" height="1200"
@@ -341,122 +351,6 @@
     </div>
   </section>
 
-  <!-- 3b · ALLE PREISE: flow, HELL. Der gepinnte Peak fasst nur die
-       Schnittpreise; alles Weitere haette dort keinen Platz. -->
-  <section id="alle-preise" class="sc-section hell" data-sc-act="flow" data-sc-drift="#EFEAE1">
-    <div class="sc-wrap">
-      <h2 class="sc-display sc-display--md" style="margin-bottom:2rem">Alle Preise</h2>
-      <div class="alle" data-sc-in data-sc-stagger="60">
-
-        <div class="block">
-          <h3>Pflege</h3>
-          <table class="preise">
-            <tbody>
-              <tr><th scope="row">Haarpflege</th><td>10 €</td></tr>
-              <tr><th scope="row">Haarmaske</th><td>15 €</td></tr>
-              <tr><th scope="row">K 18</th><td>20 €</td></tr>
-            </tbody>
-          </table>
-        </div>
-
-        <div class="block">
-          <h3>Farbe</h3>
-          <table class="preise">
-            <thead>
-              <tr><th scope="col" style="text-align:left">&nbsp;</th><th scope="col">Kurz</th><th scope="col">Mittel</th><th scope="col">Lang</th><th scope="col">Extra</th></tr>
-            </thead>
-            <tbody>
-              <tr><th scope="row">Ansatz</th><td>50 €</td><td></td><td></td><td></td></tr>
-              <tr><th scope="row">Haarfarbe komplett</th><td>50 €</td><td>60 €</td><td>70 €</td><td>80 €</td></tr>
-              <tr><th scope="row">Intensivtönung</th><td>50 €</td><td>60 €</td><td>70 €</td><td>80 €</td></tr>
-              <tr><th scope="row">Tönung</th><td>40 €</td><td>50 €</td><td>60 €</td><td></td></tr>
-              <tr><th scope="row">Grauhaar-Kaschierung</th><td>30 €</td><td>35 €</td><td>40 €</td><td>45 €</td></tr>
-            </tbody>
-          </table>
-        </div>
-
-        <div class="block">
-          <h3>Strähnen</h3>
-          <table class="preise">
-            <thead>
-              <tr><th scope="col" style="text-align:left">&nbsp;</th><th scope="col">Kurz</th><th scope="col">Mittel</th><th scope="col">Lang</th><th scope="col">Extra</th></tr>
-            </thead>
-            <tbody>
-              <tr><th scope="row">Strähnen Oberkopf</th><td>50 €</td><td>60 €</td><td>70 €</td><td>80 €</td></tr>
-              <tr><th scope="row">Strähnen komplett</th><td>80 €</td><td>90 €</td><td>100 €</td><td>110 €</td></tr>
-              <tr><th scope="row">Balayage</th><td colspan="4">ab 100 €</td></tr>
-              <tr><th scope="row">Ombré</th><td colspan="4">ab 100 €</td></tr>
-            </tbody>
-          </table>
-        </div>
-
-        <div class="block">
-          <h3>Dauerwelle</h3>
-          <table class="preise">
-            <thead>
-              <tr><th scope="col" style="text-align:left">&nbsp;</th><th scope="col">Kurz</th><th scope="col">Mittel</th><th scope="col">Lang</th></tr>
-            </thead>
-            <tbody>
-              <tr><th scope="row">Komplett mit Pflege &amp; Stylen</th><td>100 €</td><td>120 €</td><td>140 €</td></tr>
-              <tr><th scope="row">Oberkopf mit Pflege &amp; Stylen</th><td>55 €</td><td>65 €</td><td>85 €</td></tr>
-            </tbody>
-          </table>
-        </div>
-
-        <div class="block">
-          <h3>Hochstecken</h3>
-          <table class="preise">
-            <tbody>
-              <tr><th scope="row">Hochstecken, mittel</th><td>50 €</td></tr>
-              <tr><th scope="row">Hochstecken, lang</th><td>60 €</td></tr>
-              <tr><th scope="row">Hochstecken, extra lang</th><td>70 €</td></tr>
-              <tr><th scope="row">Brautsteckfrisur, ohne Probe</th><td>100 €</td></tr>
-              <tr><th scope="row">Brautsteckfrisur, mit Probe</th><td>200 €</td></tr>
-              <tr><th scope="row">Zopf flechten</th><td>ab 25 €</td></tr>
-            </tbody>
-          </table>
-        </div>
-
-        <div class="block">
-          <h3>Make-up</h3>
-          <table class="preise">
-            <tbody>
-              <tr><th scope="row">Tages-Make-up</th><td>40 €</td></tr>
-              <tr><th scope="row">Spezial</th><td>60 €</td></tr>
-              <tr><th scope="row">Braut</th><td>80 bis 100 €</td></tr>
-            </tbody>
-          </table>
-        </div>
-
-        <div class="block">
-          <h3>Augenservice</h3>
-          <table class="preise">
-            <tbody>
-              <tr><th scope="row">Zupfen</th><td>15 €</td></tr>
-              <tr><th scope="row">Zupfen mit Färben</th><td>20 €</td></tr>
-              <tr><th scope="row">Oberlippe</th><td>15 €</td></tr>
-              <tr><th scope="row">Augenbrauen färben</th><td>10 €</td></tr>
-              <tr><th scope="row">Wimpern färben</th><td>15 €</td></tr>
-            </tbody>
-          </table>
-        </div>
-
-        <div class="block">
-          <h3>Kinder</h3>
-          <table class="preise">
-            <tbody>
-              <tr><th scope="row">bis 3 Jahre, Schnitt</th><td>10 €</td></tr>
-              <tr><th scope="row">bis 6 Jahre, Schnitt</th><td>20 €</td></tr>
-              <tr><th scope="row">bis 12 Jahre, mit Waschen, Föhnen, Stylen</th><td>30 €</td></tr>
-              <tr><th scope="row">bis 16 Jahre, mit Waschen, Föhnen, Stylen</th><td>40 €</td></tr>
-            </tbody>
-          </table>
-        </div>
-
-      </div>
-    </div>
-  </section>
-
   <!-- 4 · DIE ARBEIT: pan, DUNKEL. -->
   <section id="arbeiten" class="dunkel" data-sc-act="pan" data-sc-span="2.4" data-sc-drift="#0A0A0A">
     <div data-sc-stage>
@@ -492,20 +386,21 @@
   <!-- 5 · DER RAUM: flow, HELL. -->
   <section class="sc-section hell" data-sc-act="flow" data-sc-drift="#F7F4EE">
     <div class="sc-wrap raum">
-      <figure data-sc-reveal="left" data-sc-reveal-at="0.1 0.55">
+      <figure class="raum__breit" data-sc-reveal="up" data-sc-reveal-at="0.02 0.26">
         <img src="assets/salon-plaetze.webp" width="1600" height="1200"
              alt="Drei Bedienplätze mit weiß-goldenen Stühlen unter wabenförmiger Deckenbeleuchtung.">
+        <figcaption>Die Bedienplätze</figcaption>
       </figure>
-      <div class="raum__stapel">
-        <figure data-sc-reveal="up" data-sc-reveal-at="0.2 0.66">
-          <img src="assets/salon-lounge.webp" width="1600" height="1200"
-               alt="Wartebereich mit schwarzen Chesterfield-Sofas und Messingfüßen am Schaufenster.">
-        </figure>
-        <figure data-sc-reveal="up" data-sc-reveal-at="0.3 0.76">
-          <img src="assets/salon-waschen.webp" width="1536" height="2048"
-               alt="Waschbereich mit zwei Waschbecken, Ringspiegeln und schwarzen Ledersesseln.">
-        </figure>
-      </div>
+      <figure class="raum__rechts" data-sc-reveal="left" data-sc-reveal-at="0.3 0.54">
+        <img src="assets/salon-lounge.webp" width="1600" height="1200"
+             alt="Wartebereich mit schwarzen Chesterfield-Sofas und Messingfüßen am Schaufenster.">
+        <figcaption>Warten wie im Wohnzimmer</figcaption>
+      </figure>
+      <figure class="raum__links" data-sc-reveal="right" data-sc-reveal-at="0.58 0.82">
+        <img src="assets/salon-waschen.webp" width="1536" height="2048"
+             alt="Waschbereich mit zwei Waschbecken, Ringspiegeln und schwarzen Ledersesseln.">
+        <figcaption>Waschbereich</figcaption>
+      </figure>
     </div>
   </section>
 
