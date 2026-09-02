@@ -205,13 +205,18 @@
     .raum__c { width: 34%; justify-self: center; }
   }
   /* ---- Akt 6: Kundenfeedback, dunkel, seitlich laufende Karten -------- */
-  .stimmen { display: flex; align-items: stretch; height: 100%;
-             gap: clamp(1rem, 2vw, 1.5rem); }
-  .stimmen__lead { flex: 0 0 min(80vw, 19rem); align-self: center; }
+  /* Die Gesamtnote steht still, nur die Kartenreihe laeuft: sonst ist die
+     Kopfzahl schon bei fuenf Prozent Fortschritt aus dem Bild gewandert. */
+  .stimmen { display: flex; flex-direction: column; justify-content: center;
+             height: 100%; gap: clamp(1.4rem, 4vh, 2.4rem); }
+  .stimmen__lead { max-width: 32rem; margin-inline: var(--rand); }
+  .stimmen__ende { flex: 0 0 var(--rand); }
+  .stimmen__spur { display: flex; align-items: stretch; padding-inline: var(--rand);
+                   gap: clamp(1rem, 2vw, 1.5rem); will-change: transform; }
   .note { font-family: var(--sc-font-display); font-size: clamp(2.6rem, 6vw, 4.4rem);
           line-height: 1; letter-spacing: -.03em; margin: 0; }
   .sterne { color: var(--sc-accent); letter-spacing: .18em; font-size: 1.05rem; }
-  .karte { flex: 0 0 clamp(15rem, 21vw, 19rem); align-self: center;
+  .karte { flex: 0 0 clamp(15rem, 21vw, 19rem);
            background: var(--sc-surface); padding: clamp(1.1rem, 2vw, 1.5rem);
            display: flex; flex-direction: column; gap: .8rem; }
   .karte__kopf { display: flex; align-items: center; gap: .7rem; }
@@ -421,57 +426,108 @@
     </div>
   </section>
   <!-- 6 · STIMMEN: pan, DUNKEL. Karten laufen seitwaerts durch.
-       Bewusst ohne Google-Logo und ohne Verifiziert-Siegel: Solange die
-       Bewertungen nicht nachweislich von dort stammen, waere beides eine
-       Echtheitsbehauptung, die die Seite nicht einloesen kann. -->
-  <section id="stimmen" class="dunkel" data-sc-act="pan" data-sc-span="2.6" data-sc-drift="#0A0A0A">
+       Wortlaut unveraendert aus den Google-Rezensionen, ohne Google-Logo:
+       Die Marke gehoert Google, die Quellenangabe im Text reicht. -->
+  <section id="stimmen" class="dunkel" data-sc-act="pan" data-sc-span="3.2" data-sc-drift="#0A0A0A">
     <div data-sc-stage>
-      <div class="stimmen" data-sc-pan="0.06" style="padding-inline:clamp(1rem,4vw,2.5rem)">
+      <div class="stimmen" style="--rand:clamp(1rem,4vw,2.5rem)">
         <div class="stimmen__lead sc-stack">
           <p class="label">Kundenfeedback</p>
-          <h2 class="sc-display sc-display--md">Was sagen unsere Kunden?</h2>
-          <p class="sc-body" style="color:var(--sc-ink-soft)"><span class="marker">TODO: Gesamtnote und Anzahl der Bewertungen</span></p>
+          <p class="note">5,0</p>
+          <p class="sterne" aria-hidden="true">★★★★★</p>
+          <p class="sc-body" style="color:var(--sc-ink-soft)">Aus 17 Bewertungen auf Google.</p>
         </div>
+        <div class="stimmen__spur" data-sc-pan="0">
           <article class="karte">
             <div class="karte__kopf">
-              <span class="karte__kreis" aria-hidden="true">?</span>
+              <span class="karte__kreis" aria-hidden="true">Ü</span>
               <div>
-                <div class="karte__name">Name</div>
-                <div class="karte__wann">Datum</div>
+                <div class="karte__name">Üzeyir Karaardic</div>
+                <div class="karte__wann">vor 3 Wochen</div>
               </div>
             </div>
-            <p class="karte__text"><span class="marker">Bewertung 1 folgt</span></p>
+            <p class="sterne" aria-label="5 von 5 Sternen">★★★★★</p>
+            <p class="karte__text">Ismail Mutlu ist einfach der beste Friseur in Zillertal! Sehr freundlich, professionell und immer perfekter Service. Ich bin jedes Mal mit dem Ergebnis mehr als zufrieden. Absolute Empfehlung.</p>
           </article>
           <article class="karte">
             <div class="karte__kopf">
-              <span class="karte__kreis" aria-hidden="true">?</span>
+              <span class="karte__kreis" aria-hidden="true">A</span>
               <div>
-                <div class="karte__name">Name</div>
-                <div class="karte__wann">Datum</div>
+                <div class="karte__name">Astrid Hofer</div>
+                <div class="karte__wann">vor 3 Monaten</div>
               </div>
             </div>
-            <p class="karte__text"><span class="marker">Bewertung 2 folgt</span></p>
+            <p class="sterne" aria-label="5 von 5 Sternen">★★★★★</p>
+            <p class="karte__text">War mit beiden Kindern dort (Mädchen und Junge). Beide Frisöre waren sehr freundlich und vor allem der Junge (5 Jahre) hat eine Topfrisur inkl. rassiertem Muster erhalten! Preis absolut angemessen!</p>
           </article>
           <article class="karte">
             <div class="karte__kopf">
-              <span class="karte__kreis" aria-hidden="true">?</span>
+              <span class="karte__kreis" aria-hidden="true">L</span>
               <div>
-                <div class="karte__name">Name</div>
-                <div class="karte__wann">Datum</div>
+                <div class="karte__name">Levin Benk</div>
+                <div class="karte__wann">vor einem Monat</div>
               </div>
             </div>
-            <p class="karte__text"><span class="marker">Bewertung 3 folgt</span></p>
+            <p class="sterne" aria-label="5 von 5 Sternen">★★★★★</p>
+            <p class="karte__text">Super schnitt und cooler Laden! Absolut freundlich und humane Preise. Kann ich nur weiterempfehlen, ich komme wieder.</p>
           </article>
           <article class="karte">
             <div class="karte__kopf">
-              <span class="karte__kreis" aria-hidden="true">?</span>
+              <span class="karte__kreis" aria-hidden="true">C</span>
               <div>
-                <div class="karte__name">Name</div>
-                <div class="karte__wann">Datum</div>
+                <div class="karte__name">Christian Seemann</div>
+                <div class="karte__wann">vor 3 Wochen</div>
               </div>
             </div>
-            <p class="karte__text"><span class="marker">Bewertung 4 folgt</span></p>
+            <p class="sterne" aria-label="5 von 5 Sternen">★★★★★</p>
+            <p class="karte__text">Mega! Sofort Zeit gehabt die Jungs und Top arbeit geleistet. Könnte ich 6 Sterne vergeben würde ich es machen!</p>
           </article>
+          <article class="karte">
+            <div class="karte__kopf">
+              <span class="karte__kreis" aria-hidden="true">E</span>
+              <div>
+                <div class="karte__name">Elijah Singer</div>
+                <div class="karte__wann">vor 3 Tagen</div>
+              </div>
+            </div>
+            <p class="sterne" aria-label="5 von 5 Sternen">★★★★★</p>
+            <p class="karte__text">Sehr guter Salon nette Menschen und guter Service!! Komme immer gerne.</p>
+          </article>
+          <article class="karte">
+            <div class="karte__kopf">
+              <span class="karte__kreis" aria-hidden="true">L</span>
+              <div>
+                <div class="karte__name">luca Eder</div>
+                <div class="karte__wann">vor 3 Tagen</div>
+              </div>
+            </div>
+            <p class="sterne" aria-label="5 von 5 Sternen">★★★★★</p>
+            <p class="karte__text">Sehr guter Salon, netter friseur! Geht auf Wünsche ein! Tip Top!</p>
+          </article>
+          <article class="karte">
+            <div class="karte__kopf">
+              <span class="karte__kreis" aria-hidden="true">D</span>
+              <div>
+                <div class="karte__name">Daler</div>
+                <div class="karte__wann">vor einem Monat</div>
+              </div>
+            </div>
+            <p class="sterne" aria-label="5 von 5 Sternen">★★★★★</p>
+            <p class="karte__text">Super Service, super Preise! Vielen Dank! Beim nächsten Mal sehr gerne wieder.</p>
+          </article>
+          <article class="karte">
+            <div class="karte__kopf">
+              <span class="karte__kreis" aria-hidden="true">P</span>
+              <div>
+                <div class="karte__name">Petr Škabrada</div>
+                <div class="karte__wann">vor 3 Wochen</div>
+              </div>
+            </div>
+            <p class="sterne" aria-label="5 von 5 Sternen">★★★★★</p>
+            <p class="karte__text">Great cut, thanks!</p>
+          </article>
+          <span class="stimmen__ende" aria-hidden="true"></span>
+        </div>
       </div>
     </div>
   </section>
