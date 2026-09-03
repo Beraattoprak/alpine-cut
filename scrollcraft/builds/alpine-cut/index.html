@@ -183,7 +183,16 @@
      der brauchbare Bereich, darueber wirkt es wie ein Fehler. */
   .schnitte { display: grid; gap: clamp(1rem, 2vw, 1.6rem);
               grid-template-columns: repeat(2, 1fr); align-items: start; }
-  @media (min-width: 900px) { .schnitte { grid-template-columns: repeat(4, 1fr); } }
+  /* Fuenf Bilder gehen in keinem geraden Raster auf. Statt das letzte allein
+     links liegen zu lassen, steht die angebrochene Reihe mittig. */
+  .schnitt:last-child { grid-column: 1 / -1; justify-self: center;
+                        width: calc(50% - clamp(.5rem, 1vw, .8rem)); }
+  @media (min-width: 900px) {
+    .schnitte { grid-template-columns: repeat(6, 1fr); }
+    .schnitt { grid-column: span 2; }
+    .schnitt:nth-child(4) { grid-column: 2 / span 2; }
+    .schnitt:last-child { width: auto; justify-self: stretch; grid-column: span 2; }
+  }
   .schnitt { margin: 0; }
   .schnitt img { width: 100%; height: auto; display: block; }
   .schnitt figcaption { margin-top: .7rem; font-family: var(--sc-font-display);
@@ -206,7 +215,6 @@
   @media (min-width: 900px) {
     .raum__a { width: 62%; justify-self: start; }
     .raum__b { width: 62%; justify-self: end; }
-    .raum__c { width: 34%; justify-self: center; }
   }
   /* ---- Akt 6: Kundenfeedback, dunkel, seitlich laufende Karten -------- */
   /* Die Gesamtnote steht still, nur die Kartenreihe laeuft: sonst ist die
@@ -245,9 +253,11 @@
            display: flex; flex-direction: column; gap: .8rem; }
   .karte__kopf { display: flex; align-items: flex-start; gap: .7rem; }
   .karte__quelle { margin-inline-start: auto; flex: 0 0 auto; }
+  /* Die Farbe kommt aus dem jeweiligen Google-Profil, ausgemessen statt
+     gewaehlt: eine Reihe gleicher goldener Kreise sieht aus wie erfunden. */
   .karte__kreis { width: 2.4rem; height: 2.4rem; border-radius: 50%;
                   display: grid; place-items: center; flex: 0 0 auto;
-                  background: var(--sc-accent); color: var(--sc-accent-ink);
+                  background: var(--kreis, var(--sc-accent)); color: #fff;
                   font-family: var(--sc-font-display); font-weight: 700; }
   .karte__kopf > div { display: grid; align-content: start; }
   .karte__name { font-family: var(--sc-font-display); font-weight: 600; font-size: .95rem; }
@@ -420,7 +430,11 @@
             <img src="assets/herren-taper.webp" width="1000" height="1333" alt="Herrenschnitt, weicher Übergang im Nacken, welliges Deckhaar.">
             <figcaption>Taper</figcaption>
           </figure>
-          <figure class="schnitt" data-sc-parallax="0.8">
+          <figure class="schnitt" data-sc-parallax="0.7">
+            <img src="assets/herren-textur.webp" width="1000" height="1333" alt="Herrenschnitt von hinten, langes texturiertes Deckhaar, tiefer Übergang im Nacken.">
+            <figcaption>Textur im Deckhaar</figcaption>
+          </figure>
+          <figure class="schnitt" data-sc-parallax="-0.5">
             <img src="assets/damen-lang.webp" width="1000" height="1333" alt="Damenschnitt, langes blondiertes Haar mit weichem Verlauf, von hinten.">
             <figcaption>Lang, blondiert</figcaption>
           </figure>
@@ -436,17 +450,13 @@
         <p class="sc-body" style="color:var(--sc-ink-soft)">Angenehme Atmosphäre für Ihren Aufenthalt.</p>
       </div>
       <div class="raum">
-        <figure class="raum__a" data-sc-reveal="left" data-sc-reveal-at="0.04 0.30">
+        <figure class="raum__a" data-sc-reveal="left" data-sc-reveal-at="0.16 0.40">
           <img src="assets/salon-plaetze.webp" width="1600" height="1200" alt="Drei Bedienplätze mit weiß-goldenen Stühlen unter wabenförmiger Deckenbeleuchtung.">
           <figcaption>Die Bedienplätze</figcaption>
         </figure>
-        <figure class="raum__b" data-sc-reveal="right" data-sc-reveal-at="0.34 0.60">
+        <figure class="raum__b" data-sc-reveal="right" data-sc-reveal-at="0.48 0.72">
           <img src="assets/salon-lounge.webp" width="1600" height="1200" alt="Wartebereich mit schwarzen Chesterfield-Sofas und Messingfüßen am Schaufenster.">
           <figcaption>Warten wie im Wohnzimmer</figcaption>
-        </figure>
-        <figure class="raum__c" data-sc-reveal="up" data-sc-reveal-at="0.62 0.88">
-          <img src="assets/salon-waschen.webp" width="1536" height="2048" alt="Waschbereich mit zwei Waschbecken, Ringspiegeln und schwarzen Ledersesseln.">
-          <figcaption>Waschbereich</figcaption>
         </figure>
       </div>
     </div>
@@ -476,7 +486,7 @@
         <div class="stimmen__spur" id="stimmen-spur" data-sc-pan="0">
           <article class="karte">
             <div class="karte__kopf">
-              <span class="karte__kreis" aria-hidden="true">Ü</span>
+              <span class="karte__kreis" aria-hidden="true" style="--kreis:#d5732d">Ü</span>
               <div>
                 <div class="karte__name">Üzeyir Karaardic</div>
                 <div class="karte__wann">vor 3 Wochen</div>
@@ -493,7 +503,7 @@
           </article>
           <article class="karte">
             <div class="karte__kopf">
-              <span class="karte__kreis" aria-hidden="true">A</span>
+              <span class="karte__kreis" aria-hidden="true" style="--kreis:#264c41">A</span>
               <div>
                 <div class="karte__name">Astrid Hofer</div>
                 <div class="karte__wann">vor 3 Monaten</div>
@@ -510,7 +520,7 @@
           </article>
           <article class="karte">
             <div class="karte__kopf">
-              <span class="karte__kreis" aria-hidden="true">L</span>
+              <span class="karte__kreis" aria-hidden="true" style="--kreis:#4f87cb">L</span>
               <div>
                 <div class="karte__name">Levin Benk</div>
                 <div class="karte__wann">vor einem Monat</div>
@@ -527,7 +537,7 @@
           </article>
           <article class="karte">
             <div class="karte__kopf">
-              <span class="karte__kreis" aria-hidden="true">C</span>
+              <span class="karte__kreis" aria-hidden="true" style="--kreis:#6f726f">C</span>
               <div>
                 <div class="karte__name">Christian Seemann</div>
                 <div class="karte__wann">vor 3 Wochen</div>
@@ -544,7 +554,7 @@
           </article>
           <article class="karte">
             <div class="karte__kopf">
-              <span class="karte__kreis" aria-hidden="true">E</span>
+              <span class="karte__kreis" aria-hidden="true" style="--kreis:#4c5963">E</span>
               <div>
                 <div class="karte__name">Elijah Singer</div>
                 <div class="karte__wann">vor 3 Tagen</div>
@@ -561,7 +571,7 @@
           </article>
           <article class="karte">
             <div class="karte__kopf">
-              <span class="karte__kreis" aria-hidden="true">L</span>
+              <span class="karte__kreis" aria-hidden="true" style="--kreis:#4f31a1">L</span>
               <div>
                 <div class="karte__name">luca Eder</div>
                 <div class="karte__wann">vor 3 Tagen</div>
@@ -578,7 +588,7 @@
           </article>
           <article class="karte">
             <div class="karte__kopf">
-              <span class="karte__kreis" aria-hidden="true">D</span>
+              <span class="karte__kreis" aria-hidden="true" style="--kreis:#d04f7a">D</span>
               <div>
                 <div class="karte__name">Daler</div>
                 <div class="karte__wann">vor einem Monat</div>
@@ -595,7 +605,7 @@
           </article>
           <article class="karte">
             <div class="karte__kopf">
-              <span class="karte__kreis" aria-hidden="true">B</span>
+              <span class="karte__kreis" aria-hidden="true" style="--kreis:#335696">B</span>
               <div>
                 <div class="karte__name">Berat Toprak</div>
               </div>
@@ -611,7 +621,7 @@
           </article>
           <article class="karte">
             <div class="karte__kopf">
-              <span class="karte__kreis" aria-hidden="true">P</span>
+              <span class="karte__kreis" aria-hidden="true" style="--kreis:#264c41">P</span>
               <div>
                 <div class="karte__name">Petr Škabrada</div>
                 <div class="karte__wann">vor 3 Wochen</div>
