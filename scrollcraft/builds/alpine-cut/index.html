@@ -153,12 +153,12 @@
      Fenster kostet sie die Haelfte der Preiszeilen. */
   .preisbuehne[data-liest] .preisbuehne__kopf { display: none; }
   .preisbuehne[data-liest] { grid-template-rows: 1fr; }
-  .pdeck { display: grid; grid-template-columns: 1fr 1fr;
-           gap: clamp(.8rem, 2vw, 1.4rem); min-height: 0; align-items: center;
-           width: 100%; max-width: 34rem; margin-inline: auto; }
+  .pdeck { display: grid; grid-template-columns: auto auto; justify-content: center;
+           gap: clamp(.8rem, 2vw, 1.4rem); min-height: 0; align-items: center; width: 100%; }
 
   .pkarte { perspective: 1600px; min-width: 0;
-            height: clamp(15rem, 42vh, 24rem); max-height: 100%; }
+            height: clamp(17rem, 52vh, 30rem); max-height: 100%;
+            aspect-ratio: 2 / 3; max-width: 100%; }
   .pkarte__innen { position: relative; width: 100%; height: 100%;
                    transform-style: preserve-3d;
                    transition: transform 700ms cubic-bezier(.2, .75, .25, 1); }
@@ -212,7 +212,7 @@
   /* Schmaler Schirm: die Karte wird sonst 173 zu 354 und damit ein Streifen
      statt einer Karte, und "Preise ansehen" bricht in der Pille um. */
   @media (max-width: 520px) {
-    .pkarte { height: clamp(12rem, 30vh, 17rem); }
+    .pkarte { height: clamp(13rem, 34vh, 19rem); }
     .pkarte__vorn { padding: clamp(1.1rem, 4vw, 1.5rem); gap: .7rem; }
     .pkarte__cta { font-size: .6rem; letter-spacing: .05em; padding: .5rem .7rem; gap: .4rem; }
     .pkarte__cta svg { width: 13px; height: 13px; }
@@ -246,7 +246,8 @@
   @media (prefers-reduced-motion: reduce) {
     .pkarte__innen, .pkarte__vorn, .pkarte__cta, .pkarte__cta svg { transition: none; }
   }
-  .pdeck[data-gewaehlt] { grid-template-columns: 1fr; align-items: stretch; max-width: none; }
+  .pdeck[data-gewaehlt] { grid-template-columns: 1fr; align-items: stretch; }
+  .pdeck[data-gewaehlt] .pkarte { aspect-ratio: auto; width: 100%; max-width: 60rem; justify-self: center; }
   .pdeck[data-gewaehlt] .pkarte { height: 100%; }
   .pkarte[hidden] { display: none; }
 
@@ -451,7 +452,6 @@
       <div class="preisbuehne" data-sc-cue="0 1 0 0">
         <div class="sc-stack preisbuehne__kopf">
           <h2 class="sc-display sc-display--md">Preise</h2>
-          <p class="sc-body" style="color:var(--sc-ink-soft)">Stand der Tafel im Salon. Dort gilt der Aushang.</p>
         </div>
 
         <div class="pdeck" id="pdeck">
