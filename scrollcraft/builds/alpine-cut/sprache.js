@@ -54,7 +54,6 @@
     'Wachs': 'Wax',
     'Black Mask': 'Black mask',
     'Kopfmassage': 'Head massage',
-    'Zuordnung noch nicht bestätigt': 'Assignment not yet confirmed',
     'Schnitt und Styling, nach Haarlänge': 'Cut and styling, by hair length',
     'Behandlung': 'Treatment',
     'Kurz': 'Short',
@@ -88,8 +87,6 @@
     'Nachzulesen im': 'Read them on our',
     'Google-Profil': 'Google profile',
     '(öffnet in einem neuen Tab)': '(opens in a new tab)',
-    'Die Bewertungen stehen im Wortlaut, also auf Deutsch.':
-      'The reviews are quoted word for word, so they are in German.',
     'vor 3 Tagen': '3 days ago',
     'vor 3 Wochen': '3 weeks ago',
     'vor einem Monat': 'a month ago',
@@ -185,10 +182,6 @@
     if (titel && WOERTER[titel.dataset.de || '']) {
       titel.textContent = en ? WOERTER[titel.dataset.de] : titel.dataset.de;
     }
-
-    /* Der Hinweis auf die deutschen Zitate steht nur im englischen Modus. */
-    var hinweis = document.querySelector('[data-nur-en]');
-    if (hinweis) hinweis.hidden = !en;
 
     var knoepfe = document.querySelectorAll('.sprache__knopf');
     for (var k = 0; k < knoepfe.length; k++) {

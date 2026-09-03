@@ -93,7 +93,11 @@
     gap: 1.5rem; padding: 1rem clamp(1rem, 4vw, 2.5rem);
     mix-blend-mode: difference;
   }
-  .bar__mark { text-decoration: none; }
+  /* Die Wortmarke darf nie umbrechen. Ohne nowrap drueckt der
+     Flex-Algorithmus sie auf ihre schmalste Wortbreite, und aus ALPINE CUT
+     werden zwei Zeilen — auf jeder Schirmbreite, nicht nur auf kleinen. */
+  .bar__mark { text-decoration: none; flex: 0 0 auto; }
+  .bar__mark b, .bar__cta { white-space: nowrap; }
   .bar__mark b {
     font-family: var(--sc-font-display); font-weight: 700; font-size: .95rem;
     letter-spacing: .26em; color: #fff; text-transform: uppercase;
@@ -102,6 +106,17 @@
     font-family: var(--sc-font-display); font-size: .78rem; letter-spacing: .2em;
     text-transform: uppercase; color: #fff; text-decoration: none;
     border-bottom: 1px solid currentColor; padding-bottom: .2rem;
+  }
+
+  /* Einzeilig braucht die Leiste auf Deutsch rund 464px: Wortmarke 160,
+     Umschalter 90, "Vorbeikommen" 134, dazu Abstaende und Polster. Auf dem
+     Telefon ist das zu viel, also werden alle drei Teile kleiner statt eines
+     davon umzubrechen. */
+  @media (max-width: 560px) {
+    .bar { gap: .6rem; padding-inline: 1rem; }
+    .bar__mark b { font-size: .74rem; letter-spacing: .14em; }
+    .bar__cta { font-size: .64rem; letter-spacing: .08em; padding-bottom: .15rem; }
+    .sprache__knopf { padding: .25rem .45rem; font-size: .64rem; letter-spacing: .08em; }
   }
 
   /* ---- Akt 1: Hero, hell --------------------------------------------- */
@@ -830,7 +845,6 @@
                       <tr><th scope="row">Kopfmassage</th><td>5 €</td></tr>
                     </tbody>
                   </table>
-                  <p style="margin:.9rem 0 0"><span class="marker">Zuordnung noch nicht bestätigt</span></p>
                 </div>
                 <button type="button" class="pkarte__zu">Karte zurücklegen</button>
               </div>
@@ -973,8 +987,7 @@
             <h2 class="sc-display sc-display--md">Was unsere Kunden sagen</h2>
             <p class="sc-body" style="color:var(--sc-ink-soft)">Nachzulesen im
               <a href="https://www.google.com/maps/search/?api=1&amp;query=Alpine+Cut+Dorf-Platz+1+6263+F%C3%BCgen"
-                 target="_blank" rel="noopener">Google-Profil<span class="vh"> (öffnet in einem neuen Tab)</span></a>.
-              <span data-nur-en hidden>Die Bewertungen stehen im Wortlaut, also auf Deutsch.</span></p>
+                 target="_blank" rel="noopener">Google-Profil<span class="vh"> (öffnet in einem neuen Tab)</span></a>.</p>
           </div>
           <div class="stimmen__pfeile">
             <button type="button" class="pfeil" data-stimmen="-1" aria-label="Vorherige Bewertungen" aria-controls="stimmen-spur">
