@@ -19,14 +19,12 @@ export function Preiskarten() {
   return (
     <div className="grid gap-3 sm:grid-cols-2 sm:data-[gewaehlt]:grid-cols-1" data-gewaehlt={offen ?? undefined}>
       {offen !== 'damen' && (
-        <div className="h-72 sm:h-96">
+        <div className="h-64 sm:h-96">
           <MotivKarte
-            bild="/fotos/herren-fade.webp"
-            bildAlt="Herrenschnitt mit hohem Fade an der Seite"
+            eckzeichen="H"
             titel="Herren"
-            zeile="10 Leistungen · ab 5 €"
             aktion={offen === 'herren' ? 'Karte zurücklegen' : 'Preise ansehen'}
-            ton="30 22% 13%"
+            ton="28 20% 11%"
             aria-expanded={offen === 'herren'}
             onClick={() => setOffen(offen === 'herren' ? null : 'herren')}
           />
@@ -36,12 +34,10 @@ export function Preiskarten() {
       {offen !== 'herren' && (
         <div className="h-72 sm:h-96">
           <MotivKarte
-            bild="/fotos/damen-lang.webp"
-            bildAlt="Damenschnitt, langes blondiertes Haar mit weichem Verlauf"
+            eckzeichen="D"
             titel="Damen"
-            zeile="4 Behandlungen · ab 25 €"
             aktion={offen === 'damen' ? 'Karte zurücklegen' : 'Preise ansehen'}
-            ton="18 26% 18%"
+            ton="348 18% 20%"
             aria-expanded={offen === 'damen'}
             onClick={() => setOffen(offen === 'damen' ? null : 'damen')}
           />
@@ -60,7 +56,6 @@ export function KarteAlsVerweis() {
         bild="/fotos/salon-aussen.webp"
         bildAlt="Der Salon von außen, Holzfassade am Dorf-Platz"
         titel="Anfahrt"
-        zeile="Dorf-Platz 1 · 6263 Fügen"
         aktion="Auf der Karte zeigen"
         ton="200 18% 16%"
       />
