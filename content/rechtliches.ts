@@ -12,13 +12,9 @@ export const impressum: Rechtsabschnitt[] = [
       'Ismail Enes Mutlu, Einzelunternehmer',
       anschrift,
       `Telefon: ${salon.telefon}`,
-      todo('Impressum: E-Mail-Adresse eintragen — nach § 5 ECG verpflichtend'),
-      todo(
-        'Impressum: Firmenbuchnummer und Firmenbuchgericht eintragen, oder bestätigen, dass keine Eintragung besteht',
-      ),
-      todo(
-        'Impressum: UID-Nummer eintragen, falls umsatzsteuerpflichtig; bei Kleinunternehmerregelung entfällt die Angabe',
-      ),
+      'E-Mail: alpinecut@gmail.com',
+      'Nicht im Firmenbuch eingetragen.',
+      'UID-Nummer: ATU83451319',
     ],
   },
   {
@@ -54,9 +50,10 @@ export const datenschutz: Rechtsabschnitt[] = [
   {
     titel: 'Verantwortlicher',
     absaetze: [
+      'Ismail Enes Mutlu, Einzelunternehmer',
       anschrift,
       `Telefon: ${salon.telefon}`,
-      todo('Datenschutz: E-Mail-Adresse für Datenschutzanfragen eintragen'),
+      'E-Mail: alpinecut@gmail.com',
     ],
   },
   {

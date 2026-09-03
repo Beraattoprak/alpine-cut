@@ -36,8 +36,13 @@ describe('hairSalonJsonLd', () => {
     expect(daten).not.toHaveProperty('geo')
   })
 
-  it('laesst die E-Mail weg, solange sie offen ist', () => {
-    expect(daten).not.toHaveProperty('email')
+  // Hiess einmal "laesst die E-Mail weg, solange sie offen ist" und hielt fest,
+  // dass ein todo() nicht in die strukturierten Daten durchrutscht. Die Adresse
+  // ist inzwischen geliefert, also prueft der Test jetzt die andere Haelfte
+  // derselben Regel: eine echte Adresse gehoert hinein. Dass ein offener Wert
+  // draussen bleibt, deckt weiterhin der TODO-Test darueber ab.
+  it('traegt die E-Mail, seit sie geliefert ist', () => {
+    expect(daten.email).toBe('alpinecut@gmail.com')
   })
 
   it('enthaelt keinen einzigen undefined- oder null-Wert', () => {

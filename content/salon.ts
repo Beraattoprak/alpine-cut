@@ -1,5 +1,4 @@
 import type { Salon } from './types'
-import { todo } from './todo'
 
 export const salon: Salon = {
   name: 'Alpine Cut',
@@ -13,5 +12,5 @@ export const salon: Salon = {
   instagram: 'https://www.instagram.com/alpine.cutz/',
   instagramHandle: '@alpine.cutz',
   // Für Impressum und Datenschutz gesetzlich nötig, auch ohne Kontaktformular.
-  email: todo('E-Mail-Adresse des Salons eintragen — Pflichtangabe im Impressum'),
+  email: 'alpinecut@gmail.com',
 }
