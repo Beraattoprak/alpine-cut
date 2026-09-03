@@ -135,23 +135,98 @@
   .ort__zeile { font-family: var(--sc-font-display); font-size: clamp(1.6rem, 3.4vw, 2.6rem);
                 line-height: 1.12; letter-spacing: -.02em; max-width: 18ch; }
 
-  /* ---- Akt 3: Preise, hell ------------------------------------------
-     Zwei Listen untereinander, ab 1000px nebeneinander. Herren hat zwei
-     Spalten und braucht wenig, Damen hat fuenf und bekommt den Rest. */
-  .preisbuehne { height: 100%; display: grid; align-content: center;
-                 padding-inline: clamp(1rem, 4vw, 2.5rem);
-                 max-width: var(--sc-wrap, 78rem); margin-inline: auto; width: 100%; }
-  .preisliste { display: grid; gap: clamp(2.5rem, 5vw, 4rem); align-items: start; }
-  @media (min-width: 1000px) {
-    .preisliste { grid-template-columns: minmax(0, 20rem) minmax(0, 1fr); }
+  /* ---- Akt 3: Preise, hell. Zwei Kaertchen zum Umdrehen ---------------
+     Die Buehne ist festgehalten, also darf ihr Inhalt nie hoeher werden als
+     das Fenster: was unten hinausragt, erreicht niemand mehr. Deshalb sind
+     die Kaertchen an die Fensterhoehe gebunden, und die Liste auf der
+     Rueckseite rollt notfalls in sich statt die Karte zu strecken. */
+  /* Zwei Reihen: Kopf so hoch wie noetig, Karten bekommen den Rest. Eine
+     aufgeschlagene Karte soll die freie Hoehe nutzen duerfen, sonst passen
+     von zehn Preiszeilen vier ins Bild. */
+  .preisbuehne { height: 100%; display: grid; grid-template-rows: auto 1fr;
+                 gap: clamp(1.2rem, 3vh, 2.2rem);
+                 padding: clamp(4.6rem, 9vh, 5.4rem) clamp(1rem, 4vw, 2.5rem) clamp(1rem, 4vh, 2.4rem);
+                 max-width: 68rem; margin-inline: auto; width: 100%; }
+
+  /* Ist eine Karte aufgeschlagen, tritt die Abschnittsueberschrift ab: sie
+     wiederholt nur, was die Karte selbst schon sagt, und in einem niedrigen
+     Fenster kostet sie die Haelfte der Preiszeilen. */
+  .preisbuehne[data-liest] .preisbuehne__kopf { display: none; }
+  .preisbuehne[data-liest] { grid-template-rows: 1fr; }
+  .pdeck { display: grid; grid-template-columns: 1fr 1fr;
+           gap: clamp(.8rem, 2vw, 1.4rem); min-height: 0; align-items: center; }
+
+  .pkarte { perspective: 1600px; min-width: 0;
+            height: clamp(15rem, 42vh, 24rem); max-height: 100%; }
+  .pkarte__innen { position: relative; width: 100%; height: 100%;
+                   transform-style: preserve-3d;
+                   transition: transform 700ms cubic-bezier(.2, .75, .25, 1); }
+  .pkarte[data-offen] .pkarte__innen { transform: rotateY(180deg); }
+
+  .pkarte__seite { position: absolute; inset: 0; border-radius: .9rem;
+                   overflow: hidden; backface-visibility: hidden;
+                   -webkit-backface-visibility: hidden; }
+
+  /* Vorderseite: Foto, darueber ein Farbschleier in der Tonart der Karte. */
+  .pkarte__vorn { display: flex; flex-direction: column; align-items: flex-start;
+                  justify-content: flex-end; gap: .25rem; text-align: left;
+                  padding: clamp(1rem, 2.5vw, 1.6rem); cursor: pointer;
+                  border: 0; color: #fff; font: inherit;
+                  background-image:
+                    linear-gradient(to top, hsl(var(--ton) / .96), hsl(var(--ton) / .72) 42%, hsl(var(--ton) / .3) 100%),
+                    var(--bild);
+                  background-size: cover, cover;
+                  background-position: center, center;
+                  box-shadow: 0 18px 40px -24px hsl(var(--ton) / .9);
+                  transition: box-shadow 300ms, transform 300ms; }
+  .pkarte__vorn:hover { box-shadow: 0 26px 60px -26px hsl(var(--ton) / 1); }
+  .pkarte__titel { font-family: var(--sc-font-display); font-weight: 700;
+                   font-size: clamp(1.5rem, 3.4vw, 2.4rem); line-height: 1.05;
+                   letter-spacing: -.02em; }
+  .pkarte__zeile { font-size: .86rem; color: #fff; opacity: .82; }
+  .pkarte__cta { margin-top: clamp(.8rem, 2vh, 1.4rem); align-self: stretch;
+                 display: flex; align-items: center; justify-content: space-between;
+                 gap: .6rem; padding: .7rem .9rem; border-radius: .5rem;
+                 font-family: var(--sc-font-display); font-weight: 600;
+                 font-size: .8rem; letter-spacing: .06em;
+                 background: rgb(255 255 255 / .14);
+                 border: 1px solid rgb(255 255 255 / .28);
+                 transition: background 260ms, border-color 260ms; }
+  .pkarte__vorn:hover .pkarte__cta { background: rgb(255 255 255 / .26); }
+  .pkarte__cta svg { transition: transform 260ms; }
+  .pkarte__vorn:hover .pkarte__cta svg { transform: translateX(3px); }
+
+  /* Rueckseite: die Liste. Heller Grund, damit Zahlen lesbar bleiben. */
+  .pkarte__hinten { transform: rotateY(180deg); display: flex; flex-direction: column;
+                    background: var(--sc-surface); color: var(--sc-ink);
+                    padding: clamp(.9rem, 2vw, 1.4rem);
+                    box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--sc-ink) 12%, transparent); }
+  .pkarte__rueckentitel { flex: 0 0 auto; margin: 0 0 .6rem;
+                          font-family: var(--sc-font-display); font-weight: 700;
+                          font-size: clamp(1.2rem, 2.4vw, 1.7rem); letter-spacing: -.02em; }
+  .pkarte__rollen { flex: 1 1 auto; overflow: auto; min-height: 0; }
+  .pkarte__rollen:focus-visible { outline: 2px solid var(--sc-accent); outline-offset: 2px; }
+  .pkarte__zu { flex: 0 0 auto; margin-top: .8rem; align-self: flex-start;
+                background: transparent; cursor: pointer; font: inherit;
+                font-family: var(--sc-font-display); font-size: .74rem;
+                letter-spacing: .14em; text-transform: uppercase;
+                color: var(--sc-ink); padding: .55rem .9rem; border-radius: .4rem;
+                border: 1px solid color-mix(in srgb, var(--sc-ink) 30%, transparent); }
+  .pkarte__zu:hover { background: var(--sc-accent); color: var(--sc-accent-ink);
+                      border-color: var(--sc-accent); }
+
+  /* Die gewaehlte Karte nimmt die ganze Breite, die andere tritt ab. Sonst
+     bliebe fuer die Damentabelle mit fuenf Spalten eine halbe Spalte. */
+  /* Ohne Bewegung wird aus dem Umdrehen ein Umschalten: die Seite wechselt
+     sofort, backface-visibility zeigt weiterhin die richtige. Der Zustand
+     bleibt derselbe, nur die halbe Sekunde Drehung faellt weg. */
+  @media (prefers-reduced-motion: reduce) {
+    .pkarte__innen, .pkarte__vorn, .pkarte__cta, .pkarte__cta svg { transition: none; }
   }
-  /* Ohne min-width:0 ist ein Grid-Kind mindestens so breit wie sein Inhalt.
-     Die fuenfspaltige Damentabelle schob damit auf 390px die ganze Seite
-     waagrecht auf, statt im eigenen Kasten zu rollen. */
-  .preisliste__teil { min-width: 0; }
-  .preisliste__titel { font-family: var(--sc-font-display); font-weight: 600;
-                       font-size: clamp(1.3rem, 2.4vw, 1.8rem); margin: 0 0 1rem;
-                       letter-spacing: -.01em; }
+  .pdeck[data-gewaehlt] { grid-template-columns: 1fr; align-items: stretch; }
+  .pdeck[data-gewaehlt] .pkarte { height: 100%; }
+  .pkarte[hidden] { display: none; }
+
   .preise { width: 100%; border-collapse: collapse; font-variant-numeric: tabular-nums; }
   .preise caption { text-align: left; font-family: var(--sc-font-display);
                     font-size: .72rem; letter-spacing: .2em; text-transform: uppercase;
@@ -342,71 +417,102 @@
     </div>
   </section>
 
-  <!-- 3 · PREISE: flow, HELL. Vorher hing die Liste an einem Laengenregler,
-       der zwischen Herren und Damen umschaltete. Umschalten heisst: die
-       Haelfte ist immer versteckt, und wer den Herrenpreis sucht, muss erst
-       begreifen, dass ein Schieber daneben etwas damit zu tun hat. Eine
-       Preisliste liest man, man bedient sie nicht. Beide stehen jetzt da. -->
-  <section id="preise" class="hell" data-sc-act="pin" data-sc-span="1.8" data-sc-drift="#F7F4EE">
+  <!-- 3 · PREISE: pin, HELL. Zwei Kaertchen, eines je Preisliste. Wer eines
+       anklickt, dreht es um und liest dahinter die Liste; das andere tritt
+       ab. Vorher standen beide Listen offen nebeneinander — in einem
+       niedrigen Fenster passte das nicht in die festgehaltene Buehne, und
+       was unten hinausragte war nicht mehr erreichbar. Zwei Kaertchen sind
+       immer kurz, egal wie hoch das Fenster ist. -->
+  <section id="preise" class="hell" data-sc-act="pin" data-sc-span="1.6" data-sc-drift="#F7F4EE">
     <div data-sc-stage>
       <div class="preisbuehne" data-sc-cue="0 1 0 0">
-      <div class="sc-stack" style="margin-bottom:clamp(1.6rem,3vw,2.6rem)">
-        <h2 class="sc-display sc-display--md">Preise</h2>
-        <p class="sc-body" style="color:var(--sc-ink-soft)">Stand der Tafel im Salon. Dort gilt der Aushang.</p>
-      </div>
+        <div class="sc-stack preisbuehne__kopf">
+          <h2 class="sc-display sc-display--md">Preise</h2>
+          <p class="sc-body" style="color:var(--sc-ink-soft)">Stand der Tafel im Salon. Dort gilt der Aushang.</p>
+        </div>
 
-      <div class="preisliste">
-        <section class="preisliste__teil" data-sc-reveal="up" data-sc-reveal-at="0.05 0.34">
-          <h3 class="preisliste__titel">Herren</h3>
-          <!-- Betraege in der Reihenfolge der Preistafel uebernommen. Auf der
-               Tafel sind Bezeichnungen und Betraege gegeneinander verschoben,
-               die Zuordnung ist also ungeprueft. Deshalb der sichtbare Hinweis
-               darunter: erfunden ist keine Zahl, bestaetigt aber auch nicht. -->
-          <table class="preise">
-            <caption>Schnitt, Bart und Pflege</caption>
-            <tbody>
-              <tr><th scope="row">Maschinenhaarschnitt</th><td>16 €</td></tr>
-              <tr><th scope="row">Musterhaarschnitt</th><td>6 €</td></tr>
-              <tr><th scope="row">Bartrasur</th><td>10 €</td></tr>
-              <tr><th scope="row">Maschinenbartrasur</th><td>13 €</td></tr>
-              <tr><th scope="row">Musterbartrasur</th><td>15 €</td></tr>
-              <tr><th scope="row">Waschen, Schneiden, Föhnen</th><td>26 €</td></tr>
-              <tr><th scope="row">Waschen und Föhnen</th><td>8 €</td></tr>
-              <tr><th scope="row">Wachs</th><td>8 €</td></tr>
-              <tr><th scope="row">Black Mask</th><td>8 €</td></tr>
-              <tr><th scope="row">Kopfmassage</th><td>5 €</td></tr>
-            </tbody>
-          </table>
-          <p style="margin:1rem 0 0"><span class="marker">Zuordnung noch nicht bestätigt</span></p>
-        </section>
+        <div class="pdeck" id="pdeck">
+          <article class="pkarte" id="karte-herren" style="--ton:30 22% 13%">
+            <div class="pkarte__innen">
+              <button type="button" class="pkarte__seite pkarte__vorn" aria-expanded="false" aria-controls="p-herren"
+                      style="--bild:url(assets/herren-fade.webp)">
+                <span class="pkarte__titel">Herren</span>
+                <span class="pkarte__zeile">10 Leistungen · ab 5 €</span>
+                <span class="pkarte__cta">
+                  Preise ansehen
+                  <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+                </span>
+              </button>
 
-        <section class="preisliste__teil" data-sc-reveal="up" data-sc-reveal-at="0.30 0.60">
-          <h3 class="preisliste__titel">Damen</h3>
-          <!-- Fuenf Spalten passen auf kein Telefon. Die Tabelle scrollt
-               deshalb in ihrem eigenen Kasten waagrecht, statt die Seite
-               mitzunehmen oder die Schrift unleserlich zu quetschen. -->
-          <div class="preise__rollen" tabindex="0" role="group" aria-label="Damenpreise, waagrecht scrollbar">
-            <table class="preise">
-              <caption>Schnitt und Styling, nach Haarlänge</caption>
-              <thead>
-                <tr>
-                  <th scope="col" style="text-align:left">Behandlung</th>
-                  <th scope="col">Kurz<br>bis Ohr</th>
-                  <th scope="col">Mittel<br>bis Schulter</th>
-                  <th scope="col">Lang<br>ab Schulter</th>
-                  <th scope="col">Extra lang<br>bis Linie</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr><th scope="row">Waschen &amp; Föhnen</th><td>25 €</td><td>45 €</td><td>55 €</td><td>65 €</td></tr>
-                <tr><th scope="row">Waschen &amp; Legen</th><td>45 €</td><td>55 €</td><td>65 €</td><td>75 €</td></tr>
-                <tr><th scope="row">Waschen, Schneiden &amp; Föhnen</th><td>55 €</td><td>65 €</td><td>75 €</td><td>85 €</td></tr>
-                <tr><th scope="row">Waschen &amp; Schneiden</th><td>35 €</td><td>45 €</td><td>55 €</td><td>65 €</td></tr>
-              </tbody>
-            </table>
-          </div>
-        </section>
-      </div>
+              <div class="pkarte__seite pkarte__hinten" id="p-herren">
+                <h3 class="pkarte__rueckentitel">Herren</h3>
+                <div class="pkarte__rollen" tabindex="0" role="group" aria-label="Herrenpreise">
+                  <!-- Betraege in der Reihenfolge der Preistafel uebernommen. Auf
+                       der Tafel sind Bezeichnungen und Betraege gegeneinander
+                       verschoben, die Zuordnung ist also ungeprueft. Deshalb der
+                       sichtbare Hinweis: erfunden ist keine Zahl, bestaetigt
+                       aber auch nicht. -->
+                  <table class="preise">
+                    <caption>Schnitt, Bart und Pflege</caption>
+                    <tbody>
+                      <tr><th scope="row">Maschinenhaarschnitt</th><td>16 €</td></tr>
+                      <tr><th scope="row">Musterhaarschnitt</th><td>6 €</td></tr>
+                      <tr><th scope="row">Bartrasur</th><td>10 €</td></tr>
+                      <tr><th scope="row">Maschinenbartrasur</th><td>13 €</td></tr>
+                      <tr><th scope="row">Musterbartrasur</th><td>15 €</td></tr>
+                      <tr><th scope="row">Waschen, Schneiden, Föhnen</th><td>26 €</td></tr>
+                      <tr><th scope="row">Waschen und Föhnen</th><td>8 €</td></tr>
+                      <tr><th scope="row">Wachs</th><td>8 €</td></tr>
+                      <tr><th scope="row">Black Mask</th><td>8 €</td></tr>
+                      <tr><th scope="row">Kopfmassage</th><td>5 €</td></tr>
+                    </tbody>
+                  </table>
+                  <p style="margin:.9rem 0 0"><span class="marker">Zuordnung noch nicht bestätigt</span></p>
+                </div>
+                <button type="button" class="pkarte__zu">Karte zurücklegen</button>
+              </div>
+            </div>
+          </article>
+
+          <article class="pkarte" id="karte-damen" style="--ton:18 26% 18%">
+            <div class="pkarte__innen">
+              <button type="button" class="pkarte__seite pkarte__vorn" aria-expanded="false" aria-controls="p-damen"
+                      style="--bild:url(assets/damen-lang.webp)">
+                <span class="pkarte__titel">Damen</span>
+                <span class="pkarte__zeile">4 Behandlungen · ab 25 €</span>
+                <span class="pkarte__cta">
+                  Preise ansehen
+                  <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+                </span>
+              </button>
+
+              <div class="pkarte__seite pkarte__hinten" id="p-damen">
+                <h3 class="pkarte__rueckentitel">Damen</h3>
+                <div class="pkarte__rollen" tabindex="0" role="group" aria-label="Damenpreise, waagrecht scrollbar">
+                  <table class="preise">
+                    <caption>Schnitt und Styling, nach Haarlänge</caption>
+                    <thead>
+                      <tr>
+                        <th scope="col" style="text-align:left">Behandlung</th>
+                        <th scope="col">Kurz<br>bis Ohr</th>
+                        <th scope="col">Mittel<br>bis Schulter</th>
+                        <th scope="col">Lang<br>ab Schulter</th>
+                        <th scope="col">Extra lang<br>bis Linie</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr><th scope="row">Waschen &amp; Föhnen</th><td>25 €</td><td>45 €</td><td>55 €</td><td>65 €</td></tr>
+                      <tr><th scope="row">Waschen &amp; Legen</th><td>45 €</td><td>55 €</td><td>65 €</td><td>75 €</td></tr>
+                      <tr><th scope="row">Waschen, Schneiden &amp; Föhnen</th><td>55 €</td><td>65 €</td><td>75 €</td><td>85 €</td></tr>
+                      <tr><th scope="row">Waschen &amp; Schneiden</th><td>35 €</td><td>45 €</td><td>55 €</td><td>65 €</td></tr>
+                    </tbody>
+                  </table>
+                </div>
+                <button type="button" class="pkarte__zu">Karte zurücklegen</button>
+              </div>
+            </div>
+          </article>
+        </div>
       </div>
     </div>
   </section>
@@ -707,6 +813,58 @@
 <script src="scrollcraft.js"></script>
 <script>
   ScrollCraft.mount(document.body);
+
+  /* ---- Die zwei Preiskaertchen -----------------------------------------
+     Umdrehen ist ein Zustandswechsel, kein Ziel: Traeger ist deshalb ein
+     button, kein Link. backface-visibility versteckt die abgewandte Seite
+     nur fuer das Auge — ein Screenreader liest sie weiter. Darum wird sie
+     zusaetzlich auf inert gesetzt, sonst stehen beide Preislisten
+     gleichzeitig im Vorlesebaum und man tabbt in Unsichtbares. */
+  (function () {
+    var deck = document.getElementById('pdeck');
+    if (!deck) return;
+    var karten = [].slice.call(deck.querySelectorAll('.pkarte'));
+
+    function stellen(offene) {
+      karten.forEach(function (k) {
+        var auf = k === offene;
+        var vorn = k.querySelector('.pkarte__vorn');
+        var hinten = k.querySelector('.pkarte__hinten');
+        if (auf) k.setAttribute('data-offen', ''); else k.removeAttribute('data-offen');
+        k.hidden = !!offene && !auf;
+        vorn.setAttribute('aria-expanded', auf ? 'true' : 'false');
+        vorn.inert = auf;
+        hinten.inert = !auf;
+      });
+      if (offene) deck.setAttribute('data-gewaehlt', ''); else deck.removeAttribute('data-gewaehlt');
+      var buehne = deck.closest('.preisbuehne');
+      if (offene) buehne.setAttribute('data-liest', ''); else buehne.removeAttribute('data-liest');
+    }
+
+    karten.forEach(function (k) {
+      k.querySelector('.pkarte__vorn').addEventListener('click', function () {
+        stellen(k);
+        /* Nach dem Umdrehen liegt der Blick auf der Liste, also gehoert der
+           Tastaturfokus auch dorthin. */
+        k.querySelector('.pkarte__rollen').focus();
+      });
+      k.querySelector('.pkarte__zu').addEventListener('click', function () {
+        stellen(null);
+        k.querySelector('.pkarte__vorn').focus();
+      });
+    });
+
+    /* Escape legt die Karte zurueck, wie man es von allem Aufgeklappten kennt. */
+    deck.addEventListener('keydown', function (e) {
+      if (e.key !== 'Escape') return;
+      var offen = deck.querySelector('.pkarte[data-offen]');
+      if (!offen) return;
+      stellen(null);
+      offen.querySelector('.pkarte__vorn').focus();
+    });
+
+    stellen(null);
+  })();
 
   /* ---- Pfeile im Kundenfeedback -------------------------------------
      Die Reihe haengt am Seitenscroll: die Engine setzt ihren Versatz aus
