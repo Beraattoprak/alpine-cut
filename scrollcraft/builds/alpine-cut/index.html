@@ -143,7 +143,7 @@
   /* Zwei Reihen: Kopf so hoch wie noetig, Karten bekommen den Rest. Eine
      aufgeschlagene Karte soll die freie Hoehe nutzen duerfen, sonst passen
      von zehn Preiszeilen vier ins Bild. */
-  .preisbuehne { height: 100%; display: grid; grid-template-rows: auto 1fr auto;
+  .preisbuehne { height: 100%; display: grid; grid-template-rows: auto 1fr;
                  gap: clamp(1.2rem, 3vh, 2.2rem);
                  padding: clamp(4.6rem, 9vh, 5.4rem) clamp(1rem, 4vw, 2.5rem) clamp(1rem, 4vh, 2.4rem);
                  max-width: 68rem; margin-inline: auto; width: 100%; }
@@ -153,9 +153,6 @@
      Fenster kostet sie die Haelfte der Preiszeilen. */
   .preisbuehne[data-liest] .preisbuehne__kopf { display: none; }
   .preisbuehne[data-liest] { grid-template-rows: 1fr; }
-  .preisbuehne[data-liest] .preisfuss { display: none; }
-  .preisfuss { margin: 0; text-align: center; line-height: 1.6;
-               font-size: .84rem; color: var(--sc-ink-soft); }
   .pdeck { display: grid; grid-template-columns: auto auto; justify-content: center;
            gap: clamp(.8rem, 2vw, 1.4rem); min-height: 0; align-items: center; width: 100%; }
 
@@ -407,6 +404,21 @@
           padding: 1.2rem clamp(1rem, 4vw, 2.5rem); font-size: .78rem;
           color: var(--sc-ink-soft); }
   .foot a { color: inherit; }
+
+  /* Sprachumschalter in der Kopfzeile. Zwei Knoepfe statt eines Schalters:
+     man sieht damit auf einen Blick, welche Sprachen es gibt und welche
+     gerade gilt, ohne erst zu druecken. */
+  .sprache { display: flex; align-items: center; gap: .5rem;
+             margin-inline-start: auto; }
+  .sprache__knopf { background: none; border: 0; cursor: pointer; padding: .2rem .1rem;
+                    font-family: var(--sc-font-display); font-weight: 700;
+                    font-size: .72rem; letter-spacing: .16em;
+                    color: var(--sc-ink); opacity: .62; transition: opacity 160ms; }
+  .sprache__knopf[aria-pressed="true"] { opacity: 1; }
+  .sprache__knopf:hover { opacity: .85; }
+  .sprache__knopf[aria-pressed="true"]:hover { opacity: 1; }
+  .sprache__strich { width: 1px; height: .8rem;
+                     background: color-mix(in srgb, var(--sc-ink) 30%, transparent); }
   .foot__rechts { display: flex; flex-wrap: wrap; gap: 1.2rem; }
 </style>
 </head>
@@ -417,6 +429,11 @@
 
 <header class="bar">
   <a class="bar__mark" href="#top"><b>Alpine Cut</b></a>
+  <div class="sprache" role="group" aria-label="Sprache · Language">
+    <button type="button" class="sprache__knopf" data-sprache="de" aria-pressed="true" aria-label="Auf Deutsch umschalten">DE</button>
+    <span class="sprache__strich" aria-hidden="true"></span>
+    <button type="button" class="sprache__knopf" data-sprache="en" aria-pressed="false" aria-label="Switch to English">EN</button>
+  </div>
   <a class="bar__cta" href="#kontakt">Vorbeikommen</a>
 </header>
 
@@ -468,6 +485,7 @@
       <div class="preisbuehne" data-sc-cue="0 1 0 0">
         <div class="sc-stack preisbuehne__kopf">
           <h2 class="sc-display sc-display--md">Preise</h2>
+          <p class="sc-body" style="color:var(--sc-ink-soft)">Für genauere Preisinfos einfach <a href="tel:+436766786333">anrufen</a>.</p>
         </div>
 
         <div class="pdeck" id="pdeck">
@@ -555,8 +573,6 @@
           </article>
         </div>
 
-        <p class="preisfuss">Kein Termin nötig, einfach vorbeikommen.<br>
-          Für alle Preise gilt der Aushang im Salon.</p>
       </div>
     </div>
   </section>
@@ -566,7 +582,7 @@
     <div class="sc-wrap">
       <div class="sc-stack" style="margin-bottom:clamp(2rem,4vw,3rem)">
         <h2 class="sc-display sc-display--md">Aus dem Stuhl</h2>
-        <p class="sc-body" style="color:var(--sc-ink-soft)">Arbeiten aus dem Salon, nicht gestellt.</p>
+        <p class="sc-body" style="color:var(--sc-ink-soft)">Ein Blick auf unsere Arbeit.</p>
       </div>
     </div>
 
@@ -652,7 +668,8 @@
             <h2 class="sc-display sc-display--md">Was unsere Kunden sagen</h2>
             <p class="sc-body" style="color:var(--sc-ink-soft)">Nachzulesen im
               <a href="https://www.google.com/maps/search/?api=1&amp;query=Alpine+Cut+Dorf-Platz+1+6263+F%C3%BCgen"
-                 target="_blank" rel="noopener">Google-Profil<span class="vh"> (öffnet in einem neuen Tab)</span></a>.</p>
+                 target="_blank" rel="noopener">Google-Profil<span class="vh"> (öffnet in einem neuen Tab)</span></a>.
+              <span data-nur-en hidden>Die Bewertungen stehen im Wortlaut, also auf Deutsch.</span></p>
           </div>
           <div class="stimmen__pfeile">
             <button type="button" class="pfeil" data-stimmen="-1" aria-label="Vorherige Bewertungen" aria-controls="stimmen-spur">
@@ -679,7 +696,7 @@
               </svg>
             </div>
             <p class="sterne" aria-label="5 von 5 Sternen">★★★★★</p>
-            <p class="karte__text">Ismail Mutlu ist einfach der beste Friseur in Zillertal! Sehr freundlich, professionell und immer perfekter Service. Ich bin jedes Mal mit dem Ergebnis mehr als zufrieden. Absolute Empfehlung.</p>
+            <p class="karte__text" lang="de" data-nicht-uebersetzen>Ismail Mutlu ist einfach der beste Friseur in Zillertal! Sehr freundlich, professionell und immer perfekter Service. Ich bin jedes Mal mit dem Ergebnis mehr als zufrieden. Absolute Empfehlung.</p>
           </article>
           <article class="karte">
             <div class="karte__kopf">
@@ -696,7 +713,7 @@
               </svg>
             </div>
             <p class="sterne" aria-label="5 von 5 Sternen">★★★★★</p>
-            <p class="karte__text">War mit beiden Kindern dort (Mädchen und Junge). Beide Frisöre waren sehr freundlich und vor allem der Junge (5 Jahre) hat eine Topfrisur inkl. rassiertem Muster erhalten! Preis absolut angemessen!</p>
+            <p class="karte__text" lang="de" data-nicht-uebersetzen>War mit beiden Kindern dort (Mädchen und Junge). Beide Frisöre waren sehr freundlich und vor allem der Junge (5 Jahre) hat eine Topfrisur inkl. rassiertem Muster erhalten! Preis absolut angemessen!</p>
           </article>
           <article class="karte">
             <div class="karte__kopf">
@@ -713,7 +730,7 @@
               </svg>
             </div>
             <p class="sterne" aria-label="5 von 5 Sternen">★★★★★</p>
-            <p class="karte__text">Super schnitt und cooler Laden! Absolut freundlich und humane Preise. Kann ich nur weiterempfehlen, ich komme wieder.</p>
+            <p class="karte__text" lang="de" data-nicht-uebersetzen>Super schnitt und cooler Laden! Absolut freundlich und humane Preise. Kann ich nur weiterempfehlen, ich komme wieder.</p>
           </article>
           <article class="karte">
             <div class="karte__kopf">
@@ -730,7 +747,7 @@
               </svg>
             </div>
             <p class="sterne" aria-label="5 von 5 Sternen">★★★★★</p>
-            <p class="karte__text">Mega! Sofort Zeit gehabt die Jungs und Top arbeit geleistet. Könnte ich 6 Sterne vergeben würde ich es machen!</p>
+            <p class="karte__text" lang="de" data-nicht-uebersetzen>Mega! Sofort Zeit gehabt die Jungs und Top arbeit geleistet. Könnte ich 6 Sterne vergeben würde ich es machen!</p>
           </article>
           <article class="karte">
             <div class="karte__kopf">
@@ -747,7 +764,7 @@
               </svg>
             </div>
             <p class="sterne" aria-label="5 von 5 Sternen">★★★★★</p>
-            <p class="karte__text">Sehr guter Salon nette Menschen und guter Service!! Komme immer gerne.</p>
+            <p class="karte__text" lang="de" data-nicht-uebersetzen>Sehr guter Salon nette Menschen und guter Service!! Komme immer gerne.</p>
           </article>
           <article class="karte">
             <div class="karte__kopf">
@@ -764,7 +781,7 @@
               </svg>
             </div>
             <p class="sterne" aria-label="5 von 5 Sternen">★★★★★</p>
-            <p class="karte__text">Sehr guter Salon, netter friseur! Geht auf Wünsche ein! Tip Top!</p>
+            <p class="karte__text" lang="de" data-nicht-uebersetzen>Sehr guter Salon, netter friseur! Geht auf Wünsche ein! Tip Top!</p>
           </article>
           <article class="karte">
             <div class="karte__kopf">
@@ -781,7 +798,7 @@
               </svg>
             </div>
             <p class="sterne" aria-label="5 von 5 Sternen">★★★★★</p>
-            <p class="karte__text">Super Service, super Preise! Vielen Dank! Beim nächsten Mal sehr gerne wieder.</p>
+            <p class="karte__text" lang="de" data-nicht-uebersetzen>Super Service, super Preise! Vielen Dank! Beim nächsten Mal sehr gerne wieder.</p>
           </article>
           <article class="karte">
             <div class="karte__kopf">
@@ -797,7 +814,7 @@
               </svg>
             </div>
             <p class="sterne" aria-label="5 von 5 Sternen">★★★★★</p>
-            <p class="karte__text">Guada Bua, super Aufenthalt.</p>
+            <p class="karte__text" lang="de" data-nicht-uebersetzen>Guada Bua, super Aufenthalt.</p>
           </article>
           <article class="karte">
             <div class="karte__kopf">
@@ -814,7 +831,7 @@
               </svg>
             </div>
             <p class="sterne" aria-label="5 von 5 Sternen">★★★★★</p>
-            <p class="karte__text">Great cut, thanks!</p>
+            <p class="karte__text" lang="de" data-nicht-uebersetzen>Great cut, thanks!</p>
           </article>
           <span class="stimmen__ende" aria-hidden="true"></span>
         </div>
@@ -853,6 +870,7 @@
 </main>
 
 <script src="scrollcraft.js"></script>
+<script src="sprache.js"></script>
 <script>
   ScrollCraft.mount(document.body);
 
