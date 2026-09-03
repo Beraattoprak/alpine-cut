@@ -70,6 +70,32 @@ for (const name of fotos) {
   await melden(path.join(fotoZiel, `${name}.webp`), `fotos/${name}.webp`)
 }
 
+// --- Schnittfotos ---------------------------------------------------------
+// Gleiche Behandlung wie die Salonfotos: kein Beschnitt, das Seitenverhaeltnis
+// bestimmt die Seite. Die Vorlagen sind hochkant 3:4.
+//
+// herren-textur liegt als WebP statt als JPEG vor. Das Original ist verloren;
+// geblieben ist die daraus gebaute Datei. Deshalb wird die Endung gesucht
+// statt fest angenommen.
+const schnitte = ['herren-fade', 'herren-crop', 'herren-taper', 'herren-textur', 'damen-lang']
+
+for (const name of schnitte) {
+  const quelle = ['jpeg', 'webp']
+    .map((e) => path.join(wurzel, 'assets/source/schnitte', `${name}.${e}`))
+    .find(existsSync)
+  if (!quelle) {
+    console.error(`Schnittfoto fehlt: assets/source/schnitte/${name}`)
+    process.exit(1)
+  }
+  const m = await sharp(quelle).metadata()
+
+  await sharp(quelle)
+    .resize({ width: Math.min(1800, m.width), withoutEnlargement: true })
+    .webp({ quality: 82 })
+    .toFile(path.join(fotoZiel, `${name}.webp`))
+  await melden(path.join(fotoZiel, `${name}.webp`), `fotos/${name}.webp`)
+}
+
 // --- Open-Graph-Bild ------------------------------------------------------
 // Bewusst statisch vorgeneriert: @vercel/og laedt auf dieser Windows-Maschine
 // seine Standardschrift nicht (ERR_INVALID_URL).

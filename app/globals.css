@@ -317,6 +317,80 @@ textarea:focus {
   }
 }
 
+/* --- Bilderband ----------------------------------------------------------
+ * Aufbau wie beim Text-Laufband: zwei gleiche Spuren, jede genau einen
+ * Durchlauf breit, die vordere wandert um ihre volle Breite nach links.
+ *
+ * Der Abstand sitzt als Rand an der Kachel, nicht als gap an der Spur. Mit gap
+ * fehlt am Spurende genau ein Abstand, und das Band springt bei jedem Umlauf.
+ *
+ * Feste Hoehe, Breite aus dem Seitenverhaeltnis: die Aufnahmen sind teils 3:4
+ * und teils 9:16, und beschnitten werden soll keine.
+ */
+.bilderband {
+  display: flex;
+  overflow-x: hidden;
+  user-select: none;
+}
+
+.bilderband-spur {
+  display: flex;
+  flex-shrink: 0;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  animation: bilderband 40s linear infinite;
+}
+
+.bilderband-kachel {
+  flex: 0 0 auto;
+  height: clamp(15rem, 34vw, 26rem);
+  margin-right: clamp(0.75rem, 2vw, 1.5rem);
+  overflow: hidden;
+  border-radius: var(--radius, 0.5rem);
+}
+
+.bilderband-kachel img {
+  display: block;
+  height: 100%;
+  width: auto;
+}
+
+@keyframes bilderband {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(-100%);
+  }
+}
+
+/* Bewegung anhalten koennen ist Pflicht, nicht Komfort: Inhalt, der von selbst
+ * laeuft und laenger als fuenf Sekunden dauert, braucht einen Weg zum
+ * Anhalten (WCAG 2.2.2). Zeiger und Tastatur halten hier beide an. */
+.bilderband:hover .bilderband-spur,
+.bilderband:focus-within .bilderband-spur {
+  animation-play-state: paused;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .bilderband-spur {
+    animation: none;
+  }
+  /* Ohne Lauf muss man selber schieben koennen, sonst ist die Haelfte weg. */
+  .bilderband {
+    overflow-x: auto;
+    scroll-snap-type: x proximity;
+    scroll-padding-inline: 1rem;
+  }
+  .bilderband-kachel {
+    scroll-snap-align: center;
+  }
+  .bilderband-spur[aria-hidden='true'] {
+    display: none;
+  }
+}
+
 /* --- Hero ----------------------------------------------------------------
    Das Bild sitzt hinter dem Inhalt und wird von HeroParallaxe verschoben.
    Es ist absichtlich hoeher als die Buehne, damit beim Wandern unten nichts

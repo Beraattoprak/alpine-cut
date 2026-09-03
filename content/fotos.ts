@@ -1,5 +1,3 @@
-import { type Offen, todo } from './todo'
-
 export type Foto = {
   /** Dateiname in public/fotos/, z. B. "salon-aussen.webp" */
   datei: string
@@ -50,9 +48,40 @@ export const galerie: Foto[] = [
 ]
 
 /**
- * Schnittfotos für einen eigenen Abschnitt „Arbeiten" gibt es noch nicht —
- * die vorhandenen Bilder zeigen den Salon, nicht die Arbeit daran.
+ * Fertige Arbeiten aus dem Salon. Die Formate sind bewusst nicht angeglichen:
+ * die Aufnahmen kommen aus dem Telefon und werden nicht beschnitten. Wer sie
+ * in einer Reihe zeigt, gibt allen dieselbe Höhe und lässt die Breite aus dem
+ * Verhältnis folgen — sonst fehlt oben oder unten etwas.
  */
-export const arbeiten: Offen<Foto[]> = todo(
-  'Schnittfotos: 5 bis 8 Bilder fertiger Frisuren, hochkant im Verhältnis 3:4, mindestens 1200 px breit. Erst damit lohnt ein eigener Abschnitt „Arbeiten“ neben der Salon-Galerie.',
-)
+export const arbeiten: Foto[] = [
+  {
+    datei: 'herren-fade.webp',
+    alt: 'Herrenschnitt, hoher Fade an der Seite, längeres Deckhaar nach hinten frisiert',
+    format: '9 / 16',
+    bildunterschrift: 'Fade',
+  },
+  {
+    datei: 'herren-crop.webp',
+    alt: 'Herrenschnitt, texturierter Crop mit Bart, Übergang an der Schläfe',
+    format: '9 / 16',
+    bildunterschrift: 'Crop mit Bart',
+  },
+  {
+    datei: 'herren-taper.webp',
+    alt: 'Herrenschnitt, weicher Übergang im Nacken, welliges Deckhaar',
+    format: '3 / 4',
+    bildunterschrift: 'Taper',
+  },
+  {
+    datei: 'herren-textur.webp',
+    alt: 'Herrenschnitt von hinten, langes texturiertes Deckhaar, tiefer Übergang im Nacken',
+    format: '3 / 4',
+    bildunterschrift: 'Textur im Deckhaar',
+  },
+  {
+    datei: 'damen-lang.webp',
+    alt: 'Damenschnitt, langes blondiertes Haar mit weichem Verlauf, von hinten',
+    format: '3 / 4',
+    bildunterschrift: 'Lang, blondiert',
+  },
+]

@@ -176,28 +176,35 @@
     .preise th, .preise td { padding: .45rem .35rem; font-size: .88rem; }
   }
 
-  /* ---- Akt 4: Arbeiten, dunkel, Tiefe durch Parallaxe ---------------- */
-  /* Vier Hochformate in einer Reihe, jedes mit eigener Rate. Die Saeulen
-     wandern unterschiedlich schnell, das liest sich als Tiefe statt als
-     Effekt. Werte laut Skill: rate * 100 px Gesamtweg, 0,3 bis 1,5 ist
-     der brauchbare Bereich, darueber wirkt es wie ein Fehler. */
-  .schnitte { display: grid; gap: clamp(1rem, 2vw, 1.6rem);
-              grid-template-columns: repeat(2, 1fr); align-items: start; }
-  /* Fuenf Bilder gehen in keinem geraden Raster auf. Statt das letzte allein
-     links liegen zu lassen, steht die angebrochene Reihe mittig. */
-  .schnitt:last-child { grid-column: 1 / -1; justify-self: center;
-                        width: calc(50% - clamp(.5rem, 1vw, .8rem)); }
-  @media (min-width: 900px) {
-    .schnitte { grid-template-columns: repeat(6, 1fr); }
-    .schnitt { grid-column: span 2; }
-    .schnitt:nth-child(4) { grid-column: 2 / span 2; }
-    .schnitt:last-child { width: auto; justify-self: stretch; grid-column: span 2; }
+  /* ---- Akt 4: Arbeiten als laufendes Bilderband ----------------------
+     Zwei gleiche Spuren, jede genau einen Durchlauf breit. Der Abstand sitzt
+     als Rand am Bild statt als gap an der Spur: mit gap fehlt am Spurende
+     genau einer, und das Band springt bei jedem Umlauf um dessen halbe Breite.
+     Gleiche Hoehe, Breite aus dem Seitenverhaeltnis, kein Beschnitt. */
+  .band { display: flex; overflow-x: hidden; user-select: none; }
+  .band__spur { display: flex; flex-shrink: 0; margin: 0; padding: 0;
+                list-style: none; animation: band 46s linear infinite; }
+  .band__kachel { flex: 0 0 auto; margin-right: clamp(.75rem, 2vw, 1.5rem); }
+  .band__kachel img { display: block; height: clamp(15rem, 32vw, 26rem);
+                      width: auto; }
+  .band__titel { display: block; margin-top: .7rem;
+                 font-family: var(--sc-font-display); font-size: .7rem;
+                 letter-spacing: .18em; text-transform: uppercase;
+                 color: var(--sc-ink-soft); }
+  @keyframes band { from { transform: translateX(0); }
+                      to { transform: translateX(-100%); } }
+  /* Anhalten koennen ist Pflicht: was von selbst laeuft und laenger als fuenf
+     Sekunden dauert, braucht einen Weg zum Anhalten. Zeiger und Tastatur. */
+  .band:hover .band__spur, .band:focus-within .band__spur {
+    animation-play-state: paused; }
+  @media (prefers-reduced-motion: reduce) {
+    .band__spur { animation: none; }
+    .band__spur[aria-hidden="true"] { display: none; }
+    /* Ohne Lauf muss man selber schieben koennen, sonst fehlt die Haelfte. */
+    .band { overflow-x: auto; scroll-snap-type: x proximity;
+            scroll-padding-inline: 1rem; }
+    .band__kachel { scroll-snap-align: center; }
   }
-  .schnitt { margin: 0; }
-  .schnitt img { width: 100%; height: auto; display: block; }
-  .schnitt figcaption { margin-top: .7rem; font-family: var(--sc-font-display);
-                        font-size: .7rem; letter-spacing: .18em; text-transform: uppercase;
-                        color: var(--sc-ink-soft); }
 
   /* ---- Akt 5: der Raum, hell, drei Aufdeckungen ---------------------- */
   /* Jedes Foto deckt aus einer anderen Richtung auf: von links, von rechts,
@@ -417,28 +424,58 @@
         <h2 class="sc-display sc-display--md">Aus dem Stuhl</h2>
         <p class="sc-body" style="color:var(--sc-ink-soft)">Arbeiten aus dem Salon, nicht gestellt.</p>
       </div>
-      <div class="schnitte">
-          <figure class="schnitt" data-sc-parallax="-0.9">
-            <img src="assets/herren-fade.webp" width="1000" height="1333" alt="Herrenschnitt, hoher Fade an der Seite, längeres Deckhaar nach hinten frisiert.">
-            <figcaption>Fade</figcaption>
-          </figure>
-          <figure class="schnitt" data-sc-parallax="0.5">
-            <img src="assets/herren-crop.webp" width="1000" height="1333" alt="Herrenschnitt, texturierter Crop mit Bart, Übergang an der Schläfe.">
-            <figcaption>Crop mit Bart</figcaption>
-          </figure>
-          <figure class="schnitt" data-sc-parallax="-0.4">
-            <img src="assets/herren-taper.webp" width="1000" height="1333" alt="Herrenschnitt, weicher Übergang im Nacken, welliges Deckhaar.">
-            <figcaption>Taper</figcaption>
-          </figure>
-          <figure class="schnitt" data-sc-parallax="0.7">
-            <img src="assets/herren-textur.webp" width="1000" height="1333" alt="Herrenschnitt von hinten, langes texturiertes Deckhaar, tiefer Übergang im Nacken.">
-            <figcaption>Textur im Deckhaar</figcaption>
-          </figure>
-          <figure class="schnitt" data-sc-parallax="-0.5">
-            <img src="assets/damen-lang.webp" width="1000" height="1333" alt="Damenschnitt, langes blondiertes Haar mit weichem Verlauf, von hinten.">
-            <figcaption>Lang, blondiert</figcaption>
-          </figure>
-      </div>
+    </div>
+
+    <!-- Bilderband: zwei gleiche Spuren, jede genau einen Durchlauf breit.
+         Die vordere wandert um ihre volle Breite nach links, dann steht die
+         hintere exakt an deren Platz. Der Abstand sitzt am Bild, nicht als
+         gap an der Spur: mit gap fehlt am Spurende genau einer, und das Band
+         springt bei jedem Umlauf. Nur die erste Spur wird vorgelesen. -->
+    <div class="band" data-sc-parallax="0.15">
+      <ul class="band__spur">
+        <li class="band__kachel">
+          <img src="assets/herren-fade.webp" width="1000" height="1333" alt="Herrenschnitt, hoher Fade an der Seite, längeres Deckhaar nach hinten frisiert." loading="lazy">
+          <span class="band__titel">Fade</span>
+        </li>
+        <li class="band__kachel">
+          <img src="assets/herren-crop.webp" width="1000" height="1333" alt="Herrenschnitt, texturierter Crop mit Bart, Übergang an der Schläfe." loading="lazy">
+          <span class="band__titel">Crop mit Bart</span>
+        </li>
+        <li class="band__kachel">
+          <img src="assets/herren-taper.webp" width="1000" height="1333" alt="Herrenschnitt, weicher Übergang im Nacken, welliges Deckhaar." loading="lazy">
+          <span class="band__titel">Taper</span>
+        </li>
+        <li class="band__kachel">
+          <img src="assets/herren-textur.webp" width="1000" height="1333" alt="Herrenschnitt von hinten, langes texturiertes Deckhaar, tiefer Übergang im Nacken." loading="lazy">
+          <span class="band__titel">Textur im Deckhaar</span>
+        </li>
+        <li class="band__kachel">
+          <img src="assets/damen-lang.webp" width="1000" height="1333" alt="Damenschnitt, langes blondiertes Haar mit weichem Verlauf, von hinten." loading="lazy">
+          <span class="band__titel">Lang, blondiert</span>
+        </li>
+      </ul>
+      <ul class="band__spur" aria-hidden="true">
+        <li class="band__kachel">
+          <img src="assets/herren-fade.webp" width="1000" height="1333" alt="" loading="lazy">
+          <span class="band__titel">Fade</span>
+        </li>
+        <li class="band__kachel">
+          <img src="assets/herren-crop.webp" width="1000" height="1333" alt="" loading="lazy">
+          <span class="band__titel">Crop mit Bart</span>
+        </li>
+        <li class="band__kachel">
+          <img src="assets/herren-taper.webp" width="1000" height="1333" alt="" loading="lazy">
+          <span class="band__titel">Taper</span>
+        </li>
+        <li class="band__kachel">
+          <img src="assets/herren-textur.webp" width="1000" height="1333" alt="" loading="lazy">
+          <span class="band__titel">Textur im Deckhaar</span>
+        </li>
+        <li class="band__kachel">
+          <img src="assets/damen-lang.webp" width="1000" height="1333" alt="" loading="lazy">
+          <span class="band__titel">Lang, blondiert</span>
+        </li>
+      </ul>
     </div>
   </section>
 
