@@ -9,13 +9,16 @@ export const impressum: Rechtsabschnitt[] = [
   {
     titel: 'Medieninhaber und Betreiber',
     absaetze: [
+      'Ismail Enes Mutlu, Einzelunternehmer',
       anschrift,
       `Telefon: ${salon.telefon}`,
-      todo('Impressum: E-Mail-Adresse eintragen'),
+      todo('Impressum: E-Mail-Adresse eintragen — nach § 5 ECG verpflichtend'),
       todo(
-        'Impressum: Inhaber, Rechtsform und — falls vorhanden — Firmenbuchnummer und Firmenbuchgericht eintragen',
+        'Impressum: Firmenbuchnummer und Firmenbuchgericht eintragen, oder bestätigen, dass keine Eintragung besteht',
       ),
-      todo('Impressum: UID-Nummer eintragen, falls umsatzsteuerpflichtig'),
+      todo(
+        'Impressum: UID-Nummer eintragen, falls umsatzsteuerpflichtig; bei Kleinunternehmerregelung entfällt die Angabe',
+      ),
     ],
   },
   {
@@ -29,10 +32,13 @@ export const impressum: Rechtsabschnitt[] = [
     ],
   },
   {
+    // Der Verweis auf die OS-Plattform der EU-Kommission stand hier, weil er in
+    // jeder Impressumsvorlage steht. Die Plattform wurde am 20. Juli 2025
+    // eingestellt; der Link geht ins Leere und die Hinweispflicht dazu ist
+    // entfallen. Ein toter Pflichthinweis ist schlechter als keiner.
     titel: 'Streitbeilegung',
     absaetze: [
-      'Die Europäische Kommission stellt eine Plattform zur Online-Streitbeilegung bereit: ec.europa.eu/consumers/odr',
-      'Wir sind weder bereit noch verpflichtet, an Streitbeilegungsverfahren vor einer Verbraucherschlichtungsstelle teilzunehmen.',
+      'Wir sind weder bereit noch verpflichtet, an einem Streitbeilegungsverfahren vor einer Verbraucherschlichtungsstelle teilzunehmen.',
     ],
   },
   {
