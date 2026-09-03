@@ -132,6 +132,7 @@
   var ATTRIBUTE = ['alt', 'aria-label', 'title'];
   var textknoten = [];
   var attributknoten = [];
+  var kinetische = [];
 
   /* Zitate bleiben, wie sie geschrieben wurden. */
   function istZitat(el) {
@@ -139,6 +140,24 @@
   }
 
   function sammeln() {
+    /* Ueberschriften mit data-sc-kinetic zerlegt die Engine beim ersten
+       Sichtbarwerden in Zeilen-Spans. Ein Textknoten, den wir uns vorher
+       gemerkt haben, haengt danach nicht mehr im Dokument: Zuweisen geht ins
+       Leere, und die Ueberschrift friert in der Sprache ein, die beim
+       Zerlegen gerade galt. Deshalb merken wir uns hier das Element und
+       schreiben beim Umschalten seinen ganzen Inhalt neu.
+
+       Der Preis: eine Ueberschrift, die schon zerlegt war, verliert beim
+       Umschalten ihren zeilenweisen Auftritt, bis die Seite neu geladen wird.
+       Beim Laden selbst passiert das nicht — da steht die Sprache fest, bevor
+       irgendetwas zerlegt wurde. Eine falsche Ueberschrift waere schlimmer
+       als eine, die einmal nicht hereinwandert. */
+    var kin = document.querySelectorAll('[data-sc-kinetic]');
+    for (var q = 0; q < kin.length; q++) {
+      var roh = kin[q].textContent.trim().replace(/\s+/g, ' ');
+      if (WOERTER[roh]) kinetische.push({ el: kin[q], de: roh, en: WOERTER[roh] });
+    }
+
     var lauf = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT);
     var n;
     while ((n = lauf.nextNode())) {
@@ -150,6 +169,7 @@
       if (!text || !WOERTER[text]) continue;
       var el = n.parentElement;
       if (!el || el.closest('script, style') || istZitat(el)) continue;
+      if (el.closest('[data-sc-kinetic]')) continue;   /* laeuft ueber kinetische */
       var vorn = roh.match(/^\s*/)[0];
       var hinten = roh.match(/\s*$/)[0];
       textknoten.push({ knoten: n, de: roh, en: vorn + WOERTER[text] + hinten });
@@ -175,6 +195,13 @@
     }
     for (var j = 0; j < attributknoten.length; j++) {
       attributknoten[j].el.setAttribute(attributknoten[j].attr, en ? attributknoten[j].en : attributknoten[j].de);
+    }
+    for (var m = 0; m < kinetische.length; m++) {
+      var soll = en ? kinetische[m].en : kinetische[m].de;
+      if (kinetische[m].el.textContent.trim().replace(/\s+/g, ' ') === soll) continue;
+      kinetische[m].el.textContent = soll;
+      /* Der Zwischenspeicher der Engine zeigt jetzt auf abgehaengte Spans. */
+      kinetische[m].el.__scSplit = null;
     }
 
     document.documentElement.lang = en ? 'en' : 'de';
