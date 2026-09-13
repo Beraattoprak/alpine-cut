@@ -1,0 +1,5 @@
+# Die ganze Seite darf in den Index. Es gibt nichts Internes.
+User-agent: *
+Allow: /
+
+Sitemap: https://alpine-cut.at/sitemap.xml
