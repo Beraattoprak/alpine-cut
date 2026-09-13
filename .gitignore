@@ -53,3 +53,6 @@ next-env.d.ts
 # scrollcraft: Prueflauf-Artefakte und Abhaengigkeiten
 scrollcraft/builds/*/lab/
 scrollcraft/builds/*/node_modules/
+
+# Fertiger Upload-Ordner, wird aus scrollcraft/builds/alpine-cut erzeugt
+/hochladen
