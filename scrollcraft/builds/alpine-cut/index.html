@@ -6,6 +6,9 @@
 <title>Alpine Cut · Friseur in Fügen im Zillertal</title>
 <meta name="description" content="Friseur in Fügen im Zillertal. Haarschnitt für Damen und Herren, Bart und Pflege — ohne Termin, einfach vorbeikommen. Dorf-Platz 1, 6263 Fügen in Tirol.">
 <link rel="canonical" href="https://alpine-cut.at/">
+<link rel="alternate" hreflang="de" href="https://alpine-cut.at/">
+<link rel="alternate" hreflang="en" href="https://alpine-cut.at/en/">
+<link rel="alternate" hreflang="x-default" href="https://alpine-cut.at/">
 
 <!-- Teilbild fuer WhatsApp, Instagram und Facebook. Ohne og:image zieht sich
      jede App irgendein Bild von der Seite, meistens das erste im Quelltext. -->
@@ -495,8 +498,9 @@
                     font-family: var(--sc-font-display); font-weight: 700;
                     font-size: .72rem; letter-spacing: .14em; color: #fff;
                     transition: background 160ms, color 160ms; }
-  .sprache__knopf[aria-pressed="true"] { background: #fff; color: #000; }
-  .sprache__knopf:not([aria-pressed="true"]):hover { background: rgb(255 255 255 / .25); }
+  .sprache__knopf { text-decoration: none; }
+  .sprache__knopf[aria-current] { background: #fff; color: #000; }
+  .sprache__knopf:not([aria-current]):hover { background: rgb(255 255 255 / .25); }
 
   /* ---- Akt 1: Hero, hell --------------------------------------------- */
   /* Kein dunkler Scrim: Der Clip ist ein dunkler Haarschneider auf Weiss.
@@ -810,8 +814,8 @@
 <header class="bar">
   <a class="bar__mark" href="#top"><b>Alpine Cut</b></a>
   <div class="sprache" role="group" aria-label="Sprache · Language">
-    <button type="button" class="sprache__knopf" data-sprache="de" aria-pressed="true" aria-label="Auf Deutsch umschalten">DE</button>
-    <button type="button" class="sprache__knopf" data-sprache="en" aria-pressed="false" aria-label="Switch to English">EN</button>
+    <a class="sprache__knopf" href="/" hreflang="de" lang="de" aria-current="page">DE</a>
+    <a class="sprache__knopf" href="/en/" hreflang="en" lang="en">EN</a>
   </div>
   <a class="bar__cta" href="#kontakt">Vorbeikommen</a>
 </header>
@@ -1247,7 +1251,6 @@
 </main>
 
 <script src="scrollcraft.js"></script>
-<script src="sprache.js"></script>
 <script>
   ScrollCraft.mount(document.body);
 

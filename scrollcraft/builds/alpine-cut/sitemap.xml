@@ -1,12 +1,24 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!-- Drei Seiten, mehr gibt es nicht. Die englische Fassung steht unter
-     derselben Adresse und wird im Browser umgeschaltet, hat also keine
-     eigene URL und deshalb auch keinen eigenen Eintrag. -->
-<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+<!-- Startseite in zwei Sprachen unter zwei Adressen, ueber xhtml:link
+     miteinander verbunden. Impressum und Datenschutz gibt es nur auf
+     Deutsch: sie sind so rechtsverbindlich. -->
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
+        xmlns:xhtml="http://www.w3.org/1999/xhtml">
   <url>
     <loc>https://alpine-cut.at/</loc>
+    <xhtml:link rel="alternate" hreflang="de" href="https://alpine-cut.at/"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://alpine-cut.at/en/"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://alpine-cut.at/"/>
     <changefreq>monthly</changefreq>
     <priority>1.0</priority>
+  </url>
+  <url>
+    <loc>https://alpine-cut.at/en/</loc>
+    <xhtml:link rel="alternate" hreflang="de" href="https://alpine-cut.at/"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://alpine-cut.at/en/"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://alpine-cut.at/"/>
+    <changefreq>monthly</changefreq>
+    <priority>0.9</priority>
   </url>
   <url>
     <loc>https://alpine-cut.at/impressum.html</loc>
