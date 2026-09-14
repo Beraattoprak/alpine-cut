@@ -30,8 +30,6 @@ export const WOERTER = {
 
     'Unser Schwerpunkt sind Fades, vom weichen Übergang bis zum Skin Fade. Ein junges Team, das jeden Tag schneidet — und genau deshalb weiß, wo der Verlauf sitzen muss.':
     'Fades are what we do best, from a soft taper to a skin fade. A young team that cuts every day — which is exactly why we know where the blend belongs.',
-  'Viele unserer Gäste sind auf Urlaub im Zillertal. Im Laden sprechen wir Deutsch, Englisch und Ungarisch. Sagen Sie einfach, was Sie möchten.':
-    'Many of our guests are on holiday in the Zillertal. In the shop we speak German, English and Hungarian. Just tell us what you would like.',
 
   /* --- Preise --- */
     'Preise': 'Prices',
