@@ -19,6 +19,7 @@ const dateien = [
   'index.html',
   'impressum.html',
   'datenschutz.html',
+  '404.html',
   'recht.css',
   'scrollcraft.css',
   'scrollcraft.js',
