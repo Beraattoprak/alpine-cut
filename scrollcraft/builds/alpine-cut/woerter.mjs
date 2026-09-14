@@ -28,7 +28,12 @@ export const WOERTER = {
     'Alpine Cut ist Ihr Friseurladen im Zillertal, mitten in Fügen zwischen den Bergen. Wir schneiden Damen und Herren, dazu Bart, Farbe und Pflege. Einen Termin brauchen Sie nicht, kommen Sie einfach vorbei.':
       'Alpine Cut is your barber shop in the Zillertal, in the middle of Fügen between the mountains. We cut women and men, and do beards, colour and care. You do not need an appointment, just come by.',
 
-    /* --- Preise --- */
+    'Unser Schwerpunkt sind Fades, vom weichen Übergang bis zum Skin Fade. Ein junges Team, das jeden Tag schneidet — und genau deshalb weiß, wo der Verlauf sitzen muss.':
+    'Fades are what we do best, from a soft taper to a skin fade. A young team that cuts every day — which is exactly why we know where the blend belongs.',
+  'Viele unserer Gäste sind auf Urlaub im Zillertal. Im Laden sprechen wir Deutsch, Englisch und Ungarisch. Sagen Sie einfach, was Sie möchten.':
+    'Many of our guests are on holiday in the Zillertal. In the shop we speak German, English and Hungarian. Just tell us what you would like.',
+
+  /* --- Preise --- */
     'Preise': 'Prices',
     'Für genauere Preisinfos einfach': 'For exact prices, just give us a',
     'anrufen': 'call',

@@ -61,6 +61,7 @@
   },
   "hasMap": "https://www.google.com/maps/search/?api=1&query=Alpine+Cut+Dorf-Platz+1+6263+F%C3%BCgen",
   "priceRange": "5 € – 85 €",
+  "knowsLanguage": ["de", "en", "hu"],
   "openingHoursSpecification": [
     { "@type": "OpeningHoursSpecification", "dayOfWeek": "Monday", "opens": "10:00", "closes": "18:00" },
     { "@type": "OpeningHoursSpecification",
@@ -482,6 +483,9 @@
            padding: 1rem 1.8rem; }
   .knopf--leer { background: transparent; color: var(--sc-ink);
                  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--sc-ink) 40%, transparent); }
+  .sprachen { font-family: var(--sc-font-display); font-size: .74rem;
+              letter-spacing: .18em; text-transform: uppercase;
+              color: var(--sc-accent); margin: 0; }
   .zeiten { color: var(--sc-ink-soft); font-size: .92rem; line-height: 1.6; margin: 0; }
   .foot { position: absolute; inset-inline: 0; bottom: 0; display: flex; flex-wrap: wrap;
           gap: 1rem; justify-content: space-between; align-items: center;
@@ -855,6 +859,15 @@
           Alpine Cut ist Ihr Friseurladen im Zillertal, mitten in Fügen zwischen den
           Bergen. Wir schneiden Damen und Herren, dazu Bart, Farbe und Pflege.
           Einen Termin brauchen Sie nicht, kommen Sie einfach vorbei.
+        </p>
+        <p class="sc-body" style="color:var(--sc-ink-soft);max-width:42ch">
+          Unser Schwerpunkt sind Fades, vom weichen Übergang bis zum Skin Fade.
+          Ein junges Team, das jeden Tag schneidet — und genau deshalb weiß, wo
+          der Verlauf sitzen muss.
+        </p>
+        <p class="sc-body" style="color:var(--sc-ink-soft);max-width:42ch">
+          Viele unserer Gäste sind auf Urlaub im Zillertal. Im Laden sprechen wir
+          Deutsch, Englisch und Ungarisch. Sagen Sie einfach, was Sie möchten.
         </p>
       </div>
       <figure data-sc-reveal="up" data-sc-reveal-at="0.12 0.6">
@@ -1233,6 +1246,7 @@
         <p class="kontakt__adresse" data-sc-cue="0 1 0 0">
           Dorf-Platz 1<br>6263 Fügen, Tirol
         </p>
+        <p class="sprachen" data-sc-cue="0 1 0 0">Deutsch · English · Magyar</p>
         <p class="zeiten" data-sc-cue="0 1 0 0">
           Montag 10 bis 18 Uhr<br>
           Dienstag bis Freitag 9 bis 18 Uhr<br>
