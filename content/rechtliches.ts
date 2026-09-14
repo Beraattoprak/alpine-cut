@@ -20,9 +20,8 @@ export const impressum: Rechtsabschnitt[] = [
   {
     titel: 'Gewerbe und Aufsicht',
     absaetze: [
-      todo(
-        'Impressum: Gewerbewortlaut und zuständige Gewerbebehörde (voraussichtlich Bezirkshauptmannschaft Schwaz) bestätigen',
-      ),
+      'Gewerbewortlaut: Friseur',
+      'Gewerbebehörde: Bezirkshauptmannschaft Schwaz',
       'Mitglied der Wirtschaftskammer Tirol, Landesinnung der Friseure.',
       'Anwendbare Rechtsvorschrift: Gewerbeordnung 1994, abrufbar unter ris.bka.gv.at.',
     ],
