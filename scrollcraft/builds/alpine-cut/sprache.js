@@ -126,7 +126,7 @@
     'Switch to English': 'Switch to English',
 
     /* --- Kopfdaten der Seite --- */
-    'Alpine Cut · Friseur im Zillertal': 'Alpine Cut · Barber in the Zillertal',
+    'Alpine Cut · Friseur in Fügen im Zillertal': 'Alpine Cut · Barber in Fügen, Zillertal',
   };
 
   var ATTRIBUTE = ['alt', 'aria-label', 'title'];
