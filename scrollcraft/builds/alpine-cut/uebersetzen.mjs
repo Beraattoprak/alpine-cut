@@ -26,8 +26,14 @@ const hier = path.dirname(fileURLToPath(import.meta.url))
 /** Sonderzeichen entschärfen, damit der Text als Suchmuster taugt. */
 const roh = (s) => s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
 
-/** Wortzwischenräume dürfen im Quelltext Zeilenumbrüche sein. */
-const mitUmbruch = (s) => roh(s).replace(/\s+/g, '\\s+')
+/**
+ * Wortzwischenräume dürfen im Quelltext Zeilenumbrüche sein.
+ *
+ * Und ein kaufmännisches Und steht dort als `&amp;`. Ohne diese Zeile blieben
+ * genau die vier Zeilen der Damentabelle deutsch — „Waschen & Föhnen" im
+ * Wörterbuch trifft `Waschen &amp; Föhnen` im Quelltext nicht.
+ */
+const mitUmbruch = (s) => roh(s).replace(/\s+/g, '\\s+').replace(/&/g, '(?:&|&amp;)')
 
 export function uebersetzen(quelle) {
   let t = quelle

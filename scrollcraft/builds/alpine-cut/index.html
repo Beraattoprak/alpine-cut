@@ -220,131 +220,19 @@
   .ort__zeile { font-family: var(--sc-font-display); font-size: clamp(1.6rem, 3.4vw, 2.6rem);
                 line-height: 1.12; letter-spacing: -.02em; max-width: 18ch; }
 
-  /* ---- Akt 3: Preise, hell. Zwei Kaertchen zum Umdrehen ---------------
-     Die Buehne ist festgehalten, also darf ihr Inhalt nie hoeher werden als
-     das Fenster: was unten hinausragt, erreicht niemand mehr. Deshalb sind
-     die Kaertchen an die Fensterhoehe gebunden, und die Liste auf der
-     Rueckseite rollt notfalls in sich statt die Karte zu strecken. */
-  /* Zwei Reihen: Kopf so hoch wie noetig, Karten bekommen den Rest. Eine
-     aufgeschlagene Karte soll die freie Hoehe nutzen duerfen, sonst passen
-     von zehn Preiszeilen vier ins Bild. */
-  .preisbuehne { height: 100%; display: grid; grid-template-rows: auto 1fr;
-                 gap: clamp(1.2rem, 3vh, 2.2rem);
-                 padding: clamp(4.6rem, 9vh, 5.4rem) clamp(1rem, 4vw, 2.5rem) clamp(1rem, 4vh, 2.4rem);
-                 max-width: 68rem; margin-inline: auto; width: 100%; }
-
-  /* Ist eine Karte aufgeschlagen, tritt die Abschnittsueberschrift ab: sie
-     wiederholt nur, was die Karte selbst schon sagt, und in einem niedrigen
-     Fenster kostet sie die Haelfte der Preiszeilen. */
-  .preisbuehne[data-liest] .preisbuehne__kopf { display: none; }
-  .preisbuehne[data-liest] { grid-template-rows: 1fr; }
-  .pdeck { display: grid; grid-template-columns: auto auto; justify-content: center;
-           gap: clamp(.8rem, 2vw, 1.4rem); min-height: 0; align-items: center; width: 100%; }
-
-  .pkarte { min-width: 0; height: clamp(17rem, 52dvh, 30rem); max-height: 100%;
-            aspect-ratio: 2 / 3; max-width: 100%; }
-
-  /* Umgedreht wird ohne 3D. Eine echte rotateY-Drehung braucht
-     backface-visibility, und die bricht in Safari, sobald die gedrehte Seite
-     overflow:hidden mit border-radius hat — dann stehen beide Seiten
-     gleichzeitig uebereinander. Stattdessen staucht sich die Karte in der
-     Breite auf null, tauscht dabei die Seite und geht wieder auf. Das liest
-     sich wie eine gewendete Karte und benutzt nur eine 2D-Transformation. */
-  .pkarte__innen { position: relative; width: 100%; height: 100%;
-                   transition: transform 220ms ease-in; will-change: transform; }
-  .pkarte[data-dreht] .pkarte__innen { transform: scaleX(0); }
-
-  .pkarte__seite { position: absolute; inset: 0; border-radius: .9rem;
-                   overflow: hidden; visibility: hidden; }
-  .pkarte__vorn { visibility: visible; }
-  .pkarte[data-offen] .pkarte__vorn { visibility: hidden; }
-  .pkarte[data-offen] .pkarte__hinten { visibility: visible; }
-
-  /* Vorderseite wie eine Spielkarte: ruhige Farbflaeche, feine Goldlinie als
-     Rahmen, Eckzeichen oben links und unten rechts kopfstehend, das Wort in
-     der Mitte. Kein Foto — Schrift und Linie tragen die Karte allein, und
-     nichts kann daneben liegen. */
-  .pkarte__vorn { display: grid; grid-template-rows: 1fr auto 1fr;
-                  place-items: center; gap: .9rem; text-align: center;
-                  padding: clamp(1.6rem, 3.5vw, 2.4rem); cursor: pointer;
-                  border: 0; color: #fff; font: inherit;
-                  background:
-                    radial-gradient(120% 90% at 50% 0%, hsl(var(--ton) / 0) 40%, hsl(0 0% 0% / .3) 100%),
-                    hsl(var(--ton));
-                  box-shadow: 0 18px 40px -24px hsl(var(--ton) / .9);
-                  transition: box-shadow 300ms; }
-  .pkarte__vorn:hover { box-shadow: 0 26px 60px -26px hsl(var(--ton)); }
-
-  .pkarte__rahmen { position: absolute; inset: clamp(.7rem, 1.6vw, 1rem);
-                    border: 1px solid hsl(38 45% 62% / .38); border-radius: .5rem;
-                    pointer-events: none; }
-  .pkarte__ecke { position: absolute; font-family: var(--sc-font-display);
-                  font-weight: 700; font-size: .95rem; letter-spacing: .06em;
-                  color: hsl(38 45% 68% / .85); line-height: 1; }
-  .pkarte__ecke--ol { top: clamp(1.4rem, 2.9vw, 1.9rem); left: clamp(1.4rem, 2.9vw, 1.9rem); }
-  .pkarte__ecke--ur { bottom: clamp(1.4rem, 2.9vw, 1.9rem); right: clamp(1.4rem, 2.9vw, 1.9rem);
-                      transform: rotate(180deg); }
-
-  .pkarte__titel { grid-row: 2; font-family: var(--sc-font-display); font-weight: 700;
-                   font-size: clamp(1.7rem, 4vw, 2.8rem); line-height: 1;
-                   letter-spacing: -.02em; }
-  .pkarte__cta { grid-row: 3; align-self: start; display: inline-flex;
-                 align-items: center; gap: .6rem;
-                 padding: .6rem 1rem; border-radius: 999px;
-                 font-family: var(--sc-font-display); font-weight: 600;
-                 font-size: .74rem; letter-spacing: .12em; text-transform: uppercase;
-                 background: rgb(255 255 255 / .1);
-                 border: 1px solid rgb(255 255 255 / .26);
-                 transition: background 260ms, border-color 260ms; }
-  .pkarte__vorn:hover .pkarte__cta { background: rgb(255 255 255 / .2);
-                                     border-color: rgb(255 255 255 / .42); }
-  .pkarte__cta svg { transition: transform 260ms; }
-  .pkarte__vorn:hover .pkarte__cta svg { transform: translateX(3px); }
-
-  /* Schmaler Schirm: die Karte wird sonst 173 zu 354 und damit ein Streifen
-     statt einer Karte, und "Preise ansehen" bricht in der Pille um. */
-  @media (max-width: 520px) {
-    .pdeck { grid-template-columns: 1fr 1fr; }
-    .pkarte { width: 100%; height: auto; aspect-ratio: 2 / 3; max-height: 46dvh; }
-    /* Aufgeschlagen gilt der Deckel nicht mehr: die Liste soll die freie
-       Hoehe nutzen, sonst stehen von zehn Preiszeilen drei im Bild. */
-    .pdeck[data-gewaehlt] .pkarte { max-height: none; height: 100%; }
-    .pkarte__vorn { padding: clamp(1.1rem, 4vw, 1.5rem); gap: .7rem; }
-    .pkarte__cta { font-size: .6rem; letter-spacing: .05em; padding: .5rem .7rem; gap: .4rem; }
-    .pkarte__cta svg { width: 13px; height: 13px; }
-    .pkarte__ecke { font-size: .78rem; }
+  /* ---- Akt 3: Preise, hell ------------------------------------------- */
+  .preisliste { display: grid; gap: clamp(2.5rem, 6vw, 4.5rem); }
+  .preisliste__teil { min-width: 0; }
+  .preisliste__titel { font-family: var(--sc-font-display); font-weight: 700;
+                       font-size: clamp(1.4rem, 3vw, 2rem); letter-spacing: -.02em;
+                       margin: 0 0 1rem; }
+  /* Fuenf Spalten passen auf kein Telefon. */
+  .preise__rollen { overflow-x: auto; }
+  .preise__rollen:focus-visible { outline: 2px solid var(--sc-accent); outline-offset: 4px; }
+  @media (max-width: 700px) {
+    .preise th, .preise td { padding: .45rem .35rem; font-size: .88rem; }
+    .preise__rollen .preise { min-width: 30rem; }
   }
-
-  /* Rueckseite: die Liste. Heller Grund, damit Zahlen lesbar bleiben. */
-  .pkarte__hinten { display: flex; flex-direction: column;
-                    background: var(--sc-surface); color: var(--sc-ink);
-                    padding: clamp(.9rem, 2vw, 1.4rem);
-                    box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--sc-ink) 12%, transparent); }
-  .pkarte__rueckentitel { flex: 0 0 auto; margin: 0 0 .6rem;
-                          font-family: var(--sc-font-display); font-weight: 700;
-                          font-size: clamp(1.2rem, 2.4vw, 1.7rem); letter-spacing: -.02em; }
-  .pkarte__rollen { flex: 1 1 auto; overflow: auto; min-height: 0; }
-  .pkarte__rollen:focus-visible { outline: 2px solid var(--sc-accent); outline-offset: 2px; }
-  .pkarte__zu { flex: 0 0 auto; margin-top: .8rem; align-self: flex-start;
-                background: transparent; cursor: pointer; font: inherit;
-                font-family: var(--sc-font-display); font-size: .74rem;
-                letter-spacing: .14em; text-transform: uppercase;
-                color: var(--sc-ink); padding: .55rem .9rem; border-radius: .4rem;
-                border: 1px solid color-mix(in srgb, var(--sc-ink) 30%, transparent); }
-  .pkarte__zu:hover { background: var(--sc-accent); color: var(--sc-accent-ink);
-                      border-color: var(--sc-accent); }
-
-  /* Die gewaehlte Karte nimmt die ganze Breite, die andere tritt ab. Sonst
-     bliebe fuer die Damentabelle mit fuenf Spalten eine halbe Spalte. */
-  /* Ohne Bewegung wird aus dem Umdrehen ein Umschalten: die Seite wechselt
-     sofort, die Stauchung faellt weg. Der Zustand bleibt derselbe. */
-  @media (prefers-reduced-motion: reduce) {
-    .pkarte__innen, .pkarte__vorn, .pkarte__cta, .pkarte__cta svg { transition: none; }
-  }
-  .pdeck[data-gewaehlt] { grid-template-columns: 1fr; align-items: stretch; }
-  .pdeck[data-gewaehlt] .pkarte { aspect-ratio: auto; width: 100%; max-width: 60rem; justify-self: center; }
-  .pdeck[data-gewaehlt] .pkarte { height: 100%; }
-  .pkarte[hidden] { display: none; }
 
   .preise { width: 100%; border-collapse: collapse; font-variant-numeric: tabular-nums; }
   .preise caption { text-align: left; font-family: var(--sc-font-display);
@@ -579,104 +467,62 @@
     </div>
   </section>
 
-  <!-- 3 · PREISE: pin, HELL. Zwei Kaertchen, eines je Preisliste. Wer eines
-       anklickt, dreht es um und liest dahinter die Liste; das andere tritt
-       ab. Vorher standen beide Listen offen nebeneinander — in einem
-       niedrigen Fenster passte das nicht in die festgehaltene Buehne, und
-       was unten hinausragte war nicht mehr erreichbar. Zwei Kaertchen sind
-       immer kurz, egal wie hoch das Fenster ist. -->
-  <section id="preise" class="hell" data-sc-act="pin" data-sc-span="1.6" style="height:160vh" data-sc-drift="#F7F4EE">
-    <div data-sc-stage>
-      <div class="preisbuehne" data-sc-cue="0 1 0 0">
-        <div class="sc-stack preisbuehne__kopf">
-          <h2 class="sc-display sc-display--md">Preise</h2>
-          <p class="sc-body" style="color:var(--sc-ink-soft)">Für genauere Preisinfos einfach <a href="tel:+436766786333">anrufen</a>.</p>
+  <!-- 3 · PREISE: flow, HELL. Untereinander, zum Durchscrollen.
+       Vorher lagen die Listen hinter zwei Kaertchen, die man umdrehen musste.
+       Eine Preisliste liest man; jeder Klick davor ist eine Huerde. -->
+  <section id="preise" class="sc-section hell" data-sc-act="flow" data-sc-drift="#F7F4EE">
+    <div class="sc-wrap">
+      <div class="sc-stack" style="margin-bottom:clamp(2.5rem,5vw,4rem)">
+        <h2 class="sc-display sc-display--md">Preise</h2>
+        <p class="sc-body" style="color:var(--sc-ink-soft)">Für genauere Preisinfos einfach <a href="tel:+436766786333">anrufen</a>.</p>
+      </div>
+
+      <div class="preisliste">
+        <div class="preisliste__teil" data-sc-in>
+          <h3 class="preisliste__titel">Herren</h3>
+<table class="preise">
+          <caption>Schnitt, Bart und Pflege</caption>
+          <tbody>
+            <tr><th scope="row">Maschinenhaarschnitt</th><td>16 €</td></tr>
+            <tr><th scope="row">Musterhaarschnitt</th><td>6 €</td></tr>
+            <tr><th scope="row">Bartrasur</th><td>10 €</td></tr>
+            <tr><th scope="row">Maschinenbartrasur</th><td>13 €</td></tr>
+            <tr><th scope="row">Musterbartrasur</th><td>15 €</td></tr>
+            <tr><th scope="row">Waschen, Schneiden, Föhnen</th><td>26 €</td></tr>
+            <tr><th scope="row">Waschen und Föhnen</th><td>8 €</td></tr>
+            <tr><th scope="row">Wachs</th><td>8 €</td></tr>
+            <tr><th scope="row">Black Mask</th><td>8 €</td></tr>
+            <tr><th scope="row">Kopfmassage</th><td>5 €</td></tr>
+          </tbody>
+                  </table>
         </div>
 
-        <div class="pdeck" id="pdeck">
-          <article class="pkarte" id="karte-herren" style="--ton:28 20% 11%">
-            <div class="pkarte__innen">
-              <button type="button" class="pkarte__seite pkarte__vorn" aria-expanded="false" aria-controls="p-herren">
-                <span class="pkarte__rahmen" aria-hidden="true"></span>
-                <span class="pkarte__ecke pkarte__ecke--ol" aria-hidden="true">H</span>
-                <span class="pkarte__ecke pkarte__ecke--ur" aria-hidden="true">H</span>
-                <span class="pkarte__titel">Herren</span>
-                <span class="pkarte__cta">
-                  Preise ansehen
-                  <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
-                </span>
-              </button>
-
-              <div class="pkarte__seite pkarte__hinten" id="p-herren">
-                <h3 class="pkarte__rueckentitel">Herren</h3>
-                <div class="pkarte__rollen" tabindex="0" role="group" aria-label="Herrenpreise">
-                  <!-- Betraege in der Reihenfolge der Preistafel uebernommen. Auf
-                       der Tafel sind Bezeichnungen und Betraege gegeneinander
-                       verschoben, die Zuordnung ist also ungeprueft. Deshalb der
-                       sichtbare Hinweis: erfunden ist keine Zahl, bestaetigt
-                       aber auch nicht. -->
-                  <table class="preise">
-                    <caption>Schnitt, Bart und Pflege</caption>
-                    <tbody>
-                      <tr><th scope="row">Maschinenhaarschnitt</th><td>16 €</td></tr>
-                      <tr><th scope="row">Musterhaarschnitt</th><td>6 €</td></tr>
-                      <tr><th scope="row">Bartrasur</th><td>10 €</td></tr>
-                      <tr><th scope="row">Maschinenbartrasur</th><td>13 €</td></tr>
-                      <tr><th scope="row">Musterbartrasur</th><td>15 €</td></tr>
-                      <tr><th scope="row">Waschen, Schneiden, Föhnen</th><td>26 €</td></tr>
-                      <tr><th scope="row">Waschen und Föhnen</th><td>8 €</td></tr>
-                      <tr><th scope="row">Wachs</th><td>8 €</td></tr>
-                      <tr><th scope="row">Black Mask</th><td>8 €</td></tr>
-                      <tr><th scope="row">Kopfmassage</th><td>5 €</td></tr>
-                    </tbody>
+        <div class="preisliste__teil" data-sc-in>
+          <h3 class="preisliste__titel">Damen</h3>
+          <!-- Fuenf Spalten passen auf kein Telefon: die Tabelle rollt in
+               ihrem eigenen Kasten, statt die Seite mitzunehmen. Mit tabindex,
+               sonst kommt man per Tastatur nicht an die rechten Spalten. -->
+          <div class="preise__rollen" tabindex="0" role="group" aria-label="Damenpreise, waagrecht scrollbar">
+<table class="preise">
+          <caption>Schnitt und Styling, nach Haarlänge</caption>
+          <thead>
+            <tr>
+              <th scope="col" style="text-align:left">Behandlung</th>
+              <th scope="col">Kurz<br>bis Ohr</th>
+              <th scope="col">Mittel<br>bis Schulter</th>
+              <th scope="col">Lang<br>ab Schulter</th>
+              <th scope="col">Extra lang<br>bis Linie</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr><th scope="row">Waschen &amp; Föhnen</th><td>25 €</td><td>45 €</td><td>55 €</td><td>65 €</td></tr>
+            <tr><th scope="row">Waschen &amp; Legen</th><td>45 €</td><td>55 €</td><td>65 €</td><td>75 €</td></tr>
+            <tr><th scope="row">Waschen, Schneiden &amp; Föhnen</th><td>55 €</td><td>65 €</td><td>75 €</td><td>85 €</td></tr>
+            <tr><th scope="row">Waschen &amp; Schneiden</th><td>35 €</td><td>45 €</td><td>55 €</td><td>65 €</td></tr>
+          </tbody>
                   </table>
-                </div>
-                <button type="button" class="pkarte__zu">Karte zurücklegen</button>
-              </div>
-            </div>
-          </article>
-
-          <article class="pkarte" id="karte-damen" style="--ton:348 18% 20%">
-            <div class="pkarte__innen">
-              <button type="button" class="pkarte__seite pkarte__vorn" aria-expanded="false" aria-controls="p-damen">
-                <span class="pkarte__rahmen" aria-hidden="true"></span>
-                <span class="pkarte__ecke pkarte__ecke--ol" aria-hidden="true">D</span>
-                <span class="pkarte__ecke pkarte__ecke--ur" aria-hidden="true">D</span>
-                <span class="pkarte__titel">Damen</span>
-                <span class="pkarte__cta">
-                  Preise ansehen
-                  <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
-                </span>
-              </button>
-
-              <div class="pkarte__seite pkarte__hinten" id="p-damen">
-                <h3 class="pkarte__rueckentitel">Damen</h3>
-                <div class="pkarte__rollen" tabindex="0" role="group" aria-label="Damenpreise, waagrecht scrollbar">
-                  <table class="preise">
-                    <caption>Schnitt und Styling, nach Haarlänge</caption>
-                    <thead>
-                      <tr>
-                        <th scope="col" style="text-align:left">Behandlung</th>
-                        <th scope="col">Kurz<br>bis Ohr</th>
-                        <th scope="col">Mittel<br>bis Schulter</th>
-                        <th scope="col">Lang<br>ab Schulter</th>
-                        <th scope="col">Extra lang<br>bis Linie</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      <tr><th scope="row">Waschen &amp; Föhnen</th><td>25 €</td><td>45 €</td><td>55 €</td><td>65 €</td></tr>
-                      <tr><th scope="row">Waschen &amp; Legen</th><td>45 €</td><td>55 €</td><td>65 €</td><td>75 €</td></tr>
-                      <tr><th scope="row">Waschen, Schneiden &amp; Föhnen</th><td>55 €</td><td>65 €</td><td>75 €</td><td>85 €</td></tr>
-                      <tr><th scope="row">Waschen &amp; Schneiden</th><td>35 €</td><td>45 €</td><td>55 €</td><td>65 €</td></tr>
-                    </tbody>
-                  </table>
-                </div>
-                <button type="button" class="pkarte__zu">Karte zurücklegen</button>
-              </div>
-            </div>
-          </article>
+          </div>
         </div>
-
       </div>
     </div>
   </section>
@@ -976,69 +822,6 @@
 <script src="scrollcraft.js"></script>
 <script>
   ScrollCraft.mount(document.body);
-
-  /* ---- Die zwei Preiskaertchen -----------------------------------------
-     Umdrehen ist ein Zustandswechsel, kein Ziel: Traeger ist deshalb ein
-     button, kein Link. visibility:hidden nimmt die abgewandte Seite zwar aus
-     dem Vorlesebaum, aber inert kommt dazu: waehrend der Stauchung sind
-     beide Seiten kurz gleichzeitig da, und niemand soll dort hineintabben. */
-  (function () {
-    var deck = document.getElementById('pdeck');
-    if (!deck) return;
-    var karten = [].slice.call(deck.querySelectorAll('.pkarte'));
-
-    function stellen(offene) {
-      karten.forEach(function (k) {
-        var auf = k === offene;
-        var vorn = k.querySelector('.pkarte__vorn');
-        var hinten = k.querySelector('.pkarte__hinten');
-        if (auf) k.setAttribute('data-offen', ''); else k.removeAttribute('data-offen');
-        k.hidden = !!offene && !auf;
-        vorn.setAttribute('aria-expanded', auf ? 'true' : 'false');
-        vorn.inert = auf;
-        hinten.inert = !auf;
-      });
-      if (offene) deck.setAttribute('data-gewaehlt', ''); else deck.removeAttribute('data-gewaehlt');
-      var buehne = deck.closest('.preisbuehne');
-      if (offene) buehne.setAttribute('data-liest', ''); else buehne.removeAttribute('data-liest');
-    }
-
-    /* Erst stauchen, in der Mitte die Seite tauschen, dann wieder aufgehen.
-       Ohne Bewegungswunsch faellt die Stauchung weg. */
-    var sanftKarte = matchMedia('(prefers-reduced-motion: reduce)');
-    function drehen(karte, auf) {
-      if (sanftKarte.matches) { stellen(auf ? karte : null); return; }
-      karte.setAttribute('data-dreht', '');
-      setTimeout(function () {
-        stellen(auf ? karte : null);
-        karte.removeAttribute('data-dreht');
-      }, 220);
-    }
-
-    karten.forEach(function (k) {
-      k.querySelector('.pkarte__vorn').addEventListener('click', function () {
-        drehen(k, true);
-        /* Nach dem Umdrehen liegt der Blick auf der Liste, also gehoert der
-           Tastaturfokus auch dorthin. */
-        setTimeout(function () { k.querySelector('.pkarte__rollen').focus(); }, 260);
-      });
-      k.querySelector('.pkarte__zu').addEventListener('click', function () {
-        drehen(k, false);
-        setTimeout(function () { k.querySelector('.pkarte__vorn').focus(); }, 260);
-      });
-    });
-
-    /* Escape legt die Karte zurueck, wie man es von allem Aufgeklappten kennt. */
-    deck.addEventListener('keydown', function (e) {
-      if (e.key !== 'Escape') return;
-      var offen = deck.querySelector('.pkarte[data-offen]');
-      if (!offen) return;
-      drehen(offen, false);
-      setTimeout(function () { offen.querySelector('.pkarte__vorn').focus(); }, 260);
-    });
-
-    stellen(null);
-  })();
 
   /* ---- Pfeile im Kundenfeedback -------------------------------------
      Die Reihe ist ein gewoehnlicher waagrechter Rollbereich: wischen geht
