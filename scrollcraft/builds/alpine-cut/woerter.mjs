@@ -83,10 +83,6 @@ export const WOERTER = {
     'Nachzulesen im': 'Read them on our',
     'Google-Profil': 'Google profile',
     '(öffnet in einem neuen Tab)': '(opens in a new tab)',
-    'vor 3 Tagen': '3 days ago',
-    'vor 3 Wochen': '3 weeks ago',
-    'vor einem Monat': 'a month ago',
-    'vor 3 Monaten': '3 months ago',
 
     /* --- Vorbeikommen --- */
     'Einfach vorbeikommen': 'Just walk in',
