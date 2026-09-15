@@ -2,8 +2,14 @@
   "name": "alpine-cut-scrollcraft",
   "private": true,
   "version": "0.1.0",
-  "description": "Eigenstaendige scrollcraft-Seite. Eigene package.json, damit npm i hier nicht in das Next.js-Projekt darueber schreibt.",
+  "description": "Eigenstaendige Seite. Eigene package.json, damit npm i hier nichts im Ordner darueber anfasst.",
   "devDependencies": {
-    "playwright-core": "^1.62.1"
+    "playwright-core": "^1.62.1",
+    "sharp": "^0.34.5"
+  },
+  "scripts": {
+    "bilder": "node bilder.mjs",
+    "packen": "node packen.mjs",
+    "ansehen": "node serve.mjs"
   }
 }

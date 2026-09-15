@@ -1,94 +1,86 @@
 # Alpine Cut
 
-Website des Friseursalons Alpine Cut, Dorf-Platz 1, 6263 Fügen, Tirol.
+Website des Friseursalons **Alpine Cut**, Dorf-Platz 1, 6263 Fügen, Tirol.
+Live unter **https://alpine-cut.at** — deutsch, und unter `/en/` auf Englisch.
 
-Der Salon nimmt **Laufkundschaft** — keine Terminvergabe. Die Seite hat deshalb
-kein Formular; sie nennt Öffnungszeiten, Adresse und Telefonnummer.
+Der Salon nimmt Laufkundschaft, keine Termine. Die Seite hat deshalb kein
+Formular; sie nennt Öffnungszeiten, Adresse, Telefon und WhatsApp.
 
-## Inhalte ändern
+## Wo was liegt
 
-Alles Redaktionelle liegt unter `content/`. TypeScript meldet Tippfehler beim
-Build, statt sie live gehen zu lassen.
+Alles Gebaute steckt in `scrollcraft/builds/alpine-cut/`:
 
 | Datei | Inhalt |
 |---|---|
-| `content/salon.ts` | Name, Adresse, Telefon, Instagram, E-Mail |
-| `content/leistungen.ts` | Leistungen mit Preisen |
-| `content/oeffnungszeiten.ts` | Öffnungszeiten |
-| `content/fotos.ts` | Fotos für Hero, Arbeiten und Salon |
-| `content/texte.ts` | Hero-Texte, Über-Text, Meta-Beschreibung |
-| `content/rechtliches.ts` | Impressum und Datenschutz |
+| `index.html` | die ganze deutsche Seite, Text und CSS inbegriffen |
+| `impressum.html`, `datenschutz.html`, `404.html` | Nebenseiten |
+| `woerter.mjs` | deutsch → englisch, einzige Quelle für beide Sprachen |
+| `uebersetzen.mjs` | erzeugt daraus `en/index.html` |
+| `bilder.mjs` | baut Fotos, Logo und Symbole aus `assets/source/` |
+| `packen.mjs` | legt `hochladen/` an — das, was auf den Server kommt |
+| `serve.mjs` | kleiner Server zum Ansehen, auch vom Handy im WLAN |
+| `scrollcraft.js`, `scrollcraft.css` | die Scroll-Engine, unverändert übernommen |
 
-### Fotos einsetzen
+Die Originale der Fotos und des Videos liegen in `assets/source/`. Die werden
+nie angetastet; alles Ausgelieferte entsteht daraus.
 
-Dateien nach `public/fotos/` legen, dann in `content/fotos.ts` eintragen. Ein
-Beispiel steht dort als Kommentar. Erwartete Formate:
+## Etwas ändern
 
-| Platz | Seitenverhältnis | Mindestbreite | Anzahl |
-|---|---|---|---|
-| Hero | 3:2 quer | 2000 px | 1 |
-| Arbeiten | 3:4 hochkant | 1200 px | 5–8 |
-| Salon | 16:9 quer | 1600 px | 1 |
+**Text oder Preise:** in `index.html` ändern. Steht der Text auch auf Englisch,
+dann den Eintrag in `woerter.mjs` mitziehen — sonst bleibt `/en/` auf dem alten
+Stand. Es gibt keine zweite HTML-Datei zum Pflegen; die englische Seite entsteht
+beim Bauen.
 
-Solange ein Platz leer ist, steht dort ein gerahmter Hinweis mit Format und
-Zweck — kein grauer Kasten.
+**Ein Foto austauschen:** neues Original nach `assets/source/` legen, dann
 
-### Offene Stellen
+    cd scrollcraft/builds/alpine-cut
+    node bilder.mjs          # Fotos, Logo, Symbole
+    node bilder.mjs --clip   # zusätzlich die Videos, braucht ffmpeg
 
-Was noch nicht geliefert wurde, steht als `todo("…")` im Code und erscheint auf
-der Seite als roter Balken. `npm run check:content` listet alle offenen Stellen
-auf.
+Die Maße im Skript sind gemessen, nicht geraten: geliefert gegen tatsächlich
+dargestellt, auf Handy mit dreifacher und Desktop mit doppelter Pixeldichte.
 
-**Vor dem Livegang** im Vercel-Projekt `STRICT_CONTENT=1` setzen. Der Build
-bricht dann ab, solange irgendwo noch ein Platzhalter steht.
+**Ansehen, bevor es live geht:**
 
-## Umgebungsvariablen
+    node packen.mjs
+    cd ../../../hochladen && node ../scrollcraft/builds/alpine-cut/serve.mjs
 
-Siehe `.env.example`. Es wird nur `NEXT_PUBLIC_SITE_URL` gebraucht, für
-kanonische Adressen, Sitemap und JSON-LD. Kein Mailversand, kein API-Schlüssel.
+Das Startskript nennt auch die Adresse fürs Handy im selben WLAN.
 
-## Befehle
+## Veröffentlichen
 
-    npm run dev             Entwicklungsserver
-    npm run build           Produktionsbuild, prüft vorher die Inhalte
-    npm test                Unit-Tests (Vitest)
-    npm run test:e2e        Browser-Tests (Playwright)
-    npm run check:content   offene TODO-Marker auflisten
-    npm run assets:images   Logo-Ableitungen und OG-Bild neu erzeugen
+Push auf `main` → Vercel baut und veröffentlicht von selbst. Nichts hochladen.
+Der Bauschritt steht in `vercel.json`.
 
-`npm run test:e2e` startet einen eigenen Produktionsbuild. Läuft parallel schon
-`npm run dev` auf Port 3000, verwendet Playwright den Dev-Server — dort
-kompiliert Next Routen erst beim ersten Aufruf, was einzelne Tests flackern
-lässt. Vor dem Testlauf also den Dev-Server beenden.
+## Was nicht automatisch nachzieht
 
-## Gestaltung
+- **Die neun Kundenstimmen** in `index.html`. Sie sind im Wortlaut vom
+  Google-Profil abgeschrieben und tragen `lang="de"` — ein Zitat wird nicht
+  übersetzt, sonst stünde dort etwas, das der Mensch nie geschrieben hat. Neue
+  kommen von Hand dazu.
+- **Die Preisliste**, wenn sich der Aushang im Salon ändert.
 
-Streng monochrom auf Schwarz, abgeleitet aus dem Logo (`assets/source/`).
-Space Grotesk für Überschriften und Labels, Geist Sans für Fließtext. Keine
-Akzentfarbe: Aktionen heben sich über Fläche und Größe ab.
+## Zwei Stellen, die man beim Weiterbauen leicht kaputtmacht
 
-Zwei Stellen, die man beim Weiterbauen leicht kaputtmacht:
-
-- **`color-scheme: dark` in `:root`.** Ohne diese Zeile rendert Chrome seine
-  eingebauten Bedienelemente im Hellmodus — Bildlaufleisten, Autofill und
-  jedes künftige Formularfeld sähen falsch aus.
-- **Elementregeln gehören in `@layer base`, Hilfsklassen in `@layer
-  components`.** Ungelayerte Regeln schlagen jede Tailwind-Utility. Nur der
-  Fokus-Ring steht bewusst ungelayert, damit ihn nichts überschreibt.
+- **Höhe der festgehaltenen Abschnitte.** Sie steht als `style="height:…vh"` im
+  Markup, obwohl die Engine sie später ohnehin setzt. Ohne das springt die Seite
+  beim Laden um einen halben Bildschirm: gemessen CLS 0,56 statt 0,002.
+- **`.kontakt` darf kein `height` haben.** Das Element trägt auch `sc-stage`,
+  und die Engine gibt dem `100svh`, damit die Bühne am Fenster klebt. Ein
+  eigenes `height` daneben gewinnt und hebelt das aus.
 
 ## Rechtliches
 
-Impressum und Datenschutzerklärung sind fachlich sorgfältig auf das abgestimmt,
-was diese Seite tatsächlich tut — sie sind aber **keine Rechtsberatung**. Vor
-dem Livegang anwaltlich prüfen lassen.
+Impressum und Datenschutz sind auf das abgestimmt, was die Seite tatsächlich
+tut — sie sind aber **keine Rechtsberatung**.
 
 Die Seite bettet nichts von Dritten ein: keine Karte, kein Instagram-Widget,
-keine Schriften von fremden Servern, kein Analytics. Deshalb kein
-Einwilligungsbanner.
+keine Schriften von fremden Servern, kein Analytics. Nachgemessen mit einem
+Browser, der jede ausgehende Anfrage mitschreibt: null Fremdabrufe. Deshalb
+kein Einwilligungsbanner.
 
-## Bekannte Meldungen
+## Offene Frage
 
-`npm audit` meldet Funde in Paketen **innerhalb** von Next.js
-(`next/node_modules/postcss` und `.../sharp`). Der angebotene Fix wäre ein
-Downgrade auf Next 9.3.3. Beide sind Build-Zeit-Abhängigkeiten, die hier keine
-fremden Eingaben verarbeiten. Sie verschwinden mit dem nächsten Next-Release.
+Die Längenstufe **„Extra lang"** in der Damentabelle trug auf der Preistafel den
+Zusatz „bis Linie". Den verstand niemand — vermutlich die Kurzform von „bis zur
+BH-Linie". Ohne Bestätigung wurde der Zusatz entfernt statt geraten.

@@ -59,7 +59,6 @@ export const WOERTER = {
     'Lang': 'Long',
     'ab Schulter': 'past the shoulder',
     'Extra lang': 'Extra long',
-    'bis Linie': 'to the line',
     'Waschen & Föhnen': 'Wash & blow-dry',
     'Waschen & Legen': 'Wash & set',
     'Waschen, Schneiden & Föhnen': 'Wash, cut & blow-dry',
