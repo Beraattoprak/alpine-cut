@@ -139,31 +139,51 @@ console.log(`  teilbild.jpg     ${ogB}x${ogH}  ${kb(ogAus)} KB`)
    geschätzt: SSIM 0,995 beziehungsweise 0,991. */
 if (process.argv.includes('--clip')) {
   console.log('Videos')
-  const original = path.join(quellen, 'scroll_effekt.mp4')
-  if (!existsSync(original)) {
-    console.error('  Vorlage fehlt: scroll_effekt.mp4')
+  /* hero.mp4 ist die aktuelle Vorlage; scroll_effekt.mp4 war die erste.
+     Beide Namen werden gesucht, damit ein Zurueckwechseln nichts bricht. */
+  const original = ['hero.mp4', 'scroll_effekt.mp4']
+    .map((n) => path.join(quellen, n))
+    .find(existsSync)
+  if (!original) {
+    console.error('  Vorlage fehlt: assets/source/hero.mp4')
     process.exit(1)
   }
-  for (const [name, breite, crf, gop] of [
-    ['clipper.mp4', 1914, 29, 8],
-    ['clipper-m.mp4', 960, 29, 4],
+  console.log('  Vorlage:', path.basename(original))
+  /* Der Handy-Clip bekommt ein hochkantes Format, der für den Desktop bleibt
+     quer. Grund: die Bühne füllt den Schirm, also schneidet object-fit:cover
+     aus einem 16:9-Clip auf einem Telefon nur einen gut 26 % breiten
+     Mittelstreifen heraus. Beim ersten Clip ging das knapp auf, weil der
+     Haarschneider nur 25 % der Bildbreite einnahm. Im neuen füllt er 37 % —
+     da bleibt ein Fragment übrig.
+     Gepolstert wird mit #fdfdfd, dem gemessenen Grund der Vorlage, nicht mit
+     reinem Weiß: sonst sieht man die Kante. */
+  for (const [name, filter, crf, gop] of [
+    ['clipper.mp4', 'scale=1914:-2', 29, 8],
+    ['clipper-m.mp4', 'scale=720:-2,pad=720:1280:(ow-iw)/2:(oh-ih)/2:#fdfdfd', 29, 4],
   ]) {
     const aus = path.join(ziel, name)
     execFileSync('ffmpeg', [
       '-y', '-v', 'error', '-i', original,
-      '-vf', `scale=${breite}:-2`,
+      '-vf', filter,
       '-c:v', 'libx264', '-crf', String(crf),
       '-g', String(gop), '-keyint_min', String(gop), '-sc_threshold', '0',
       '-preset', 'slow', '-profile:v', 'high', '-pix_fmt', 'yuv420p',
       '-an', '-movflags', '+faststart', aus,
     ])
-    console.log(`  ${name.padEnd(16)} ${breite}px  ${kb(aus)} KB`)
+    const m = execFileSync('ffprobe', ['-v', 'error', '-select_streams', 'v:0', '-show_entries', 'stream=width,height', '-of', 'csv=p=0', aus])
+      .toString().trim()
+    console.log(`  ${name.padEnd(16)} ${m}  ${kb(aus)} KB`)
   }
+  /* Standbild aus dem Querformat, nicht aus dem hochkanten Handy-Clip: es
+     steht in beiden Bühnen, und ein hochkantes Bild würde auf dem Desktop zu
+     einem gestreckten Streifen. Quer gekippt verhält es sich auf dem Telefon
+     so wie die Bühne es ohnehin beschneidet. */
   await sharp(
-    execFileSync('ffmpeg', ['-v', 'error', '-i', path.join(ziel, 'clipper-m.mp4'), '-frames:v', '1', '-f', 'image2pipe', '-vcodec', 'png', '-'], {
+    execFileSync('ffmpeg', ['-v', 'error', '-i', path.join(ziel, 'clipper.mp4'), '-frames:v', '1', '-f', 'image2pipe', '-vcodec', 'png', '-'], {
       maxBuffer: 64 * 1024 * 1024,
     }),
   )
+    .resize({ width: 1280 })
     .webp({ quality: 80 })
     .toFile(path.join(ziel, 'clipper-poster.webp'))
   console.log(`  clipper-poster.webp      ${kb(path.join(ziel, 'clipper-poster.webp'))} KB`)

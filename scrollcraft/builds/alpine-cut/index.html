@@ -191,10 +191,14 @@
 
   /* ---- Akt 1: Hero, hell --------------------------------------------- */
   /* Kein dunkler Scrim: Der Clip ist ein dunkler Haarschneider auf Weiss.
-     Ein heller Verlauf von links haelt die Flaeche unter der Schrift ruhig. */
+     Ein heller Verlauf von links haelt die Flaeche unter der Schrift ruhig.
+     Die Stufen sind ausgemessen, nicht gewaehlt: der zweite Clip zeigt den
+     Haarschneider mittig und doppelt so breit wie der erste, er laeuft also
+     hinter die Ueberschrift. Bei 0,78 Deckkraft faellt der Kontrasttest
+     durch, bei 0,84 besteht er — staerker macht den Clip nur unnoetig blass. */
   .scrim-hell {
     position: absolute; inset: 0; pointer-events: none;
-    background: linear-gradient(to right, #F7F4EE 0%, rgb(247 244 238 / .82) 34%, rgb(247 244 238 / 0) 62%);
+    background: linear-gradient(to right, #F7F4EE 0%, rgb(247 244 238 / .84) 38%, rgb(247 244 238 / .45) 60%, rgb(247 244 238 / 0) 78%);
   }
   /* Schmaler Schirm: Die Schrift steht ueber die volle Breite, der dunkle
      Haarschneider wandert dahinter durch. Ein Verlauf von links haelt die
