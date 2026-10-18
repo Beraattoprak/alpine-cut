@@ -257,72 +257,59 @@
   .ort__zeile { font-family: var(--sc-font-display); font-size: clamp(1.6rem, 3.4vw, 2.6rem);
                 line-height: 1.12; letter-spacing: -.02em; max-width: 18ch; }
 
-  /* Das Foto geht beim Scrollen auf: der sichtbare Ausschnitt waechst aus
-     einem Fenster in der Mitte auf das ganze Bild, und das Bild selbst
-     faehrt dabei von 1,14 auf 1 zurueck. Zusammen liest sich das wie eine
-     Kamera, die zurueckgeht.
+  /* Das Foto macht zwei Dinge, nacheinander, beide am Scrollstand:
 
-     Wichtig: der KASTEN aendert sich nicht. Beschnitten wird mit clip-path,
-     nicht mit Breite und Hoehe. Darum rueckt im Layout nichts, die
-     Anordnung bleibt genau wie zuvor, und es gibt keinen Versatz beim
-     Laden.
+     1. Es geht auf, waehrend es ins Bild faehrt. Der sichtbare Ausschnitt
+        waechst aus einem Fenster in der Mitte auf das ganze Bild, und das
+        Bild selbst faehrt von 1,14 auf 1 zurueck — wie eine Kamera, die
+        zurueckgeht. Das steuert --auf.
+     2. Danach klebt es oben fest und waechst auf den ganzen Schirm. Das
+        steuert --voll.
 
-     --sc-p ist der Fortschritt des Akts, den die Engine auf den Abschnitt
-     schreibt. Bei einem flow-Akt laeuft er, solange der Abschnitt durchs
-     Fenster wandert. --auf schneidet davon den Anfang und das Ende weg:
-     --sc-p ist der Fortschritt des Akts.
-     Anfang und Ende sind ausgemessen, nicht geschaetzt. Das Foto ist im
-     Fenster zu sehen, solange p zwischen etwa 0,25 und 0,92 liegt; davor
-     steht es darunter, danach darueber. Laeuft das Oeffnen ueber einen
-     groesseren Bereich, passiert die Haelfte davon ausserhalb des
-     Fensters — vorher war es erst bei 0,78 offen, und da schob es sich
-     schon oben hinaus. 0,20 bis 0,68 nutzt den sichtbaren Teil aus: rund
-     100 Bildschirmhoehen Scrollweg am Desktop, 122 am Telefon. */
-  .ort-akt { --auf: clamp(0, calc((var(--sc-p, 0) - .2) / .48), 1); }
+     Beide Werte setzt das Skript aus der Lage des Platzhalters im Fenster,
+     nicht aus dem Fortschritt des Akts. Das ist der Unterschied, der
+     zaehlt: der Akt ist durch den Scrollweg des Platzhalters sehr lang
+     geworden, und eine feste Spanne darin waere bei jeder Fensterhoehe
+     woanders. Aus der eigenen Lage gerechnet stimmt es von selbst.
+
+     Drei Masse kann CSS nicht wissen, weil sie aus dem Raster kommen:
+     Breite und Hoehe der Spalte und ihr Abstand zum linken Fensterrand.
+     Die misst das Skript einmal und schreibt sie als Variablen. */
   .ort__bild {
     overflow: hidden;
     clip-path: inset(
-      calc(17% * (1 - var(--auf))) calc(14% * (1 - var(--auf)))
-      calc(17% * (1 - var(--auf))) calc(14% * (1 - var(--auf)))
-      round calc(16px * (1 - var(--auf))));
+      calc(17% * (1 - var(--auf, 1))) calc(14% * (1 - var(--auf, 1)))
+      calc(17% * (1 - var(--auf, 1))) calc(14% * (1 - var(--auf, 1)))
+      round calc(16px * (1 - var(--auf, 1))));
   }
-  .ort__bild img { transform: scale(calc(1 + .14 * (1 - var(--auf)))); transform-origin: center; }
-  /* Wer Bewegung abgeschaltet hat, bekommt das Foto einfach so. */
+  .ort__bild img { transform: scale(calc(1 + .14 * (1 - var(--auf, 1)))); transform-origin: center; }
+
+  /* Ab hier nur mit Skript. Ohne Skript steht das Foto einfach in seiner
+     Spalte, so wie es ohne jede Bewegung aussaehe. */
+  .ort--waechst .ort { align-items: start; }
+  /* min-width: 0 ist hier nicht Kosmetik. Rasterspalten haben von Haus aus
+     min-width: auto, also koennen sie nicht schmaler werden als ihr Inhalt.
+     Sobald das Foto ueber die Spaltenbreite hinauswaechst, zieht es die
+     Spalte mit und die ganze Zeile rutscht zur Seite — gemessen 136 Punkte
+     nach links, und das Vollbild endete 136 Punkte vor dem rechten Rand. */
+  .ort--waechst .ort__platz { position: relative; min-width: 0; }
+  .ort--waechst .ort__bild {
+    position: sticky; top: 0; z-index: 2;
+    width: calc(var(--b0) + (100vw - var(--b0)) * var(--voll, 0));
+    height: calc(var(--h0) + (100svh - var(--h0)) * var(--voll, 0));
+    /* Nach links aus der Spalte heraus, bis an den Fensterrand. */
+    margin-left: calc(var(--versatz, 0px) * -1 * var(--voll, 0));
+  }
+  .ort--waechst .ort__bild img { width: 100%; height: 100%; object-fit: cover; }
+  /* Der Text tritt zurueck, waehrend das Foto ueber ihn waechst. */
+  .ort--waechst .sc-stack { opacity: calc(1 - var(--voll, 0)); }
+
+  /* Wer Bewegung abgeschaltet hat, bekommt das Foto ohne alles: keine
+     Oeffnung, kein Zoom, kein Vollbild. Das Skript setzt die Klasse dann
+     gar nicht erst. */
   @media (prefers-reduced-motion: reduce) {
     .ort__bild { clip-path: none; }
     .ort__bild img { transform: none; }
-  }
-
-  /* ---- Akt 2b: derselbe Laden, bildschirmfuellend --------------------
-     Das Foto waechst aus etwa der Groesse, die es nebenan in der Spalte
-     hat, auf den ganzen Schirm. Gewachsen wird ueber width und height,
-     nicht ueber transform: das Seitenverhaeltnis aendert sich dabei, eine
-     Skalierung wuerde das Bild verzerren. Die Buehne traegt KEIN height —
-     das setzt die Engine, damit sie am Fenster klebt. */
-  .laden__buehne { --voll: clamp(0, calc(var(--sc-p, 0) / .5), 1); background: #0A0A0A; }
-  .laden__rahmen {
-    position: absolute; top: 50%; left: 50%; translate: -50% -50%;
-    margin: 0; overflow: hidden;
-    width: calc(52% + 48% * var(--voll));
-    height: calc(58% + 42% * var(--voll));
-    border-radius: calc(16px * (1 - var(--voll)));
-    box-shadow: 0 0 calc(60px * (1 - var(--voll))) rgb(0 0 0 / .55);
-  }
-  .laden__rahmen img { width: 100%; height: 100%; object-fit: cover; display: block; }
-  /* Der Verlauf ist nur so stark wie das Bild offen ist: solange es klein
-     ist, steht keine Schrift darauf und er waere nur Schmutz. */
-  .laden__rahmen::after {
-    content: ""; position: absolute; inset: 0; pointer-events: none;
-    background: linear-gradient(to top, rgb(10 10 10 / .9) 0%, rgb(10 10 10 / .62) 18%,
-                rgb(10 10 10 / .22) 40%, transparent 62%);
-    opacity: var(--voll);
-  }
-  .laden__ort { margin: 0; color: #fff; font-family: 'Archivo', system-ui, sans-serif;
-                font-size: .8rem; letter-spacing: .16em; text-transform: uppercase; }
-  @media (max-width: 820px) {
-    /* Hochkant waere ein 52 % breiter Anfang ein schmaler Streifen, und von
-       einem 4:3-Foto bliebe darin fast nichts uebrig. Also quer beginnen. */
-    .laden__rahmen { width: calc(88% + 12% * var(--voll)); height: calc(40% + 60% * var(--voll)); }
   }
 
   /* ---- Akt 3: Preise, hell ------------------------------------------- */
@@ -637,30 +624,14 @@
           der Verlauf sitzen muss.
         </p>
       </div>
-      <figure class="ort__bild">
-        <img src="assets/salon-aussen.webp" width="1800" height="1350" loading="lazy" decoding="async"
-             alt="Der Salon von außen: Holzfassade am Dorf-Platz, das Alpine-Cut-Logo im Schaufenster.">
-      </figure>
-    </div>
-  </section>
-
-  <!-- 2b · DER LADEN IM VOLLBILD: pin, DUNKEL. Nach dem Abschnitt darueber,
-       der unveraendert bleibt, nimmt dasselbe Foto den ganzen Schirm ein.
-       Es waechst dabei aus der Groesse heraus, in der es nebenan in der
-       Spalte stand, damit es wie eine Fortsetzung wirkt und nicht wie ein
-       zweites Bild.
-
-       Die Groesse haengt an --sc-p, dem Fortschritt des Akts; --voll rechnet
-       das so um, dass das Wachsen nach der Haelfte fertig ist und der Rest
-       des Akts das Bild ganz zeigt. Es ist dieselbe Datei wie oben, kommt
-       also aus dem Zwischenspeicher. -->
-  <section class="dunkel laden" data-sc-act="pin" data-sc-span="2.2" style="height:220vh" data-sc-drift="#0A0A0A">
-    <div class="laden__buehne" data-sc-stage>
-      <figure class="laden__rahmen">
-        <img src="assets/salon-aussen.webp" width="1800" height="1350" loading="lazy" decoding="async" alt="">
-      </figure>
-      <div class="sc-copy sc-copy--lead laden__zeile" data-sc-cue="0.58 1.4 0.2 0.1">
-        <p class="laden__ort">Dorf-Platz 1 · 6263 Fügen</p>
+      <!-- Der Platzhalter haelt die Spalte und bringt den Scrollweg mit,
+           ueber den das Foto darin zum Vollbild waechst. Beides setzt das
+           Skript; ohne Skript steht hier einfach das Foto. -->
+      <div class="ort__platz">
+        <figure class="ort__bild">
+          <img src="assets/salon-aussen.webp" width="1800" height="1350" loading="lazy" decoding="async"
+               alt="Der Salon von außen: Holzfassade am Dorf-Platz, das Alpine-Cut-Logo im Schaufenster.">
+        </figure>
       </div>
     </div>
   </section>
@@ -1012,6 +983,87 @@
 <script src="scrollcraft.js"></script>
 <script>
   ScrollCraft.mount(document.body);
+
+  /* ---- Das Ladenfoto: erst aufgehen, dann Vollbild -------------------
+     Ohne dieses Skript steht das Foto einfach in seiner Spalte, so wie es
+     ohne jede Bewegung aussaehe. Erst hier bekommt es beides:
+
+     1. Es geht auf, waehrend es ins Bild faehrt.
+     2. Danach klebt es oben fest und waechst auf den ganzen Schirm.
+
+     Gerechnet wird beides aus der Lage des Platzhalters im Fenster, nicht
+     aus dem Fortschritt des Akts. Das ist der Unterschied, der zaehlt: der
+     Abschnitt ist durch den Scrollweg sehr lang geworden, und eine feste
+     Spanne darin laege bei jeder Fensterhoehe woanders. Aus der eigenen
+     Lage gerechnet stimmt es von selbst.
+
+     Drei Masse kann CSS nicht wissen, weil sie aus dem Raster kommen:
+     Breite und Hoehe der Spalte und ihr Abstand zum linken Fensterrand.
+     Die misst dieses Skript; gerechnet wird im CSS. */
+  (function () {
+    var akt = document.querySelector('.ort-akt');
+    var platz = document.querySelector('.ort__platz');
+    if (!akt || !platz) return;
+    if (matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+
+    var lauf = 0, sichtbar = true;
+
+    function messen() {
+      /* Ohne die Klasse messen, sonst misst man das Ergebnis der eigenen
+         Rechnung statt des Rasters. */
+      akt.classList.remove('ort--waechst');
+      platz.style.height = '';
+      platz.style.paddingTop = '';
+
+      var reihe = platz.parentElement.getBoundingClientRect();
+      var r = platz.getBoundingClientRect();
+      var b0 = Math.round(r.width);
+      var h0 = Math.round(b0 * 0.75);          /* das Foto ist 4:3 */
+
+      /* Die Spalten standen auf "unten buendig". Fuer das Kleben muss die
+         Zeile oben buendig werden, sonst saesse der Text am Fuss einer sehr
+         hohen Zeile. Damit das Foto trotzdem dort anfaengt, wo es vorher
+         stand, wird der gemessene Abstand als Polster uebernommen. */
+      var oben = Math.max(0, Math.round(r.top - reihe.top));
+
+      akt.style.setProperty('--b0', b0 + 'px');
+      akt.style.setProperty('--h0', h0 + 'px');
+      akt.style.setProperty('--versatz', Math.round(r.left) + 'px');
+      platz.style.paddingTop = oben + 'px';
+      /* Hoehe des Fotos, plus Weg zum Wachsen, plus Halten im Vollbild. */
+      platz.style.height = (oben + h0 + Math.round(innerHeight * 2.1)) + 'px';
+      akt.classList.add('ort--waechst');
+      stand();
+    }
+
+    function stand() {
+      var r = platz.getBoundingClientRect();
+      var vh = innerHeight || 1;
+      /* Aufgehen, waehrend das Foto ins Bild faehrt: von 90 % Fensterhoehe
+         bis 10 %. Fertig, bevor das Wachsen anfaengt. */
+      var auf = (vh * 0.9 - r.top) / (vh * 0.8);
+      /* Wachsen, sobald es oben klebt, ueber neun Zehntel einer
+         Fensterhoehe. */
+      var voll = -r.top / (vh * 0.9);
+      akt.style.setProperty('--auf', Math.min(1, Math.max(0, auf)).toFixed(4));
+      akt.style.setProperty('--voll', Math.min(1, Math.max(0, voll)).toFixed(4));
+    }
+
+    function bild() {
+      lauf = 0;
+      if (!sichtbar) return;
+      stand();
+      lauf = requestAnimationFrame(bild);
+    }
+
+    messen();
+    addEventListener('resize', messen);
+    new IntersectionObserver(function (e) {
+      sichtbar = e[0].isIntersecting;
+      if (sichtbar && !lauf) lauf = requestAnimationFrame(bild);
+    }, { rootMargin: '100px' }).observe(platz);
+    lauf = requestAnimationFrame(bild);
+  })();
 
   /* ---- Kundenfeedback: die Bewertungen haengen an einer Leine ---------
      Ohne dieses Skript bleibt die Reihe ein gewoehnlicher waagrechter
