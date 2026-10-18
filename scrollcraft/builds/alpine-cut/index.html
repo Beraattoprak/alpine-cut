@@ -458,30 +458,35 @@
 
   <!-- 1 · ANKUNFT: scrub, HELL. Der Clip ist beschnitten und auf das Creme
        der Seite getoent (siehe bilder.mjs), damit die Maschine frei auf
-       einheitlichem Grund steht statt unter einem Verlauf. -->
-  <section class="hell" data-sc-act="scrub" data-sc-span="2.4" style="height:240vh" data-sc-dwell="0.34" data-sc-drift="#F7F4EE">
+       einheitlichem Grund steht statt unter einem Verlauf.
+
+       Drei Saetze, drei Fenster. Der Akt ist dafuer von 240 auf 340vh
+       gewachsen: bei 240 blieben fuer den mittleren Satz nur 37vh Scrollweg,
+       und genau das war die Klage. Span und die Hoehe im style muessen
+       uebereinstimmen — die Engine setzt die Hoehe sonst erst in JS nach,
+       und die Seite springt beim Laden um einen halben Schirm. -->
+  <section class="hell" data-sc-act="scrub" data-sc-span="3.4" style="height:340vh" data-sc-dwell="0.34" data-sc-drift="#F7F4EE">
     <div data-sc-stage>
       <img class="sc-stage__poster" src="assets/clipper-poster.webp" alt="">
       <video data-sc-scrub data-sc-src="assets/clipper.mp4"
              data-sc-src-mobile="assets/clipper-m.mp4" muted playsinline></video>
-      <div class="sc-copy sc-copy--lead" data-sc-cue="0 0.54 0 0.22">
+      <div class="sc-copy sc-copy--lead" data-sc-cue="0 0.42 0 0.25">
         <h1 class="sc-display sc-display--xl" data-sc-kinetic="lines">Ihr Friseur im Zillertal</h1>
         <p class="sc-body hero__sub">Ohne Termin, einfach vorbeikommen</p>
       </div>
-      <!-- Der zweite Satz kommt erst, wenn der erste weg ist. Die beiden
-           Fenster stossen nicht aneinander: dazwischen liegt ein Moment, in
-           dem nur die Maschine da ist.
-
-           Das Ausblendfenster endet bei 1,5 und damit jenseits dessen, was
-           je erreicht wird: die Engine kappt den Fortschritt des Akts bei 1.
-           Der Satz blendet deshalb nie weg. Er bleibt stehen und faehrt mit
-           der Buehne hinaus, so wie jeder andere Seiteninhalt auch. Mit
-           einem Fenster bis 1 verschwand er, kaum dass er da war — voll
-           sichtbar nur ueber 37vh, waehrend der erste Satz 53vh bekam.
-           Dazu kommt, dass die dwell-Kurve am Aktende 1,7-mal schneller
-           laeuft und das Ende zusaetzlich wegreisst. -->
-      <div class="sc-copy sc-copy--lead" data-sc-cue="0.58 1.5 0.09 0.1">
+      <!-- Die Fenster stossen nicht aneinander: zwischen zwei Saetzen liegt
+           jedesmal ein Moment, in dem nur die Maschine da ist. -->
+      <div class="sc-copy sc-copy--lead" data-sc-cue="0.46 0.74 0.18 0.18">
         <p class="sc-display sc-display--xl" data-sc-kinetic="lines">Bei uns zählt jedes Detail</p>
+      </div>
+      <!-- Der letzte Satz blendet nicht weg. Sein Ausblendfenster endet bei
+           1,5 und damit jenseits dessen, was je erreicht wird: die Engine
+           kappt den Fortschritt eines Akts bei 1. Er bleibt stehen und
+           faehrt mit der Buehne hinaus, so wie jeder andere Seiteninhalt.
+           Das ist der Unterschied zwischen "verschwindet unter der Hand"
+           und "man scrollt daran vorbei". -->
+      <div class="sc-copy sc-copy--lead" data-sc-cue="0.78 1.5 0.09 0.1">
+        <p class="sc-display sc-display--xl" data-sc-kinetic="lines">und Ihre Zufriedenheit</p>
       </div>
     </div>
   </section>
