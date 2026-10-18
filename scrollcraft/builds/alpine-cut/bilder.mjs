@@ -155,11 +155,28 @@ if (process.argv.includes('--clip')) {
      In der Hoehe wird nicht beschnitten: dort reicht sie von 1 % bis 98 %. */
   const BESCHNITT = 'crop=in_w*0.54:in_h:in_w*0.22:0'
 
-  /* Toenung: die Vorlage steht auf 253,253,253, die Seite auf #F7F4EE
-     (247,244,238). Multiplikativ, damit nur der helle Grund wandert und die
-     dunklen Toene der Maschine bleiben, wo sie sind. Ohne das saehe man den
-     Rand des Videokastens als helleres Rechteck auf dem Creme der Seite. */
-  const TOENUNG = 'colorchannelmixer=rr=0.97628:gg=0.96443:bb=0.94071'
+  /* Der Grund der Vorlage ist nicht ganz weiss, sondern Y 232..234 (RGB 253).
+     Hier auf Y 235 gezogen, also reines Weiss, damit er sich exakt mit dem
+     weissen Hintergrund der Buehne deckt. Genauer: alles ab Y 230 wird
+     auf 240 gesetzt, also ueber den Weisspunkt hinaus. Das ist Absicht —
+     beim Dekodieren wird auf 255 gekappt, und so landet auch das
+     Kompressionsrauschen noch auf reinem Weiss statt knapp darunter. Mit
+     Y 235 blieb der Grund bei 252 stehen, gemessen. Der Uebergang laeuft
+     weich von 215 an, damit der Schlagschatten unter der Maschine nicht
+     abreisst — dort liegen 1,7 % der Flaeche, und das ist genau er.
+
+     Wichtig ist, dass das in YUV passiert und nicht in RGB. Der fruehere
+     Toenungsfilter (colorchannelmixer) schickte die Kette durch RGB; das
+     Ergebnis trug danach keine Farbkennzeichnung mehr, und ein Browser, der
+     den Wertebereich daraufhin falsch raet, dehnt ihn ein zweites Mal. Dann
+     steht der Videokasten als weisses Rechteck auf der Seite. Genau das war
+     zu sehen. */
+  /* Dazu die Farbdifferenzkanaele: was ohnehin fast neutral ist, wird exakt
+     neutral. Sonst zieht das Weiss ins Kalte — gemessen 253,255,255 statt
+     255,255,255. Die Schwelle von 5 trifft nur Grautoene; die gruene Platine
+     im Inneren der Maschine liegt weit darueber und bleibt bunt. */
+  const NEUTRAL = ":u='if(lt(abs(val-128),5),128,val)':v='if(lt(abs(val-128),5),128,val)'"
+  const WEISS = "lutyuv=y='if(gte(val,230),240,if(lte(val,215),val,215+(val-215)*1.3333))'" + NEUTRAL
 
   /* Die Stufen sind gemessen, nicht gewaehlt. Der Beschnitt hat den leeren
      Grund entfernt, der praktisch nichts kostete — jetzt ist jeder Pixel
@@ -174,34 +191,41 @@ if (process.argv.includes('--clip')) {
     const aus = path.join(ziel, name)
     execFileSync('ffmpeg', [
       '-y', '-v', 'error', '-i', original,
-      '-vf', BESCHNITT + ',' + TOENUNG + ',scale=-2:' + hoehe,
+      /* Reihenfolge: erst beschneiden, dann skalieren, dann klemmen. Wird
+         vor dem Skalieren geklemmt, rechnet das Skalieren den Wert wieder
+         weg — gemessen landete der Farbdifferenzkanal danach auf 127 statt
+         128, und schon fehlten dem Weiss zwei Stufen im Rot. */
+      '-vf', BESCHNITT + ',scale=-2:' + hoehe + ',' + WEISS,
       '-c:v', 'libx264', '-crf', String(crf),
       '-g', String(gop), '-keyint_min', String(gop), '-sc_threshold', '0',
       '-preset', 'slow', '-profile:v', 'high', '-pix_fmt', 'yuv420p',
+      /* Ausdruecklich kennzeichnen. Ohne diese vier Angaben steht in der
+         Datei "unknown", und jeder Browser raet selbst. Das war die Ursache
+         des weissen Rechtecks. */
+      '-color_range', 'tv', '-colorspace', 'bt709',
+      '-color_primaries', 'bt709', '-color_trc', 'bt709',
       '-an', '-movflags', '+faststart', aus,
     ])
-    const m = execFileSync('ffprobe', ['-v', 'error', '-select_streams', 'v:0', '-show_entries', 'stream=width,height', '-of', 'csv=p=0', aus])
+    const m = execFileSync('ffprobe', ['-v', 'error', '-select_streams', 'v:0', '-show_entries', 'stream=width,height,color_range,color_space', '-of', 'csv=p=0', aus])
       .toString().trim()
     console.log('  ' + name.padEnd(16) + ' ' + m + '  ' + kb(aus) + ' KB')
   }
 
-  /* Standbild aus dem Desktop-Clip: beide Buehnen zeigen jetzt denselben
-     Ausschnitt, also taugt ein Bild fuer beide. */
+  /* Standbild aus dem Desktop-Clip: beide Buehnen zeigen denselben Ausschnitt. */
   const standbild = execFileSync('ffmpeg', ['-v', 'error', '-i', path.join(ziel, 'clipper.mp4'), '-frames:v', '1', '-f', 'image2pipe', '-vcodec', 'png', '-'], {
     maxBuffer: 64 * 1024 * 1024,
   })
   await sharp(standbild).resize({ width: 900 }).webp({ quality: 80 }).toFile(path.join(ziel, 'clipper-poster.webp'))
   console.log('  clipper-poster.webp      ' + kb(path.join(ziel, 'clipper-poster.webp')) + ' KB')
 
-  /* Nachmessen, welchen Grundton der fertige Clip wirklich zeigt: die Toenung
-     laeuft durch YUV, da wird gerundet. Diese Zahl gehoert als Hintergrund der
-     Buehne ins CSS, sonst steht der Videokasten als Rechteck im Bild. */
+  /* Nachmessen, was wirklich herauskommt. Der Grund muss 255,255,255 sein —
+     steht hier etwas anderes, deckt er sich nicht mit dem CSS der Buehne. */
   const ecke = await sharp(standbild).extract({ left: 8, top: 8, width: 40, height: 40 }).raw().toBuffer()
   let r = 0, g = 0, b = 0
   for (let i = 0; i < ecke.length; i += 3) { r += ecke[i]; g += ecke[i + 1]; b += ecke[i + 2] }
   const anz = ecke.length / 3
-  const hex = [r, g, b].map((v) => Math.round(v / anz).toString(16).padStart(2, '0')).join('')
-  console.log('  Grundton des Clips: #' + hex.toUpperCase() + '  (gehoert ins CSS: .hell [data-sc-stage])')
+  const werte = [r, g, b].map((v) => Math.round(v / anz))
+  console.log('  Grund des fertigen Clips: ' + werte.join(',') + (werte.every((v) => v >= 254) ? '  (reines Weiss, deckt sich mit der Buehne)' : '  ACHTUNG: nicht weiss!'))
 }
 
 console.log('\nFertig. Danach: node packen.mjs')

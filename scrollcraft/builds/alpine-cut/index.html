@@ -203,10 +203,13 @@
      damit die Schrift lesbar blieb, und machte die Maschine milchig. Jetzt
      stehen Schrift und Maschine nebeneinander statt uebereinander.
 
-     Der Grundton ist der nachgemessene Grund des fertigen Clips, nicht das
-     Creme der Seite: die Toenung in bilder.mjs laeuft durch YUV und rundet.
-     Eine Stufe daneben, und der Videokasten stuende als Rechteck im Bild. */
-  .hell [data-sc-stage] { background: #F7F3ED; }
+     Der Grund ist reines Weiss, nicht das Creme der uebrigen hellen
+     Abschnitte. Das ist kein Versehen: der Clip bringt seinen eigenen Grund
+     mit, und der deckt sich nur dann sicher mit dem CSS, wenn beide auf dem
+     Weisspunkt sitzen. Jede andere Farbe muss der Browser aus dem Video
+     erst errechnen — raet er dabei falsch, steht der Videokasten als
+     Rechteck auf der Seite. Genau das war zu sehen. */
+  .hell [data-sc-stage] { background: #FFFFFF; }
   .hell [data-sc-stage] :is(video[data-sc-scrub], .sc-stage__poster) {
     /* Oben und unten angeschlagen statt feste Hoehe: so haelt die Maschine
        auch in einem flachen Fenster Abstand zur Kopfleiste. Bei fester Hoehe
@@ -456,36 +459,40 @@
 
 <main id="top">
 
-  <!-- 1 · ANKUNFT: scrub, HELL. Der Clip ist beschnitten und auf das Creme
-       der Seite getoent (siehe bilder.mjs), damit die Maschine frei auf
+  <!-- 1 · ANKUNFT: scrub, HELL. Der Clip ist beschnitten und sein Grund auf
+       reines Weiss geklemmt (siehe bilder.mjs), damit die Maschine frei auf
        einheitlichem Grund steht statt unter einem Verlauf.
 
-       Drei Saetze, drei Fenster. Der Akt ist dafuer von 240 auf 340vh
-       gewachsen: bei 240 blieben fuer den mittleren Satz nur 37vh Scrollweg,
-       und genau das war die Klage. Span und die Hoehe im style muessen
-       uebereinstimmen — die Engine setzt die Hoehe sonst erst in JS nach,
-       und die Seite springt beim Laden um einen halben Schirm. -->
-  <section class="hell" data-sc-act="scrub" data-sc-span="3.4" style="height:340vh" data-sc-dwell="0.34" data-sc-drift="#F7F4EE">
+       Drei Saetze, drei Fenster, 400vh. Die Zahlen in den Fenstern sehen
+       beliebig aus, sind aber zurueckgerechnet: die Engine legt eine Kurve
+       (dwell) ueber den Fortschritt, die in der Mitte langsam und an den
+       Raendern schnell laeuft. Gewuenscht war, in Scrollweg gemessen:
+
+         Satz 1   steht    0..60    geht   60..90
+         nur Maschine     90..115
+         Satz 2   kommt  115..150   steht 150..200   geht 200..230
+         nur Maschine    230..255
+         Satz 3   kommt  255..290   steht ab 290 und faehrt hinaus
+
+       Span und die Hoehe im style muessen uebereinstimmen — die Engine setzt
+       die Hoehe sonst erst in JS nach, und die Seite springt beim Laden. -->
+  <section class="hell" data-sc-act="scrub" data-sc-span="4" style="height:400vh" data-sc-dwell="0.34" data-sc-drift="#FFFFFF">
     <div data-sc-stage>
       <img class="sc-stage__poster" src="assets/clipper-poster.webp" alt="">
       <video data-sc-scrub data-sc-src="assets/clipper.mp4"
              data-sc-src-mobile="assets/clipper-m.mp4" muted playsinline></video>
-      <div class="sc-copy sc-copy--lead" data-sc-cue="0 0.42 0 0.25">
+      <div class="sc-copy sc-copy--lead" data-sc-cue="0 0.36 0 0.26">
         <h1 class="sc-display sc-display--xl" data-sc-kinetic="lines">Ihr Friseur im Zillertal</h1>
         <p class="sc-body hero__sub">Ohne Termin, einfach vorbeikommen</p>
       </div>
-      <!-- Die Fenster stossen nicht aneinander: zwischen zwei Saetzen liegt
-           jedesmal ein Moment, in dem nur die Maschine da ist. -->
-      <div class="sc-copy sc-copy--lead" data-sc-cue="0.46 0.74 0.18 0.18">
+      <div class="sc-copy sc-copy--lead" data-sc-cue="0.42 0.7 0.28 0.3">
         <p class="sc-display sc-display--xl" data-sc-kinetic="lines">Bei uns zählt jedes Detail</p>
       </div>
       <!-- Der letzte Satz blendet nicht weg. Sein Ausblendfenster endet bei
            1,5 und damit jenseits dessen, was je erreicht wird: die Engine
-           kappt den Fortschritt eines Akts bei 1. Er bleibt stehen und
-           faehrt mit der Buehne hinaus, so wie jeder andere Seiteninhalt.
-           Das ist der Unterschied zwischen "verschwindet unter der Hand"
-           und "man scrollt daran vorbei". -->
-      <div class="sc-copy sc-copy--lead" data-sc-cue="0.78 1.5 0.09 0.1">
+           kappt den Fortschritt eines Akts bei 1. Er bleibt stehen und faehrt
+           mit der Buehne hinaus, so wie jeder andere Seiteninhalt. -->
+      <div class="sc-copy sc-copy--lead" data-sc-cue="0.79 1.5 0.22 0.08">
         <p class="sc-display sc-display--xl" data-sc-kinetic="lines">und Ihre Zufriedenheit</p>
       </div>
     </div>
