@@ -190,23 +190,49 @@
   }
 
   /* ---- Akt 1: Hero, hell --------------------------------------------- */
-  /* Kein dunkler Scrim: Der Clip ist ein dunkler Haarschneider auf Weiss.
-     Ein heller Verlauf von links haelt die Flaeche unter der Schrift ruhig.
-     Die Stufen sind ausgemessen, nicht gewaehlt: der zweite Clip zeigt den
-     Haarschneider mittig und doppelt so breit wie der erste, er laeuft also
-     hinter die Ueberschrift. Bei 0,78 Deckkraft faellt der Kontrasttest
-     durch, bei 0,84 besteht er — staerker macht den Clip nur unnoetig blass. */
-  .scrim-hell {
-    position: absolute; inset: 0; pointer-events: none;
-    background: linear-gradient(to right, #F7F4EE 0%, rgb(247 244 238 / .84) 38%, rgb(247 244 238 / .45) 60%, rgb(247 244 238 / 0) 78%);
+  /* Die Maschine steht rechts frei im Bild, die Schrift links daneben.
+     Zwei Dinge, die hier aussehen wie Geschmack, aber gemessen sind:
+
+     Erstens geht formatfuellend nicht. Im Clip reicht die Maschine von 1 %
+     bis 98 % der Bildhoehe. Fuellt der Clip die Buehne, stoesst sie oben
+     zwangslaeufig an die Fensterkante — und zwar auf jedem Fensterformat,
+     das anders steht als der Clip. `contain` in einem Kasten mit Rand haelt
+     sie immer ganz im Bild.
+
+     Zweitens braucht es keinen Verlauf mehr darueber. Der lag frueher hier,
+     damit die Schrift lesbar blieb, und machte die Maschine milchig. Jetzt
+     stehen Schrift und Maschine nebeneinander statt uebereinander.
+
+     Der Grundton ist der nachgemessene Grund des fertigen Clips, nicht das
+     Creme der Seite: die Toenung in bilder.mjs laeuft durch YUV und rundet.
+     Eine Stufe daneben, und der Videokasten stuende als Rechteck im Bild. */
+  .hell [data-sc-stage] { background: #F7F3ED; }
+  .hell [data-sc-stage] :is(video[data-sc-scrub], .sc-stage__poster) {
+    /* Oben und unten angeschlagen statt feste Hoehe: so haelt die Maschine
+       auch in einem flachen Fenster Abstand zur Kopfleiste. Bei fester Hoehe
+       und Mittelachse rueckt sie dort hoch — bei 1440x600 gemessen auf 20 px
+       unter die Leiste. Breite kommt vom Seitenverhaeltnis des Clips. */
+    inset: 5.5rem clamp(1rem, 4vw, 4rem) 3rem auto;
+    width: auto; height: auto;
+    max-width: 46%;
+    object-fit: contain;
   }
-  /* Schmaler Schirm: Die Schrift steht ueber die volle Breite, der dunkle
-     Haarschneider wandert dahinter durch. Ein Verlauf von links haelt die
-     Flaeche darunter dann nicht mehr hell, gemessen 1,03:1. Also von unten. */
+  /* Der Textkasten darf nicht unter die Maschine laufen. 42vw laesst auch auf
+     einem schmalen Laptop eine Luecke. */
+  .hell .sc-copy--lead { max-width: min(42rem, 42vw); }
+
+  /* Schmaler Schirm: nebeneinander ist kein Platz, also untereinander —
+     Maschine oben, Schrift darunter. */
   @media (max-width: 820px) {
-    .scrim-hell {
-      background: linear-gradient(to top, #F7F4EE 0%, rgb(247 244 238 / .94) 46%, rgb(247 244 238 / 0) 82%);
+    .hell [data-sc-stage] :is(video[data-sc-scrub], .sc-stage__poster) {
+      /* 6rem: die Kopfleiste endet bei 68 px. Die Maschine reicht im Clip
+         bis 1 % an den oberen Bildrand, muss also tiefer ansetzen als es
+         aussieht. */
+      inset: 5.5rem 0 auto 0;
+      width: 100%; height: 44%;
+      max-width: none;
     }
+    .hell .sc-copy--lead { max-width: none; }
   }
 
   .hero__mark { width: clamp(130px, 15vw, 200px); height: auto; margin-bottom: 1.4rem; }
@@ -430,18 +456,23 @@
 
 <main id="top">
 
-  <!-- 1 · ANKUNFT: scrub, HELL. Der Clip ist unveraendert aus der Quelle:
-       dunkler Haarschneider auf weissem Grund, also passt er auf den hellen
-       Abschnitt ohne jede Nachbearbeitung. -->
+  <!-- 1 · ANKUNFT: scrub, HELL. Der Clip ist beschnitten und auf das Creme
+       der Seite getoent (siehe bilder.mjs), damit die Maschine frei auf
+       einheitlichem Grund steht statt unter einem Verlauf. -->
   <section class="hell" data-sc-act="scrub" data-sc-span="2.4" style="height:240vh" data-sc-dwell="0.34" data-sc-drift="#F7F4EE">
     <div data-sc-stage>
       <img class="sc-stage__poster" src="assets/clipper-poster.webp" alt="">
       <video data-sc-scrub data-sc-src="assets/clipper.mp4"
              data-sc-src-mobile="assets/clipper-m.mp4" muted playsinline></video>
-      <div class="scrim-hell" aria-hidden="true"></div>
-      <div class="sc-copy sc-copy--lead" data-sc-cue="0 0.8 0">
+      <div class="sc-copy sc-copy--lead" data-sc-cue="0 0.54 0 0.22">
         <h1 class="sc-display sc-display--xl" data-sc-kinetic="lines">Ihr Friseur im Zillertal</h1>
         <p class="sc-body hero__sub">Ohne Termin, einfach vorbeikommen</p>
+      </div>
+      <!-- Der zweite Satz kommt erst, wenn der erste weg ist. Die beiden
+           Fenster stossen nicht aneinander: dazwischen liegt ein Moment, in
+           dem nur die Maschine da ist. -->
+      <div class="sc-copy sc-copy--lead" data-sc-cue="0.58 1 0.16 0.12">
+        <p class="sc-display sc-display--xl" data-sc-kinetic="lines">Bei uns zählt jedes Detail</p>
       </div>
     </div>
   </section>

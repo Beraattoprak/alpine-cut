@@ -22,6 +22,7 @@ export const WOERTER = {
     /* --- Ankunft --- */
     'Ihr Friseur im Zillertal': 'Your barber in the Zillertal',
     'Ohne Termin, einfach vorbeikommen': 'No appointment, just walk in',
+    'Bei uns zählt jedes Detail': 'Every detail counts',
 
     /* --- Der Ort --- */
     'Ihr Friseur im Zillertal.': 'Your barber in the Zillertal.',

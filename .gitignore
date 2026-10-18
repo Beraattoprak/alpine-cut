@@ -59,3 +59,6 @@ scrollcraft/builds/*/node_modules/
 
 # Meine eigenen Pruefbilder, auch im Wurzelverzeichnis
 /lab
+
+# Englische Seite: entsteht beim Bauen aus index.html + woerter.mjs
+/scrollcraft/builds/alpine-cut/en/

@@ -27,8 +27,13 @@ const dateien = [
   'sitemap.xml',
 ]
 
-rmSync(ziel, { recursive: true, force: true })
+/* Nur den Inhalt loeschen, nicht den Ordner selbst: unter Windows laesst
+   sich ein Verzeichnis nicht entfernen, solange ein Prozess darin steht —
+   ein laufender Vorschauserver reicht schon. Das ist hier passiert und hat
+   eine ganze Messreihe wertlos gemacht: das Packen scheiterte, gemessen
+   wurde dreimal derselbe alte Stand. */
 mkdirSync(ziel, { recursive: true })
+for (const e of readdirSync(ziel)) rmSync(path.join(ziel, e), { recursive: true, force: true })
 for (const d of dateien) cpSync(path.join(hier, d), path.join(ziel, d))
 cpSync(path.join(hier, 'assets'), path.join(ziel, 'assets'), { recursive: true })
 

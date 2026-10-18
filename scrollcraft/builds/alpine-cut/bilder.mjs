@@ -149,22 +149,32 @@ if (process.argv.includes('--clip')) {
     process.exit(1)
   }
   console.log('  Vorlage:', path.basename(original))
-  /* Der Handy-Clip bekommt ein hochkantes Format, der für den Desktop bleibt
-     quer. Grund: die Bühne füllt den Schirm, also schneidet object-fit:cover
-     aus einem 16:9-Clip auf einem Telefon nur einen gut 26 % breiten
-     Mittelstreifen heraus. Beim ersten Clip ging das knapp auf, weil der
-     Haarschneider nur 25 % der Bildbreite einnahm. Im neuen füllt er 37 % —
-     da bleibt ein Fragment übrig.
-     Gepolstert wird mit #fdfdfd, dem gemessenen Grund der Vorlage, nicht mit
-     reinem Weiß: sonst sieht man die Kante. */
-  for (const [name, filter, crf, gop] of [
-    ['clipper.mp4', 'scale=1914:-2', 29, 8],
-    ['clipper-m.mp4', 'scale=720:-2,pad=720:1280:(ow-iw)/2:(oh-ih)/2:#fdfdfd', 29, 4],
+  /* Beschnitt: die Maschine steht im Bild zwischen 26 % und 72 % der Breite,
+     links und rechts davon ist nur leerer Grund. Der kostet Bytes und drueckt
+     die Maschine klein. Gemessen ueber sechs Bilder, 4 % Rand dazu.
+     In der Hoehe wird nicht beschnitten: dort reicht sie von 1 % bis 98 %. */
+  const BESCHNITT = 'crop=in_w*0.54:in_h:in_w*0.22:0'
+
+  /* Toenung: die Vorlage steht auf 253,253,253, die Seite auf #F7F4EE
+     (247,244,238). Multiplikativ, damit nur der helle Grund wandert und die
+     dunklen Toene der Maschine bleiben, wo sie sind. Ohne das saehe man den
+     Rand des Videokastens als helleres Rechteck auf dem Creme der Seite. */
+  const TOENUNG = 'colorchannelmixer=rr=0.97628:gg=0.96443:bb=0.94071'
+
+  /* Die Stufen sind gemessen, nicht gewaehlt. Der Beschnitt hat den leeren
+     Grund entfernt, der praktisch nichts kostete — jetzt ist jeder Pixel
+     Motiv, und der Handy-Clip sprang von 183 auf 462 KB. Durchgerechnet:
+     Hoehe 900/crf 30 462 KB, 700/30 330 KB, 700/32 271 KB, 560/30 242 KB.
+     700 bei 32 ist der Knick: auf dem Telefon steht der Clip 354 Punkte
+     hoch, 700 gelieferte Zeilen sind dort noch doppelte Dichte. */
+  for (const [name, hoehe, crf, gop] of [
+    ['clipper.mp4', 1200, 29, 8],
+    ['clipper-m.mp4', 700, 32, 4],
   ]) {
     const aus = path.join(ziel, name)
     execFileSync('ffmpeg', [
       '-y', '-v', 'error', '-i', original,
-      '-vf', filter,
+      '-vf', BESCHNITT + ',' + TOENUNG + ',scale=-2:' + hoehe,
       '-c:v', 'libx264', '-crf', String(crf),
       '-g', String(gop), '-keyint_min', String(gop), '-sc_threshold', '0',
       '-preset', 'slow', '-profile:v', 'high', '-pix_fmt', 'yuv420p',
@@ -172,21 +182,26 @@ if (process.argv.includes('--clip')) {
     ])
     const m = execFileSync('ffprobe', ['-v', 'error', '-select_streams', 'v:0', '-show_entries', 'stream=width,height', '-of', 'csv=p=0', aus])
       .toString().trim()
-    console.log(`  ${name.padEnd(16)} ${m}  ${kb(aus)} KB`)
+    console.log('  ' + name.padEnd(16) + ' ' + m + '  ' + kb(aus) + ' KB')
   }
-  /* Standbild aus dem Querformat, nicht aus dem hochkanten Handy-Clip: es
-     steht in beiden Bühnen, und ein hochkantes Bild würde auf dem Desktop zu
-     einem gestreckten Streifen. Quer gekippt verhält es sich auf dem Telefon
-     so wie die Bühne es ohnehin beschneidet. */
-  await sharp(
-    execFileSync('ffmpeg', ['-v', 'error', '-i', path.join(ziel, 'clipper.mp4'), '-frames:v', '1', '-f', 'image2pipe', '-vcodec', 'png', '-'], {
-      maxBuffer: 64 * 1024 * 1024,
-    }),
-  )
-    .resize({ width: 1280 })
-    .webp({ quality: 80 })
-    .toFile(path.join(ziel, 'clipper-poster.webp'))
-  console.log(`  clipper-poster.webp      ${kb(path.join(ziel, 'clipper-poster.webp'))} KB`)
+
+  /* Standbild aus dem Desktop-Clip: beide Buehnen zeigen jetzt denselben
+     Ausschnitt, also taugt ein Bild fuer beide. */
+  const standbild = execFileSync('ffmpeg', ['-v', 'error', '-i', path.join(ziel, 'clipper.mp4'), '-frames:v', '1', '-f', 'image2pipe', '-vcodec', 'png', '-'], {
+    maxBuffer: 64 * 1024 * 1024,
+  })
+  await sharp(standbild).resize({ width: 900 }).webp({ quality: 80 }).toFile(path.join(ziel, 'clipper-poster.webp'))
+  console.log('  clipper-poster.webp      ' + kb(path.join(ziel, 'clipper-poster.webp')) + ' KB')
+
+  /* Nachmessen, welchen Grundton der fertige Clip wirklich zeigt: die Toenung
+     laeuft durch YUV, da wird gerundet. Diese Zahl gehoert als Hintergrund der
+     Buehne ins CSS, sonst steht der Videokasten als Rechteck im Bild. */
+  const ecke = await sharp(standbild).extract({ left: 8, top: 8, width: 40, height: 40 }).raw().toBuffer()
+  let r = 0, g = 0, b = 0
+  for (let i = 0; i < ecke.length; i += 3) { r += ecke[i]; g += ecke[i + 1]; b += ecke[i + 2] }
+  const anz = ecke.length / 3
+  const hex = [r, g, b].map((v) => Math.round(v / anz).toString(16).padStart(2, '0')).join('')
+  console.log('  Grundton des Clips: #' + hex.toUpperCase() + '  (gehoert ins CSS: .hell [data-sc-stage])')
 }
 
 console.log('\nFertig. Danach: node packen.mjs')
