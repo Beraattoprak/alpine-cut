@@ -257,6 +257,38 @@
   .ort__zeile { font-family: var(--sc-font-display); font-size: clamp(1.6rem, 3.4vw, 2.6rem);
                 line-height: 1.12; letter-spacing: -.02em; max-width: 18ch; }
 
+  /* ---- Akt 2b: der Laden, das Foto waechst --------------------------- */
+  /* --sc-p ist der Fortschritt des Akts, den die Engine auf den Abschnitt
+     schreibt. --auf streckt die ersten 55 % davon auf 0..1: so ist das Bild
+     offen, bevor der Akt zu Ende ist, und steht den Rest ueber ganz da.
+     Gewachsen wird ueber width/height statt ueber transform, weil sich das
+     Seitenverhaeltnis dabei aendert — eine Skalierung wuerde das Bild
+     verzerren. */
+  .laden__buehne { --auf: clamp(0, calc(var(--sc-p, 0) / .55), 1); background: #0A0A0A; }
+  .laden__rahmen {
+    position: absolute; top: 50%; left: 50%; translate: -50% -50%;
+    margin: 0; overflow: hidden;
+    width: calc(46% + 54% * var(--auf));
+    height: calc(54% + 46% * var(--auf));
+    border-radius: calc(16px * (1 - var(--auf)));
+    box-shadow: 0 0 calc(60px * (1 - var(--auf))) rgb(0 0 0 / .55);
+  }
+  .laden__rahmen img { width: 100%; height: 100%; object-fit: cover; display: block; }
+  /* Verlauf nur so stark wie das Bild offen ist: solange es eine Karte ist,
+     steht keine Schrift darauf und er waere nur Schmutz. */
+  .laden__rahmen::after {
+    content: ""; position: absolute; inset: 0; pointer-events: none;
+    background: linear-gradient(to top, rgb(10 10 10 / .9) 0%, rgb(10 10 10 / .62) 18%, rgb(10 10 10 / .22) 40%, transparent 62%);
+    opacity: var(--auf);
+  }
+  .laden__ort { margin: 0; color: #fff; font-family: 'Archivo', system-ui, sans-serif;
+                font-size: .8rem; letter-spacing: .16em; text-transform: uppercase; }
+  @media (max-width: 820px) {
+    /* Hochkant waere eine 46 % breite Karte ein schmaler Streifen, und von
+       einem 4:3-Foto bliebe darin fast nichts uebrig. Also quer. */
+    .laden__rahmen { width: calc(86% + 14% * var(--auf)); height: calc(36% + 64% * var(--auf)); }
+  }
+
   /* ---- Akt 3: Preise, hell ------------------------------------------- */
   .preisliste { display: grid; gap: clamp(2.5rem, 6vw, 4.5rem); }
   .preisliste__teil { min-width: 0; }
@@ -502,12 +534,16 @@
     </div>
   </section>
 
-  <!-- 2 · DER ORT: flow, DUNKEL. Die beabsichtigte Stille vor dem Peak. -->
+  <!-- 2 · DER ORT: flow, DUNKEL. Nur noch Text. Das Foto ist in einen
+       eigenen Akt gewandert und braucht dort den ganzen Schirm; der Text
+       steht jetzt zweispaltig, damit rechts keine Luecke bleibt. -->
   <section class="sc-section dunkel" data-sc-act="flow" data-sc-drift="#0A0A0A">
     <div class="sc-wrap ort">
       <div class="sc-stack" data-sc-in data-sc-stagger="80">
         <img class="hero__mark" src="assets/logo.webp" alt="Alpine Cut" width="1100" height="794">
         <p class="ort__zeile">Ihr Friseur im Zillertal.</p>
+      </div>
+      <div class="sc-stack" data-sc-in data-sc-stagger="80">
         <p class="sc-body" style="color:var(--sc-ink-soft);max-width:42ch">
           Alpine Cut ist Ihr Friseurladen im Zillertal, mitten in Fügen zwischen den
           Bergen. Wir schneiden Damen und Herren, dazu Bart, Farbe und Pflege.
@@ -519,10 +555,29 @@
           der Verlauf sitzen muss.
         </p>
       </div>
-      <figure data-sc-reveal="up" data-sc-reveal-at="0.12 0.6">
-        <img src="assets/salon-aussen.webp" width="1500" height="1125"
+    </div>
+  </section>
+
+  <!-- 2b · DER LADEN: pin, DUNKEL. Das Foto waechst beim Scrollen aus einer
+       Karte ins Vollbild. Die Groesse haengt an --sc-p, dem Fortschritt des
+       Akts; --auf rechnet das so um, dass das Oeffnen nach 55 % fertig ist
+       und der Rest des Akts das Bild ganz zeigt.
+
+       Die vorgeschlagene React-Komponente wurde bewusst nicht uebernommen,
+       und nicht nur, weil diese Seite kein React ist: sie kapert das
+       Scrollen (preventDefault auf dem Mausrad, dazu window.scrollTo(0,0)
+       bei jedem Scrollereignis). Damit funktionieren Tastatur, Scrollbalken
+       und Sprungmarken nicht mehr. Hier haengt derselbe Effekt am echten
+       Scrollstand, statt ihn zu ersetzen. -->
+  <section class="dunkel laden" data-sc-act="pin" data-sc-span="2" style="height:200vh" data-sc-drift="#0A0A0A">
+    <div class="laden__buehne" data-sc-stage>
+      <figure class="laden__rahmen">
+        <img src="assets/salon-aussen.webp" width="1800" height="1350" loading="lazy" decoding="async"
              alt="Der Salon von außen: Holzfassade am Dorf-Platz, das Alpine-Cut-Logo im Schaufenster.">
       </figure>
+      <div class="sc-copy sc-copy--lead laden__zeile" data-sc-cue="0.62 1.4 0.2 0.1">
+        <p class="laden__ort">Dorf-Platz 1 · 6263 Fügen</p>
+      </div>
     </div>
   </section>
 
