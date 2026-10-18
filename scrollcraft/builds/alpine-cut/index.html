@@ -212,17 +212,21 @@
   .hell [data-sc-stage] { background: #FFFFFF; }
   .hell [data-sc-stage] :is(video[data-sc-scrub], .sc-stage__poster) {
     /* Oben und unten angeschlagen statt feste Hoehe: so haelt die Maschine
-       auch in einem flachen Fenster Abstand zur Kopfleiste. Bei fester Hoehe
-       und Mittelachse rueckt sie dort hoch — bei 1440x600 gemessen auf 20 px
-       unter die Leiste. Breite kommt vom Seitenverhaeltnis des Clips. */
-    inset: 5.5rem clamp(1rem, 4vw, 4rem) 3rem auto;
-    width: auto; height: auto;
-    max-width: 46%;
+       auch in einem flachen Fenster Abstand zur Kopfleiste.
+
+       Die Hoehe ist das Kleinere aus "was zwischen Leiste und Unterkante
+       Platz hat" und "was die Breitengrenze zulaesst". Zweiteres verhindert,
+       dass der Kasten breiter wird als der Clip hoch ist: waere nur die
+       Breite gedeckelt, bliebe daneben leerer Kasten stehen und die Maschine
+       stuende klein darin. 57.7vw ist 56vw geteilt durch das
+       Seitenverhaeltnis des Clips (1164/1200). */
+    inset: 5rem clamp(.5rem, 2vw, 2rem) 1.5rem auto;
+    height: min(calc(100% - 6.5rem), 57.7vw);
+    width: auto;
     object-fit: contain;
   }
-  /* Der Textkasten darf nicht unter die Maschine laufen. 42vw laesst auch auf
-     einem schmalen Laptop eine Luecke. */
-  .hell .sc-copy--lead { max-width: min(42rem, 42vw); }
+  /* Der Textkasten darf nicht unter die Maschine laufen. */
+  .hell .sc-copy--lead { max-width: min(34rem, 34vw); }
 
   /* Schmaler Schirm: nebeneinander ist kein Platz, also untereinander —
      Maschine oben, Schrift darunter. */
