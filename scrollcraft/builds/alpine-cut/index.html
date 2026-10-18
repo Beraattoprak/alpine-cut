@@ -435,52 +435,6 @@
   .karte__name { font-family: var(--sc-font-display); font-weight: 600; font-size: .95rem; }
   .karte__text { margin: 0; font-size: .92rem; line-height: 1.5; }
 
-  /* ---- Die Leine ------------------------------------------------------
-     Nur mit Skript. Ohne Skript bleibt die Reihe genau das, was sie vorher
-     war: ein waagrechter Rollbereich zum Wischen. Erst das Skript setzt die
-     Klasse und macht daraus die Leine. So steht niemand vor einer leeren
-     Flaeche, wenn das Skript nicht laedt. */
-  .stimmen--leine .stimmen__spur {
-    position: relative; display: block; overflow: hidden;
-    padding-inline: 0; touch-action: pan-y; cursor: grab;
-    /* Ohne das markiert der Browser beim Ziehen den Bewertungstext und
-       die Karten stehen in gelber Markierung da. Beim Prueflauf gesehen,
-       nicht vermutet. */
-    user-select: none; -webkit-user-select: none;
-    scroll-snap-type: none; scroll-behavior: auto;
-  }
-  .stimmen--leine .stimmen__spur:focus-visible { outline: 2px solid var(--sc-ink); outline-offset: 4px; }
-  .stimmen--leine[data-zieht="1"] .stimmen__spur { cursor: grabbing; }
-  .stimmen--leine .stimmen__ende { display: none; }
-  .stimmen__schnur { position: absolute; left: 0; top: 0; width: 100%; height: 100%;
-                     pointer-events: none; overflow: visible;
-                     color: color-mix(in srgb, var(--sc-ink) 42%, transparent); }
-  /* Die Karte ist jetzt ein Abzug auf Papier: heller Grund im dunklen
-     Abschnitt, damit sie wie ein Foto an der Leine wirkt. */
-  .stimmen--leine .karte {
-    position: absolute; left: 0; top: 0; flex: none;
-    width: var(--leine-b, 19rem);
-    transform-origin: 50% 0; will-change: transform;
-    background: #FBFAF7; color: #14120F;
-    box-shadow: 0 1px 2px rgb(0 0 0 / .22), 0 20px 34px -18px rgb(0 0 0 / .8);
-  }
-  .stimmen--leine .karte__name { color: #14120F; }
-  .stimmen--leine .karte__text { color: #3B3833; }
-  /* Die Klammer sitzt ueber dem oberen Rand und haelt die Karte an der
-     Schnur. Sie wird vom Skript eingehaengt, weil es sie ohne Leine nicht
-     gibt. */
-  .karte__klammer { position: absolute; left: 50%; top: -15px; width: 10px; height: 26px;
-                    margin-left: -5px; border-radius: 2px;
-                    background: linear-gradient(90deg, #c9a67a, #e3c9a1 45%, #b8915f);
-                    box-shadow: 0 2px 3px rgb(0 0 0 / .35); }
-  .karte__klammer::after { content: ""; position: absolute; left: 4px; top: 9px;
-                           width: 2px; height: 7px; border-radius: 1px;
-                           background: rgb(80 60 30 / .45); }
-  /* Auf schmalen Schirmen waren die Pfeile ausgeblendet, weil man dort
-     wischt. An der Leine sind sie neben dem Ziehen die einzige Bedienung,
-     also bleiben sie stehen. */
-  .stimmen--leine .stimmen__pfeile { display: flex; }
-
   /* ---- Akt 6: Kontakt, dunkel ---------------------------------------- */
   /* Kein height hier. Dieses Element traegt auch sc-stage, und die Engine
      gibt dem 100svh, damit die Buehne am Fenster klebt. Ein height:100%
@@ -965,211 +919,38 @@
 <script>
   ScrollCraft.mount(document.body);
 
-  /* ---- Kundenfeedback: die Bewertungen haengen an einer Leine ---------
-     Ohne dieses Skript bleibt die Reihe ein gewoehnlicher waagrechter
-     Rollbereich; wischen funktioniert dann wie bisher. Erst hier wird
-     daraus die Leine: die Karten haengen an Holzklammern an einer
-     durchhaengenden Schnur, schwingen mit der Geschwindigkeit, die man
-     ihnen gibt, und pendeln aus.
-
-     Die Rechnung ist aus der Vorlage uebernommen, die als React-Komponente
-     geschickt wurde: Durchhang als Parabel, ein kritisch gedaempfter
-     Federschritt fuer die Lage der Leine, ein zweiter fuer den Ausschlag
-     jeder Karte. React braucht es dafuer nicht — die Seite hat kein
-     Build-System, und die Komponente waere ohne eines nicht lauffaehig.
-
-     Zwei Dinge sind bewusst anders als in der Vorlage:
-     - kein Selbstlauf. Die Vorlage schiebt alle 4,5 Sekunden weiter. Hier
-       steht Text, den jemand liest; der darf nicht unter der Hand
-       weggezogen werden.
-     - die nicht mittigen Karten bleiben fuer Vorlesewerkzeuge lesbar. Die
-       Vorlage setzt aria-hidden darauf. Das sind echte Kundenstimmen, die
-       gehoeren nicht versteckt. */
+  /* ---- Pfeile im Kundenfeedback -------------------------------------
+     Die Reihe ist ein gewoehnlicher waagrechter Rollbereich: wischen geht
+     ohne Skript, die Pfeile sind die Zugabe fuer Maus und Tastatur. Sie
+     schieben um genau eine Kartenbreite. */
   (function () {
-    var wurzel = document.querySelector('#stimmen .stimmen');
     var spur = document.getElementById('stimmen-spur');
-    if (!wurzel || !spur) return;
-    var karten = [].slice.call(spur.querySelectorAll('.karte'));
-    var n = karten.length;
-    if (n < 2) return;
-    var knoepfe = [].slice.call(document.querySelectorAll('#stimmen .pfeil'));
-    var ruhig = matchMedia('(prefers-reduced-motion: reduce)').matches;
+    if (!spur) return;
+    var knoepfe = document.querySelectorAll('#stimmen .pfeil');
+    if (!knoepfe.length) return;
 
-    function klemm(v, a, b) { return Math.min(b, Math.max(a, v)); }
-    /* Hoehe der durchhaengenden Schnur an der Stelle x. */
-    function schnurY(x, w, y0, hang) { var t = klemm(x / w, 0, 1); return y0 + 4 * hang * t * (1 - t); }
-    /* Ein Schritt einer kritisch gedaempften Feder auf das Ziel zu. */
-    function feder(x, v, ziel, dt) {
-      var k = 70, c = 2 * Math.sqrt(k);
-      var nv = v + (k * (ziel - x) - c * v) * dt;
-      return [x + nv * dt, nv];
-    }
-    /* Ein Schritt des Ausschlags: die Karte haengt der Bewegung nach, die
-       Schwerkraft zieht sie zurueck, Reibung bremst sie aus. */
-    function pendel(a, av, tempo, dt, kraft) {
-      var nav = av + (-38 * a - 4.2 * av + tempo * 0.0034 * kraft) * dt;
-      return [klemm(a + nav * dt, -0.6, 0.6), nav];
-    }
-    function naechste(off, schritt) { return klemm(Math.round(off / schritt), 0, n - 1); }
-
-    /* Schnur, Klammern und Ansage einhaengen */
-    var NS = 'http://www.w3.org/2000/svg';
-    var schnur = document.createElementNS(NS, 'svg');
-    schnur.setAttribute('class', 'stimmen__schnur');
-    schnur.setAttribute('aria-hidden', 'true');
-    var pfad = document.createElementNS(NS, 'path');
-    pfad.setAttribute('fill', 'none');
-    pfad.setAttribute('stroke', 'currentColor');
-    pfad.setAttribute('stroke-width', '1.5');
-    pfad.setAttribute('stroke-linecap', 'round');
-    schnur.appendChild(pfad);
-    spur.insertBefore(schnur, spur.firstChild);
-    for (var i = 0; i < n; i++) {
-      var kl = document.createElement('span');
-      kl.className = 'karte__klammer';
-      kl.setAttribute('aria-hidden', 'true');
-      karten[i].appendChild(kl);
-    }
-    var melder = document.createElement('p');
-    melder.className = 'vh';
-    melder.setAttribute('aria-live', 'polite');
-    wurzel.appendChild(melder);
-    wurzel.classList.add('stimmen--leine');
-    spur.tabIndex = 0;
-
-    var Z = { off: 0, v: 0, ziel: 0, a: [], av: [], s: [] };
-    var aktiv = 0, zug = null;
-    var breite = 0, cw = 0, y0 = 46, hang = 46, abstand = 0;
-
-    function messen() {
-      breite = spur.clientWidth || 1;
-      cw = Math.round(klemm(Math.min(304, breite * 0.74), 150, 304));
-      var hoch = 0;
-      for (var i = 0; i < n; i++) {
-        karten[i].style.width = cw + 'px';
-        if (karten[i].offsetHeight > hoch) hoch = karten[i].offsetHeight;
-      }
-      hang = Math.round(klemm(breite * 0.045, 22, 54));
-      abstand = cw * 1.12;
-      spur.style.height = (y0 + hang + hoch + 30) + 'px';
-      Z.off = Z.ziel = aktiv * abstand;
+    function schritt() {
+      var k = spur.querySelectorAll('.karte');
+      if (k.length < 2) return 320;
+      return k[1].getBoundingClientRect().left - k[0].getBoundingClientRect().left;
     }
 
-    function hin(i) { Z.ziel = klemm(i, 0, n - 1) * abstand; }
-
-    function knoepfePruefen() {
-      if (knoepfe.length < 2) return;
-      knoepfe[0].disabled = aktiv <= 0;
-      knoepfe[1].disabled = aktiv >= n - 1;
+    /* Der Knopf am Ende bleibt stehen, wird aber unbedienbar: eine
+       Schaltflaeche, die nichts tut, ist schlimmer als eine graue. */
+    function pruefen() {
+      var max = spur.scrollWidth - spur.clientWidth;
+      knoepfe[0].disabled = spur.scrollLeft <= 2;
+      knoepfe[1].disabled = spur.scrollLeft >= max - 2;
     }
 
-    var lauf = 0, sichtbar = true, vorher = 0;
-    function bild(jetzt) {
-      lauf = 0;
-      if (!sichtbar) return;
-      var dt = Math.min(0.033, (jetzt - vorher) / 1000);
-      vorher = jetzt;
-      var tempo;
-      if (zug && zug.bewegt) {
-        tempo = zug.v * 1000;
-      } else {
-        var davor = Z.off;
-        var r = feder(Z.off, Z.v, Z.ziel, dt);
-        Z.off = r[0]; Z.v = r[1];
-        tempo = -(Z.off - davor) / Math.max(dt, 1e-3);
-      }
-      var kraft = ruhig ? 0 : 1;
-      var nah = naechste(Z.off, abstand);
-      for (var i = 0; i < n; i++) {
-        var el = karten[i];
-        var x = breite / 2 + i * abstand - Z.off;
-        if (x < -cw * 1.6 || x > breite + cw * 1.6) { el.style.visibility = 'hidden'; continue; }
-        el.style.visibility = 'visible';
-        var p = pendel(Z.a[i] || 0, Z.av[i] || 0, tempo, dt, kraft);
-        var a = p[0];
-        Z.av[i] = p[1];
-        /* Ein Hauch Luftzug, damit es auch im Stillstand lebt. */
-        if (kraft) a += Math.sin(jetzt / 1300 + i * 1.7) * 0.0009;
-        Z.a[i] = a;
-        var zs = (Z.s[i] === undefined) ? 1 : Z.s[i];
-        zs += ((i === nah ? 1 : 0.92) - zs) * Math.min(1, dt * 9);
-        Z.s[i] = zs;
-        var y = schnurY(x, breite, y0, hang) - 6;
-        el.style.transform = 'translate(' + (x - cw / 2).toFixed(1) + 'px,' + y.toFixed(1) +
-          'px) rotate(' + a.toFixed(4) + 'rad) scale(' + zs.toFixed(3) + ')';
-        el.style.zIndex = String(i === nah ? n + 1 : n - Math.abs(i - nah));
-      }
-      pfad.setAttribute('d', 'M0 ' + y0 + ' Q' + (breite / 2) + ' ' + (y0 + 2 * hang) + ' ' + breite + ' ' + y0);
-      if (nah !== aktiv) {
-        aktiv = nah;
-        knoepfePruefen();
-        melder.textContent = 'Bewertung ' + (aktiv + 1) + ' von ' + n;
-      }
-      lauf = requestAnimationFrame(bild);
-    }
-
-    /* Ziehen. touch-action: pan-y steht im CSS, damit das Blaettern nach
-       unten auf dem Telefon weiter funktioniert. */
-    spur.addEventListener('pointerdown', function (e) {
-      if (e.target.closest('a, button')) return;
-      zug = { x: e.clientX, off: Z.off, lx: e.clientX, lt: e.timeStamp, v: 0, bewegt: false };
-    });
-    spur.addEventListener('pointermove', function (e) {
-      if (!zug) return;
-      var dx = e.clientX - zug.x;
-      if (!zug.bewegt && Math.abs(dx) > 5) {
-        zug.bewegt = true;
-        wurzel.setAttribute('data-zieht', '1');
-        try { spur.setPointerCapture(e.pointerId); } catch (f) {}
-      }
-      if (!zug.bewegt) return;
-      var dt = Math.max(1, e.timeStamp - zug.lt);
-      zug.v = 0.7 * ((e.clientX - zug.lx) / dt) + 0.3 * zug.v;
-      zug.lx = e.clientX; zug.lt = e.timeStamp;
-      var max = (n - 1) * abstand;
-      var off = zug.off - dx;
-      /* Ueber die Enden hinaus gibt es nach, statt hart zu stehen. */
-      if (off < 0) off *= 0.35;
-      if (off > max) off = max + (off - max) * 0.35;
-      Z.off = off;
-    });
-    function los(e) {
-      var z = zug;
-      zug = null;
-      wurzel.removeAttribute('data-zieht');
-      if (!z) return;
-      if (z.bewegt) {
-        Z.v = -z.v * 1000;
-        hin(naechste(Z.off - z.v * 180, abstand));
-        return;
-      }
-      var k = e.target.closest('.karte');
-      if (k) hin(karten.indexOf(k));
-    }
-    spur.addEventListener('pointerup', los);
-    spur.addEventListener('pointercancel', los);
-
-    for (var b = 0; b < knoepfe.length; b++) {
-      knoepfe[b].addEventListener('click', function () {
-        hin(aktiv + parseInt(this.getAttribute('data-stimmen'), 10));
+    for (var i = 0; i < knoepfe.length; i++) {
+      knoepfe[i].addEventListener('click', function () {
+        spur.scrollBy({ left: schritt() * parseInt(this.getAttribute('data-stimmen'), 10) });
       });
     }
-    spur.addEventListener('keydown', function (e) {
-      if (e.key === 'ArrowRight') hin(aktiv + 1);
-      else if (e.key === 'ArrowLeft') hin(aktiv - 1);
-      else return;
-      e.preventDefault();
-    });
-
-    messen();
-    knoepfePruefen();
-    addEventListener('resize', messen);
-    new IntersectionObserver(function (e) {
-      sichtbar = e[0].isIntersecting;
-      if (sichtbar && !lauf) { vorher = performance.now(); lauf = requestAnimationFrame(bild); }
-    }).observe(spur);
-    vorher = performance.now();
-    lauf = requestAnimationFrame(bild);
+    spur.addEventListener('scroll', pruefen, { passive: true });
+    addEventListener('resize', pruefen);
+    pruefen();
   })();
 </script>
 </body>
