@@ -203,7 +203,11 @@ if (process.argv.includes('--clip')) {
          Datei "unknown", und jeder Browser raet selbst. Das war die Ursache
          des weissen Rechtecks. */
       '-color_range', 'tv', '-colorspace', 'bt709',
-      '-color_primaries', 'bt709', '-color_trc', 'bt709',
+      /* Die beiden letzten Felder schreibt diese ffmpeg-Fassung nur ueber
+         x264opts; -color_primaries und -color_trc schluckt sie wortlos.
+         Nachgeprueft: ohne diese Zeile steht in der Datei
+         'tv,bt709,unknown,unknown'. */
+      '-x264opts', 'colorprim=bt709:transfer=bt709:colormatrix=bt709',
       '-an', '-movflags', '+faststart', aus,
     ])
     const m = execFileSync('ffprobe', ['-v', 'error', '-select_streams', 'v:0', '-show_entries', 'stream=width,height,color_range,color_space', '-of', 'csv=p=0', aus])
