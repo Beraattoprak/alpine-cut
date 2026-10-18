@@ -56,3 +56,6 @@ scrollcraft/builds/*/node_modules/
 
 # Fertiger Upload-Ordner, wird aus scrollcraft/builds/alpine-cut erzeugt
 /hochladen
+
+# Meine eigenen Pruefbilder, auch im Wurzelverzeichnis
+/lab
