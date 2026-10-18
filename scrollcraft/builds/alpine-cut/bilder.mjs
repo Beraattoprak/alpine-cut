@@ -69,9 +69,15 @@ for (const name of ['salon-aussen', 'salon-plaetze', 'salon-lounge']) {
   }
   const aus = path.join(ziel, `${name}.webp`)
   const m = await sharp(quelle).metadata()
+  /* salon-aussen steht in Akt 2b bildschirmfuellend und braucht deshalb
+     mehr Pixel als die beiden anderen: 1800 statt 1500, dafuer Stufe 72
+     statt 78. Durchgerechnet 1500/78 291 KB, 1600/74 287, 1800/72 347,
+     1800/78 405, 2048/78 522. Bei 1800 ist ein 1920 breites Fenster
+     praktisch scharf; mehr als 2048 gibt die Vorlage ohnehin nicht her. */
+  const gross = name === 'salon-aussen'
   await sharp(quelle)
-    .resize({ width: Math.min(1500, m.width), withoutEnlargement: true })
-    .webp({ quality: 78, effort: 6 })
+    .resize({ width: Math.min(gross ? 1800 : 1500, m.width), withoutEnlargement: true })
+    .webp({ quality: gross ? 72 : 78, effort: 6 })
     .toFile(aus)
   const n = await sharp(aus).metadata()
   console.log(`  ${name.padEnd(16)} ${n.width}x${n.height}  ${kb(aus)} KB`)
