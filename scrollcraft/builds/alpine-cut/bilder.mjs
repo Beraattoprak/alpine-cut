@@ -111,6 +111,24 @@ for (const [kante, name] of [[32, 'favicon-32.png'], [180, 'apple-touch-icon.png
   console.log(`  ${name.padEnd(16)} ${kante}x${kante}  ${kb(aus)} KB`)
 }
 
+/* ---- Logo der Agentur im Fuss -----------------------------------------
+   Lag vorher als <img src="https://alpvent-agency.at/logo.png"> im Markup und
+   war damit der einzige Fremdabruf der ganzen Seite: jeder Aufruf schickte die
+   IP des Besuchers an einen anderen Server, und die Datenschutzerklaerung sagte
+   "null Fremdabrufe". Dazu kam das Gewicht — die Vorlage ist 1380x382 und
+   455 KB gross, dargestellt wird sie 15 Punkte hoch. 60 Punkte Hoehe reicht
+   auch bei vierfacher Dichte und kostet 7,8 KB. */
+console.log('Agenturlogo')
+{
+  const aus = path.join(ziel, 'alpvent.webp')
+  await sharp(path.join(quellen, 'alpvent-logo.png'))
+    .resize({ height: 60 })
+    .webp({ quality: 88, effort: 6, alphaQuality: 90 })
+    .toFile(aus)
+  const m = await sharp(aus).metadata()
+  console.log(`  alpvent.webp     ${m.width}x${m.height}  ${kb(aus)} KB`)
+}
+
 /* ---- Teilbild für WhatsApp, Instagram, Facebook ------------------------ */
 const ogB = 1200
 const ogH = 630
